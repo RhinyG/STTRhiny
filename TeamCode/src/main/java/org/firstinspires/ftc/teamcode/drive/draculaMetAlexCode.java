@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.drive;
 
-import static org.firstinspires.ftc.teamcode.robotParts.Arm.ArmHeight.HIGH;
 import static org.firstinspires.ftc.teamcode.robotParts.ArmAlex.ArmHeightAlex.INTAKE2;
-import static org.firstinspires.ftc.teamcode.robotParts.ArmAlex.ArmHeightAlex.LOW;
-import static org.firstinspires.ftc.teamcode.robotParts.ArmAlex.ArmHeightAlex.MID;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,14 +8,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.robotParts.AlexDistanceSensorUtil;
 import org.firstinspires.ftc.teamcode.robotParts.ArmAlex;
 import org.firstinspires.ftc.teamcode.robotParts.DrivetrainAlex;
-import org.firstinspires.ftc.teamcode.robotParts.Intake;
+import org.firstinspires.ftc.teamcode.robotParts.IntakeReza;
 
 @TeleOp
 public class draculaMetAlexCode extends LinearOpMode {
     DrivetrainAlex drivetrain = new DrivetrainAlex();
     AlexDistanceSensorUtil distanceSensor = new AlexDistanceSensorUtil();
     ArmAlex arm = new ArmAlex();
-    Intake intake = new Intake();
+    IntakeReza intake = new IntakeReza();
 
     @Override
     public void runOpMode() throws InterruptedException {

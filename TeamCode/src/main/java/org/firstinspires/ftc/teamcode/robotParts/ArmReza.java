@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class Arm extends RobotPart {
+public class ArmReza extends RobotPart {
 
     DcMotorEx armLeft;
     DcMotorEx armRight;
