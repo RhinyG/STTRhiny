@@ -14,7 +14,6 @@ public class ArmReza extends RobotPart {
 
     int upperLimit = 3500;
 
-//    double rightMultiplier = 0.63;
     double rightMultiplier = 0.63;
 
     ArmHeight armHeight;

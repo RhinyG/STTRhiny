@@ -12,6 +12,9 @@ import org.firstinspires.ftc.teamcode.robotParts.Outtake;
 public class SlideTest extends LinearOpMode {
     DrivetrainAlex drivetrain = new DrivetrainAlex();
     Outtake outtake = new Outtake();
+    int leftClawVar; // 1 = release, 2 = rotate
+    int leftRotateVar; //1 = intakePos, 2 = movePos, 3 = outtakePos
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -27,18 +30,15 @@ public class SlideTest extends LinearOpMode {
         while (opModeIsActive()) {
             double x = gamepad1.left_stick_x; // y direction is reversed
             double y = -gamepad1.left_stick_y;
-            double rotate = gamepad1.right_stick_x;
-            int slidePosition = 0;
-            int leftClawVar = 0; // 1 = release, 2 = rotate
-            int leftRotateVar = 0; //1 = intakePos, 2 = movePos, 3 = outtakePos
+            double rotate = gamepad1.right_stick_x; //Drivetrain rotate, not rotate Servo
+            double slidePower = gamepad1.right_trigger - gamepad1.left_trigger;
+
             boolean release = gamepad1.dpad_left;
             boolean grab = gamepad1.dpad_right;
             boolean intakePos = gamepad1.x;
             boolean movePos = gamepad1.y;
             boolean outtakePos = gamepad1.dpad_down;
-
-
-            double slidePower = gamepad1.right_trigger - gamepad1.left_trigger;
+            boolean sequenceLow = gamepad2.a;
 
             DrivetrainAlex.maxSpeed = 1;
 
@@ -65,11 +65,16 @@ public class SlideTest extends LinearOpMode {
                 leftRotateVar = 3;
             }
 
-            outtake.slideMove(slidePower);
+            if(sequenceLow){
+                outtake.outtakeSequence(1000, telemetry);
+            }
 
+            outtake.moveSlidesManually(slidePower);
             drivetrain.drive(y, x, rotate);
             outtake.updateLeftClaw(leftClawVar);
             outtake.updateLeftRotate(leftRotateVar);
+            telemetry.addData("Slide Position", outtake.slideLeft.getCurrentPosition());
+            telemetry.update();
         }
     }
 }
