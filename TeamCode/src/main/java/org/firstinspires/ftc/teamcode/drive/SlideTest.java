@@ -28,12 +28,14 @@ public class SlideTest extends LinearOpMode {
             double x = gamepad1.left_stick_x; // y direction is reversed
             double y = -gamepad1.left_stick_y;
             double rotate = gamepad1.right_stick_x;
-            boolean open = gamepad1.dpad_left;
-            boolean closed = gamepad1.dpad_right;
-            boolean up = gamepad1.x;
-            boolean down = gamepad1.y;
-            boolean down2 = gamepad1.dpad_down;
-            double slidePosition = 0;
+            int slidePosition = 0;
+            int leftClawVar = 0; // 1 = release, 2 = rotate
+            int leftRotateVar = 0; //1 = intakePos, 2 = movePos, 3 = outtakePos
+            boolean release = gamepad1.dpad_left;
+            boolean grab = gamepad1.dpad_right;
+            boolean intakePos = gamepad1.x;
+            boolean movePos = gamepad1.y;
+            boolean outtakePos = gamepad1.dpad_down;
 
 
             double slidePower = gamepad1.right_trigger - gamepad1.left_trigger;
@@ -49,11 +51,25 @@ public class SlideTest extends LinearOpMode {
                 intake.setPower(0);
             }
 
+            if(release){
+                leftClawVar = 1;
+            } else if (grab) {
+                leftClawVar = 2;
+            }
+
+            if(intakePos){
+                leftRotateVar = 1;
+            } else if (movePos) {
+                leftRotateVar = 2;
+            } else if (outtakePos) {
+                leftRotateVar = 3;
+            }
+
             outtake.slideMove(slidePower);
 
             drivetrain.drive(y, x, rotate);
-//            outtake.updateLeftClaw(open, closed);
-//            outtake.updateLeftRotate(up,down, down2);
+            outtake.updateLeftClaw(leftClawVar);
+            outtake.updateLeftRotate(leftRotateVar);
         }
     }
 }
