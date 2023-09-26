@@ -46,6 +46,14 @@ public class Outtake extends RobotPart{
         }
         leftRotate.setPosition(leftRotatePos);
     }
+
+    /**
+     * I mean this is pretty self-explanatory
+     * @param Power between -1 and 1
+     */
+    public void slideMove(double Power){
+        slide.setPower(Power);
+    }
     /**
      * Hiervoor moet de slides eerst encoder cables hebben.
      * @param height encoder height

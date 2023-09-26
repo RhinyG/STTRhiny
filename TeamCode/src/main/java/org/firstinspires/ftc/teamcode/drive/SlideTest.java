@@ -36,20 +36,20 @@ public class SlideTest extends LinearOpMode {
             double slidePosition = 0;
 
 
-            double intakePower = gamepad1.right_trigger - gamepad1.left_trigger;
+            double slidePower = gamepad1.right_trigger - gamepad1.left_trigger;
 
             DrivetrainAlex.maxSpeed = 1;
 
             if(gamepad1.left_bumper) {
-                //outtake.slide.setPower(1);
+                intake.setPower(1);
             } else if (gamepad1.right_bumper) {
-                //outtake.slide.setPower(-1);
+                intake.setPower(-1);
             }
             else {
-                //outtake.slide.setPower(0);
+                intake.setPower(0);
             }
 
-            intake.setPower(intakePower);
+            outtake.slideMove(slidePower);
 
             drivetrain.drive(y, x, rotate);
 //            outtake.updateLeftClaw(open, closed);
