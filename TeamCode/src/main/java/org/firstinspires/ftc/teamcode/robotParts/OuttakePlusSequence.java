@@ -12,14 +12,12 @@ public class OuttakePlusSequence extends RobotPart{
 
     Servo leftClaw;
     Servo leftRotate;
+    Servo rightClaw;
+    Servo rightRotate;
     public DcMotorEx slideLeft;
     public DcMotorEx slideRight;
-    double leftClawPos;
-    double leftRotatePos;
     int upperLimit = 2150; //2400 but can shoot up to 130 more than limit
     int lowerLimit = 0;
-
-    ArmHeight armHeight;
 
     public enum ArmHeight {
         INTAKE(0),
@@ -67,16 +65,16 @@ public class OuttakePlusSequence extends RobotPart{
         leftClaw = map.get(Servo.class, "leftClaw");
         leftRotate = map.get(Servo.class, "leftRotate");
 
-        slideLeft = map.get(DcMotorEx.class, "arm1");
+        slideLeft = map.get(DcMotorEx.class, "slideLeft");
         slideLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-//        slideRight = map.get(DcMotorEx.class, "arm1");
+        slideRight = map.get(DcMotorEx.class, "slideRight");
 
         slideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        slideRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slideRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // from ArmReza code seems do interact with RobotPart.java i don't know really
         motors.put("slideLeft", slideLeft);
-//        motors.put("slideRight", slideRight);
+        motors.put("slideRight", slideRight);
         resetEncoders();
     }
 
@@ -85,6 +83,7 @@ public class OuttakePlusSequence extends RobotPart{
      * @param position
      */
     public void updateLeftRotate(RotatePositions position) {
+        double leftClawPos = 0;
         if (position == RotatePositions.INTAKEPOS) {
             leftClawPos = 0.5;
         } else if (position == RotatePositions.MOVEPOS) {
@@ -96,69 +95,122 @@ public class OuttakePlusSequence extends RobotPart{
     }
 
     /**
+     * Same as above
+     * @param position
+     */
+    public void updateRightRotate(RotatePositions position) {
+        double rightClawPos = 0;
+        if (position == RotatePositions.INTAKEPOS) {
+            rightClawPos = 0.5;
+        } else if (position == RotatePositions.MOVEPOS) {
+            rightClawPos = 0.2;
+        } else if (position == RotatePositions.OUTTAKEPOS) {
+            rightClawPos = 1.0;
+        }
+        rightClaw.setPosition(rightClawPos);
+    }
+
+    /**
      *
      * @param position
      */
     public void updateLeftClaw(ClawPositions position) {
+        double leftRotatePos = 0;
         if (position == ClawPositions.RELEASE) {
             leftRotatePos = 0.25;
         } else if (position == ClawPositions.GRAB) {
-            leftRotatePos= 0.5;
+            leftRotatePos = 0.5;
         }
         leftRotate.setPosition(leftRotatePos);
     }
 
     /**
+     * Same as above
+     * @param position
+     */
+    public void updateRightClaw(ClawPositions position) {
+        double rightRotatePos = 0;
+        if (position == ClawPositions.RELEASE) {
+            rightRotatePos = 0.25;
+        } else if (position == ClawPositions.GRAB) {
+            rightRotatePos = 0.5;
+        }
+        rightRotate.setPosition(rightRotatePos);
+    }
+
+    /**
      * From Reza
+     * When we have two equal motors it might be better to move everything under one thing so no currentPosLeft & currentPosRight, just currentPos
      * @param position
      * @param telemetry
      * @return
      */
     public double goToHeight(int position, Telemetry telemetry) {
         double margin = 100;
-        double currentPos = slideLeft.getCurrentPosition();
-        double distance = Math.abs(currentPos - position);
-        if (currentPos < position) {
-            if (distance > margin) {
+        double currentPosLeft = slideLeft.getCurrentPosition();
+        double currentPosRight = slideRight.getCurrentPosition();
+        double distanceLeft = Math.abs(currentPosLeft - position);
+        double distanceRight = Math.abs(currentPosRight - position);
+        if (currentPosLeft < position) {
+            if (distanceLeft > margin) {
                 slideLeft.setPower(1);
-//                slideRight.setPower(1);
             } else {
-                slideLeft.setPower(1 * (distance/margin) * 0.4);
-//                slideRight.setPower(1 * (distance/margin) * 0.4);
+                slideLeft.setPower(1 * (distanceLeft/margin) * 0.4);
             }
             telemetry.addLine("up");
-        } else if (currentPos > position) {
-            if (distance > margin) {
+        } else if (currentPosLeft > position) {
+            if (distanceLeft > margin) {
                 slideLeft.setPower(-1);
-//                slideRight.setPower(-1);
             } else {
-                slideLeft.setPower(-1 * (distance/margin) * 0.4);
-//                slideRight.setPower(-1 * (distance/margin) * 0.4);
+                slideLeft.setPower(-1 * (distanceLeft/margin) * 0.4);
             }
             telemetry.addLine("down");
-        } else if (position == 0 && currentPos <= 0) {
+        } else if (position == 0 && currentPosLeft <= 0) {
             setPower(0);
         } else {
             setPower(0.01);
         }
-        return distance;
+        //so delete this then
+        if (currentPosRight < position) {
+            if (distanceRight > margin) {
+                slideRight.setPower(1);
+            } else {
+                slideRight.setPower(1 * (distanceRight/margin) * 0.4);
+            }
+            telemetry.addLine("up");
+        } else if (currentPosRight > position) {
+            if (distanceRight > margin) {
+                slideRight.setPower(-1);
+            } else {
+                slideRight.setPower(-1 * (distanceRight/margin) * 0.4);
+            }
+            telemetry.addLine("down");
+        } else if (position == 0 && currentPosRight <= 0) {
+            setPower(0);
+        } else {
+            setPower(0.01);
+        }
+        return distanceLeft;
     }
 
     /**
      * From Reza
      * @param btns if True, buttonmode is on (and arm will go to predetermined position). If false, it's on manual.
      * @param power power for manual mode
-     * @param height predetermined height for buttonmode
+     * @param heightLeft predetermined height for buttonmode
+     * @param heightRight same but right
      * @param telemetry necessary otherwise NPE
      */
 
-    public void update(boolean btns, double power, ArmHeight height, Telemetry telemetry) {
-        double distance = 0;
+    public void update(boolean btns, double power, ArmHeight heightLeft, ArmHeight heightRight, Telemetry telemetry) {
+        double distanceLeft = 0;
+        double distanceRight = 0;
         if (btns) {
-            distance = goToHeight(height.getPosition(), telemetry);
+            distanceLeft = goToHeight(heightLeft.getPosition(), telemetry);
+            distanceRight = goToHeight(heightRight.getPosition(), telemetry);
             telemetry.addData("arm", slideLeft.getCurrentPosition());
-            telemetry.addData("arm goal", height.getPosition());
-            telemetry.addLine(String.valueOf(height));
+            telemetry.addData("arm goal", heightLeft.getPosition());
+            telemetry.addLine(String.valueOf(heightLeft));
             telemetry.addData("arm power", slideLeft.getPower());
         } else {
             int position = slideLeft.getCurrentPosition();
@@ -170,11 +222,11 @@ public class OuttakePlusSequence extends RobotPart{
                 setPower(0);
             } else {
                 slideLeft.setPower(power);
-//                slideRight.setPower(power);
+                slideRight.setPower(power);
             }
             telemetry.addData("arm", position);
             telemetry.addData("arm power", slideLeft.getPower());
-            telemetry.addData("distance to goal", distance);
+            telemetry.addData("distance to goal", distanceLeft);
         }
     }
 //    public void sequenceAttempt(Telemetry telemetry){
