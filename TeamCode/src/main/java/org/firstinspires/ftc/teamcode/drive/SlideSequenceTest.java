@@ -139,9 +139,12 @@ public class SlideSequenceTest extends LinearOpMode {
             }
 
             drivetrain.drive(y, x, rotate);
-            outtake.update(buttonMode1, slidePower1, height1, height2, telemetry);
+            outtake.updateLeft(buttonMode1, slidePower1, height1, telemetry);
+            outtake.updateRight(buttonMode2,slidePower2,height2,telemetry);
             outtake.updateLeftClaw(clawPosition1);
+            outtake.updateRightClaw(clawPosition2);
             outtake.updateLeftRotate(rotatePosition1);
+            outtake.updateRightRotate(rotatePosition2);
             telemetry.addData("Slide Position", outtake.slideLeft.getCurrentPosition());
             telemetry.addData("Slide Power", slidePower1);
             telemetry.update();

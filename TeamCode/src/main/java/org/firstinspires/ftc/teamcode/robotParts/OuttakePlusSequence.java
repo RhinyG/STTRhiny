@@ -64,6 +64,8 @@ public class OuttakePlusSequence extends RobotPart{
     public void init(HardwareMap map) {
         leftClaw = map.get(Servo.class, "leftClaw");
         leftRotate = map.get(Servo.class, "leftRotate");
+        rightClaw = map.get(Servo.class,"rightClaw");
+        rightRotate = map.get(Servo.class,"rightRotate");
 
         slideLeft = map.get(DcMotorEx.class, "slideLeft");
         slideLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -198,16 +200,13 @@ public class OuttakePlusSequence extends RobotPart{
      * @param btns if True, buttonmode is on (and arm will go to predetermined position). If false, it's on manual.
      * @param power power for manual mode
      * @param heightLeft predetermined height for buttonmode
-     * @param heightRight same but right
      * @param telemetry necessary otherwise NPE
      */
 
-    public void update(boolean btns, double power, ArmHeight heightLeft, ArmHeight heightRight, Telemetry telemetry) {
+    public void updateLeft(boolean btns, double power, ArmHeight heightLeft, Telemetry telemetry) {
         double distanceLeft = 0;
-        double distanceRight = 0;
         if (btns) {
             distanceLeft = goToHeight(heightLeft.getPosition(), telemetry);
-            distanceRight = goToHeight(heightRight.getPosition(), telemetry);
             telemetry.addData("arm", slideLeft.getCurrentPosition());
             telemetry.addData("arm goal", heightLeft.getPosition());
             telemetry.addLine(String.valueOf(heightLeft));
@@ -222,11 +221,28 @@ public class OuttakePlusSequence extends RobotPart{
                 setPower(0);
             } else {
                 slideLeft.setPower(power);
-                slideRight.setPower(power);
             }
             telemetry.addData("arm", position);
             telemetry.addData("arm power", slideLeft.getPower());
             telemetry.addData("distance to goal", distanceLeft);
+        }
+    }
+
+    public void updateRight(boolean btns, double power, ArmHeight heightRight, Telemetry telemetry) {
+        double distanceRight = 0;
+        if (btns) {
+            distanceRight = goToHeight(heightRight.getPosition(), telemetry);
+        } else {
+            int position = slideRight.getCurrentPosition();
+
+            if (position <= lowerLimit && power <= 0) {
+                setPower(0);
+            }
+            else if (position >= upperLimit && power >= 0) {
+                setPower(0);
+            } else {
+                slideRight.setPower(power);
+            }
         }
     }
 //    public void sequenceAttempt(Telemetry telemetry){
