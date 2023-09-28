@@ -1,13 +1,15 @@
+//Can move servo's and slides manually but not with buttons
 package org.firstinspires.ftc.teamcode.robotParts;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class Outtake extends RobotPart{
+public class OutdatedOuttake extends RobotPart{
 
     Servo leftClaw;
     Servo leftRotate;
@@ -15,13 +17,15 @@ public class Outtake extends RobotPart{
     public DcMotorEx slideRight;
     double leftClawPos;
     double leftRotatePos;
-    int upperLimit = 3500;
+    int upperLimit = 2400; //2400 but can shoot up to 130 more than limit
+    int lowerLimit = 0;
 
     public void init(HardwareMap map) {
         leftClaw = map.get(Servo.class, "leftClaw");
         leftRotate = map.get(Servo.class, "leftRotate");
 
         slideLeft = map.get(DcMotorEx.class, "arm1");
+        slideLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 //        slideRight = map.get(DcMotorEx.class, "arm1");
 
         slideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -39,13 +43,12 @@ public class Outtake extends RobotPart{
      */
     public void updateLeftRotate(int mode) {
         if (mode == 1) {
-            leftClawPos = 1.0;
+            leftClawPos = 0.5;
         } else if (mode == 2) {
             leftClawPos = 0.2; //0.5
         } else if (mode == 3) {
-            leftClawPos = 0.5;
+            leftClawPos = 1.0;
         }
-
         leftClaw.setPosition(leftClawPos);
     }
 
@@ -55,18 +58,22 @@ public class Outtake extends RobotPart{
      */
     public void updateLeftClaw(int mode) {
         if (mode == 1) {
-            leftRotatePos = 0.5;
+            leftRotatePos = 0.25;
         } else if (mode == 2) {
-            leftRotatePos= 0.25;
+            leftRotatePos= 0.5;
         }
         leftRotate.setPosition(leftRotatePos);
     }
 
     public void moveSlidesManually(double power) {
-        if (slideLeft.getCurrentPosition() < upperLimit) {
+        int marginOfError = 140;
+        if ((slideLeft.getCurrentPosition() > (upperLimit - marginOfError) && power > 0) || (slideLeft.getCurrentPosition() < (lowerLimit+marginOfError) && power < 0)) {
+            slideLeft.setPower(0);
+            //slideRight.setPower(0);
+        } else if (slideLeft.getCurrentPosition() < upperLimit) {
             slideLeft.setPower(power);
-            slideRight.setPower(power);
-        }
+//            slideRight.setPower(power);
+            }
     }
 
     /**
@@ -75,26 +82,26 @@ public class Outtake extends RobotPart{
      * @param targetPosition desired slide height
      * @param telemetry anders NPE
      */
-    public double slidesGoToHeight(int targetPosition, Telemetry telemetry) {
+    public void slidesGoToHeight(int targetPosition, Telemetry telemetry) {
         double margin = 100;
         double currentPos = slideLeft.getCurrentPosition();
         double distance = Math.abs(currentPos - targetPosition);
         if (currentPos < targetPosition) {
             if (distance > margin) {
                 slideLeft.setPower(1);
-                slideRight.setPower(1);
+//                slideRight.setPower(1);
             } else {
                 slideLeft.setPower(1 * (distance/margin) * 0.4);
-                slideRight.setPower(1 * (distance/margin) * 0.4);
+//                slideRight.setPower(1 * (distance/margin) * 0.4);
             }
             telemetry.addLine("up");
         } else if (currentPos > targetPosition) {
             if (distance > margin) {
                 slideLeft.setPower(-1);
-                slideRight.setPower(-1);
+//                slideRight.setPower(-1);
             } else {
                 slideLeft.setPower(-1 * (distance/margin) * 0.4);
-                slideRight.setPower(-1 * (distance/margin) * 0.4);
+//                slideRight.setPower(-1 * (distance/margin) * 0.4);
             }
             telemetry.addLine("down");
         } else if (targetPosition == 0 && currentPos <= 0) {
@@ -102,7 +109,6 @@ public class Outtake extends RobotPart{
         } else {
             setPower(0.01);
         }
-        return distance;
     }
     /**
      * Sequence so the outtake claw can pick up a pixel in and place it on the backboard at the desired height,
@@ -112,6 +118,7 @@ public class Outtake extends RobotPart{
      */
     public void outtakeSequence(int height, Telemetry telemetry) {
         updateLeftClaw(1);
+//        sleep(20);
         updateLeftRotate(2);
         slidesGoToHeight(0, telemetry);
         updateLeftRotate(1);

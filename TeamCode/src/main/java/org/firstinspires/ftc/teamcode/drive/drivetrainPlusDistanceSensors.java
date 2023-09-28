@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.robotParts.DrivetrainAlex;
 import org.firstinspires.ftc.teamcode.robotParts.IntakeReza;
 
 @TeleOp
-public class draculaMetAlexCode extends LinearOpMode {
+public class drivetrainPlusDistanceSensors extends LinearOpMode {
     DrivetrainAlex drivetrain = new DrivetrainAlex();
     AlexDistanceSensorUtil distanceSensor = new AlexDistanceSensorUtil();
     ArmAlex arm = new ArmAlex();

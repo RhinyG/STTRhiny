@@ -1,20 +1,20 @@
-//comment 5
+// Can move slides, outtake servo's, intake and drive but not buttons.
 package org.firstinspires.ftc.teamcode.drive;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.robotParts.DrivetrainAlex;
-import org.firstinspires.ftc.teamcode.robotParts.Outtake;
-
+import org.firstinspires.ftc.teamcode.robotParts.OutdatedOuttake;
+@Disabled
 @TeleOp
-public class SlideTest extends LinearOpMode {
+public class OutdatedDriveCode extends LinearOpMode {
     DrivetrainAlex drivetrain = new DrivetrainAlex();
-    Outtake outtake = new Outtake();
+    OutdatedOuttake outtake = new OutdatedOuttake();
     int leftClawVar; // 1 = release, 2 = rotate
     int leftRotateVar; //1 = intakePos, 2 = movePos, 3 = outtakePos
-
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -28,9 +28,9 @@ public class SlideTest extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            double x = gamepad1.left_stick_x; // y direction is reversed
-            double y = -gamepad1.left_stick_y;
-            double rotate = gamepad1.right_stick_x; //Drivetrain rotate, not rotate Servo
+            double y = gamepad1.left_stick_y;
+            double x = gamepad1.right_stick_x; //Drivetrain rotate, not rotate Servo
+            double rotate = gamepad1.left_stick_x;
             double slidePower = gamepad1.right_trigger - gamepad1.left_trigger;
 
             boolean release = gamepad1.dpad_left;
@@ -66,7 +66,7 @@ public class SlideTest extends LinearOpMode {
             }
 
             if(sequenceLow){
-                outtake.outtakeSequence(1000, telemetry);
+                outtake.outtakeSequence(1500, telemetry);
             }
 
             outtake.moveSlidesManually(slidePower);
@@ -74,6 +74,7 @@ public class SlideTest extends LinearOpMode {
             outtake.updateLeftClaw(leftClawVar);
             outtake.updateLeftRotate(leftRotateVar);
             telemetry.addData("Slide Position", outtake.slideLeft.getCurrentPosition());
+            telemetry.addData("Slide Power", slidePower);
             telemetry.update();
         }
     }

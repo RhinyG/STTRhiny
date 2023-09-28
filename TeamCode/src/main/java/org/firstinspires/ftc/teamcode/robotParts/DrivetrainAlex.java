@@ -32,10 +32,10 @@ public class DrivetrainAlex extends RobotPart{
     }
 
     public void drive(double forward, double right, double rotate) {
-        double leftFrontPower = forward + right + rotate;
-        double rightFrontPower = forward - right - rotate;
-        double rightRearPower = forward + right - rotate;
-        double leftRearPower = forward - right + rotate;
+        double leftFrontPower = -forward - right + rotate;
+        double rightFrontPower = -forward + right - rotate;
+        double rightRearPower = -forward - right - rotate;
+        double leftRearPower = -forward + right + rotate;
         double maxPower = 1.0;
 
         maxPower = Math.max(maxPower, Math.abs(leftFrontPower));
