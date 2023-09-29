@@ -16,7 +16,8 @@ public class OuttakePlusSequence extends RobotPart{
     Servo rightRotate;
     public DcMotorEx slideLeft;
     public DcMotorEx slideRight;
-    int upperLimit = 2150; //2400 but can shoot up to 130 more than limit
+    int upperLimitLeft = 2150; //2400 but can shoot up to 130 more than limit
+    int upperLimitRight = 12700;
     int lowerLimit = 0;
 
     public enum ArmHeight {
@@ -105,9 +106,9 @@ public class OuttakePlusSequence extends RobotPart{
         if (position == RotatePositions.INTAKEPOS) {
             rightClawPos = 0.5;
         } else if (position == RotatePositions.MOVEPOS) {
-            rightClawPos = 0.2;
+            rightClawPos = 0.8;
         } else if (position == RotatePositions.OUTTAKEPOS) {
-            rightClawPos = 1.0;
+            rightClawPos = 0;
         }
         rightClaw.setPosition(rightClawPos);
     }
@@ -118,10 +119,10 @@ public class OuttakePlusSequence extends RobotPart{
      */
     public void updateLeftClaw(ClawPositions position) {
         double leftRotatePos = 0;
-        if (position == ClawPositions.RELEASE) {
-            leftRotatePos = 0.25;
-        } else if (position == ClawPositions.GRAB) {
-            leftRotatePos = 0.5;
+        if (position == ClawPositions.GRAB) {
+            leftRotatePos = 0.22;
+        } else if (position == ClawPositions.RELEASE) {
+            leftRotatePos = 0.35;
         }
         leftRotate.setPosition(leftRotatePos);
     }
@@ -132,9 +133,9 @@ public class OuttakePlusSequence extends RobotPart{
      */
     public void updateRightClaw(ClawPositions position) {
         double rightRotatePos = 0;
-        if (position == ClawPositions.RELEASE) {
-            rightRotatePos = 0.25;
-        } else if (position == ClawPositions.GRAB) {
+        if (position == ClawPositions.GRAB) {
+            rightRotatePos = 0.4;
+        } else if (position == ClawPositions.RELEASE) {
             rightRotatePos = 0.5;
         }
         rightRotate.setPosition(rightRotatePos);
@@ -147,12 +148,10 @@ public class OuttakePlusSequence extends RobotPart{
      * @param telemetry
      * @return
      */
-    public double goToHeight(int position, Telemetry telemetry) {
+    public double goToHeightLeft(int position, Telemetry telemetry) {
         double margin = 100;
         double currentPosLeft = slideLeft.getCurrentPosition();
-        double currentPosRight = slideRight.getCurrentPosition();
         double distanceLeft = Math.abs(currentPosLeft - position);
-        double distanceRight = Math.abs(currentPosRight - position);
         if (currentPosLeft < position) {
             if (distanceLeft > margin) {
                 slideLeft.setPower(1);
@@ -168,11 +167,17 @@ public class OuttakePlusSequence extends RobotPart{
             }
             telemetry.addLine("down");
         } else if (position == 0 && currentPosLeft <= 0) {
-            setPower(0);
+            slideLeft.setPower(0);
         } else {
-            setPower(0.01);
+            slideLeft.setPower(0.01);
         }
         //so delete this then
+        return distanceLeft;
+    }
+    public double goToHeightRight(int position, Telemetry telemetry) {
+        double margin = 100;
+        double currentPosRight = slideRight.getCurrentPosition();
+        double distanceRight = Math.abs(currentPosRight - position);
         if (currentPosRight < position) {
             if (distanceRight > margin) {
                 slideRight.setPower(1);
@@ -188,13 +193,12 @@ public class OuttakePlusSequence extends RobotPart{
             }
             telemetry.addLine("down");
         } else if (position == 0 && currentPosRight <= 0) {
-            setPower(0);
+            slideRight.setPower(0);
         } else {
-            setPower(0.01);
+            slideRight.setPower(0.01);
         }
-        return distanceLeft;
+        return distanceRight;
     }
-
     /**
      * From Reza
      * @param btns if True, buttonmode is on (and arm will go to predetermined position). If false, it's on manual.
@@ -206,7 +210,7 @@ public class OuttakePlusSequence extends RobotPart{
     public void updateLeft(boolean btns, double power, ArmHeight heightLeft, Telemetry telemetry) {
         double distanceLeft = 0;
         if (btns) {
-            distanceLeft = goToHeight(heightLeft.getPosition(), telemetry);
+            distanceLeft = goToHeightLeft(heightLeft.getPosition(), telemetry);
             telemetry.addData("arm", slideLeft.getCurrentPosition());
             telemetry.addData("arm goal", heightLeft.getPosition());
             telemetry.addLine(String.valueOf(heightLeft));
@@ -215,10 +219,10 @@ public class OuttakePlusSequence extends RobotPart{
             int position = slideLeft.getCurrentPosition();
 
             if (position <= lowerLimit && power <= 0) {
-                setPower(0);
+                slideLeft.setPower(0);
             }
-            else if (position >= upperLimit && power >= 0) {
-                setPower(0);
+            else if (position >= upperLimitLeft && power >= 0) {
+                slideLeft.setPower(0);
             } else {
                 slideLeft.setPower(power);
             }
@@ -231,18 +235,21 @@ public class OuttakePlusSequence extends RobotPart{
     public void updateRight(boolean btns, double power, ArmHeight heightRight, Telemetry telemetry) {
         double distanceRight = 0;
         if (btns) {
-            distanceRight = goToHeight(heightRight.getPosition(), telemetry);
+            distanceRight = goToHeightRight(heightRight.getPosition() * 6, telemetry);
         } else {
             int position = slideRight.getCurrentPosition();
 
             if (position <= lowerLimit && power <= 0) {
-                setPower(0);
+                slideRight.setPower(0);
             }
-            else if (position >= upperLimit && power >= 0) {
-                setPower(0);
+            else if (position >= upperLimitRight && power >= 0) {
+                slideRight.setPower(0);
             } else {
                 slideRight.setPower(power);
             }
+            telemetry.addData("arm", position);
+            telemetry.addData("arm power", slideLeft.getPower());
+            telemetry.addData("distance to goal", distanceRight);
         }
     }
 //    public void sequenceAttempt(Telemetry telemetry){

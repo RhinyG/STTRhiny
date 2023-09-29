@@ -45,11 +45,10 @@ public class SlideSequenceTest extends LinearOpMode {
 
         while (opModeIsActive()) {
             double y = gamepad1.left_stick_y;
-            double x = -gamepad1.right_stick_x; //Drivetrain rotate, not rotate Servo
-            double rotate = -gamepad1.left_stick_x;
+            double x = -gamepad1.right_stick_x;
+            double rotate = -gamepad1.left_stick_x; //Drivetrain rotate, not rotate Servo
             double slidePower1 = gamepad1.right_trigger - gamepad1.left_trigger;
             double slidePower2 = gamepad2.right_trigger - gamepad2.left_trigger;
-
 
             boolean release1 = gamepad1.right_bumper;
             boolean grab1 = gamepad1.left_bumper;
@@ -146,6 +145,7 @@ public class SlideSequenceTest extends LinearOpMode {
             outtake.updateLeftRotate(rotatePosition1);
             outtake.updateRightRotate(rotatePosition2);
             telemetry.addData("Slide Position", outtake.slideLeft.getCurrentPosition());
+            telemetry.addData("Slide right position", outtake.slideRight.getCurrentPosition());
             telemetry.addData("Slide Power", slidePower1);
             telemetry.update();
         }
