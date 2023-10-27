@@ -8,12 +8,12 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class OuttakePlusSequence extends RobotPart{
+public class OuttakeTwoSlides extends RobotPart{
 
     Servo leftClaw;
-    Servo leftRotate;
+    public Servo leftRotate;
     Servo rightClaw;
-    Servo rightRotate;
+    public Servo rightRotate;
     public DcMotorEx slideLeft;
     public DcMotorEx slideRight;
     int upperLimit = 2150; //2400 but can shoot up to 130 more than limit
@@ -84,32 +84,19 @@ public class OuttakePlusSequence extends RobotPart{
      *
      * @param position
      */
-    public void updateLeftRotate(RotatePositions position) {
-        double leftClawPos = 0;
+    public void updateRotate(RotatePositions position) {
+        double leftRotatePos;
+        double rightRotatePos = 0;
         if (position == RotatePositions.INTAKEPOS) {
-            leftClawPos = 0.5;
+            rightRotatePos = 0.2;
         } else if (position == RotatePositions.MOVEPOS) {
-            leftClawPos = 0.2; //0.5
+            rightRotatePos = 0.5; //0.5
         } else if (position == RotatePositions.OUTTAKEPOS) {
-            leftClawPos = 1.0;
+            rightRotatePos = 1.0;
         }
-        leftClaw.setPosition(leftClawPos);
-    }
-
-    /**
-     * Same as above
-     * @param position
-     */
-    public void updateRightRotate(RotatePositions position) {
-        double rightClawPos = 0;
-        if (position == RotatePositions.INTAKEPOS) {
-            rightClawPos = 0.5;
-        } else if (position == RotatePositions.MOVEPOS) {
-            rightClawPos = 0.2;
-        } else if (position == RotatePositions.OUTTAKEPOS) {
-            rightClawPos = 1.0;
-        }
-        rightClaw.setPosition(rightClawPos);
+        leftRotatePos = 1 - rightRotatePos;
+        leftClaw.setPosition(leftRotatePos);
+        rightClaw.setPosition(rightRotatePos);
     }
 
     /**
@@ -117,13 +104,13 @@ public class OuttakePlusSequence extends RobotPart{
      * @param position
      */
     public void updateLeftClaw(ClawPositions position) {
-        double leftRotatePos = 0;
+        double leftClawPos = 0;
         if (position == ClawPositions.RELEASE) {
-            leftRotatePos = 0.25;
+            leftClawPos = 1.0;
         } else if (position == ClawPositions.GRAB) {
-            leftRotatePos = 0.5;
+            leftClawPos = 0.5;
         }
-        leftRotate.setPosition(leftRotatePos);
+        leftRotate.setPosition(leftClawPos);
     }
 
     /**
@@ -131,13 +118,13 @@ public class OuttakePlusSequence extends RobotPart{
      * @param position
      */
     public void updateRightClaw(ClawPositions position) {
-        double rightRotatePos = 0;
+        double rightClawPos = 0;
         if (position == ClawPositions.RELEASE) {
-            rightRotatePos = 0.25;
+            rightClawPos = 1.0;
         } else if (position == ClawPositions.GRAB) {
-            rightRotatePos = 0.5;
+            rightClawPos = 0.5;
         }
-        rightRotate.setPosition(rightRotatePos);
+        rightRotate.setPosition(rightClawPos);
     }
 
     /**
@@ -164,6 +151,7 @@ public class OuttakePlusSequence extends RobotPart{
             if (distanceLeft > margin) {
                 slideLeft.setPower(-1);
             } else {
+                slideLeft.setPower(-1 * (distanceLeft/margin) * 0.4);
                 slideLeft.setPower(-1 * (distanceLeft/margin) * 0.4);
             }
             telemetry.addLine("down");

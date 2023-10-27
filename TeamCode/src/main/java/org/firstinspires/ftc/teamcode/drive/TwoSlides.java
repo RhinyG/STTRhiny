@@ -1,26 +1,28 @@
 package org.firstinspires.ftc.teamcode.drive;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.robotParts.DrivetrainAlex;
-import org.firstinspires.ftc.teamcode.robotParts.OuttakePlusSequence;
+import org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides;
 
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakePlusSequence.ArmHeight.INTAKE;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakePlusSequence.ArmHeight.BOTTOM;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakePlusSequence.ArmHeight.FIRSTLINE;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakePlusSequence.ArmHeight.SECONDLINE;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakePlusSequence.RotatePositions.INTAKEPOS;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakePlusSequence.RotatePositions.MOVEPOS;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakePlusSequence.RotatePositions.OUTTAKEPOS;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakePlusSequence.ClawPositions.RELEASE;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakePlusSequence.ClawPositions.GRAB;
+import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.ArmHeight.INTAKE;
+import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.ArmHeight.BOTTOM;
+import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.ArmHeight.FIRSTLINE;
+import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.ArmHeight.SECONDLINE;
+import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.RotatePositions.INTAKEPOS;
+import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.RotatePositions.MOVEPOS;
+import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.RotatePositions.OUTTAKEPOS;
+import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.ClawPositions.RELEASE;
+import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.ClawPositions.GRAB;
 
+@Disabled
 @TeleOp
-public class SlideSequenceTest extends LinearOpMode {
+public class TwoSlides extends LinearOpMode {
     DrivetrainAlex drivetrain = new DrivetrainAlex();
-    OuttakePlusSequence outtake = new OuttakePlusSequence();
+    OuttakeTwoSlides outtake = new OuttakeTwoSlides();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -29,12 +31,12 @@ public class SlideSequenceTest extends LinearOpMode {
         outtake.init(hardwareMap);
         DcMotor intake = hardwareMap.dcMotor.get("intake");
 
-        OuttakePlusSequence.ArmHeight height1 = INTAKE;
-        OuttakePlusSequence.ArmHeight height2= INTAKE;
-        OuttakePlusSequence.ClawPositions clawPosition1 = GRAB;
-        OuttakePlusSequence.ClawPositions clawPosition2 = GRAB;
-        OuttakePlusSequence.RotatePositions rotatePosition1 = INTAKEPOS;
-        OuttakePlusSequence.RotatePositions rotatePosition2 = INTAKEPOS;
+        OuttakeTwoSlides.ArmHeight height1 = INTAKE;
+        OuttakeTwoSlides.ArmHeight height2= INTAKE;
+        OuttakeTwoSlides.ClawPositions clawPosition1 = GRAB;
+        OuttakeTwoSlides.ClawPositions clawPosition2 = GRAB;
+        OuttakeTwoSlides.RotatePositions rotatePosition1 = INTAKEPOS;
+        OuttakeTwoSlides.RotatePositions rotatePosition2 = INTAKEPOS;
 
         boolean buttonMode1 = false;
         boolean buttonMode2 = false;
@@ -53,14 +55,11 @@ public class SlideSequenceTest extends LinearOpMode {
 
             boolean release1 = gamepad1.right_bumper;
             boolean grab1 = gamepad1.left_bumper;
-            boolean intakePos1 = gamepad1.dpad_down;
-            boolean movePos1 = gamepad1.dpad_left;
-            boolean outtakePos1 = gamepad1.dpad_right;
+            boolean intakePos = gamepad1.dpad_left;
+            boolean movePos = gamepad1.dpad_down;
+            boolean outtakePos = gamepad1.dpad_right;
             boolean release2 = gamepad2.right_bumper;
             boolean grab2 = gamepad2.left_bumper;
-            boolean intakePos2 = gamepad2.dpad_down;
-            boolean movePos2 = gamepad2.dpad_left;
-            boolean outtakePos2 = gamepad2.dpad_right;
 
             boolean intakeBtn1 = gamepad1.x;
             boolean low1 = gamepad1.a;
@@ -122,20 +121,12 @@ public class SlideSequenceTest extends LinearOpMode {
                 clawPosition2 = GRAB;
             }
 
-            if(intakePos1){
+            if(intakePos){
                 rotatePosition1 = INTAKEPOS;
-            } else if (movePos1) {
+            } else if (movePos) {
                 rotatePosition1 = MOVEPOS;
-            } else if (outtakePos1) {
+            } else if (outtakePos) {
                 rotatePosition1 = OUTTAKEPOS;
-            }
-
-            if(intakePos2){
-                rotatePosition2 = INTAKEPOS;
-            } else if (movePos2) {
-                rotatePosition2 = MOVEPOS;
-            } else if (outtakePos2) {
-                rotatePosition2 = OUTTAKEPOS;
             }
 
             drivetrain.drive(y, x, rotate);
@@ -143,10 +134,11 @@ public class SlideSequenceTest extends LinearOpMode {
             outtake.updateRight(buttonMode2,slidePower2,height2,telemetry);
             outtake.updateLeftClaw(clawPosition1);
             outtake.updateRightClaw(clawPosition2);
-            outtake.updateLeftRotate(rotatePosition1);
-            outtake.updateRightRotate(rotatePosition2);
+            outtake.updateRotate(rotatePosition1);
             telemetry.addData("Slide Position", outtake.slideLeft.getCurrentPosition());
             telemetry.addData("Slide Power", slidePower1);
+            telemetry.addData("LeftPos", outtake.leftRotate.getPosition());
+            telemetry.addData("RightPos", outtake.rightRotate.getPosition());
             telemetry.update();
         }
     }
