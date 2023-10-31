@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.drive;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -18,9 +17,8 @@ import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.RotateP
 import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.ClawPositions.RELEASE;
 import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.ClawPositions.GRAB;
 
-@Disabled
-@TeleOp
-public class TwoSlides extends LinearOpMode {
+@TeleOp(name = "IGORGEBRUIKDEZE")
+public class CurrentTeleOp extends LinearOpMode {
     DrivetrainAlex drivetrain = new DrivetrainAlex();
     OuttakeTwoSlides outtake = new OuttakeTwoSlides();
 
@@ -30,16 +28,14 @@ public class TwoSlides extends LinearOpMode {
         drivetrain.init(hardwareMap);
         outtake.init(hardwareMap);
         DcMotor intake = hardwareMap.dcMotor.get("intake");
+        DcMotor hook = hardwareMap.dcMotor.get("hook");
 
-        OuttakeTwoSlides.ArmHeight height1 = INTAKE;
-        OuttakeTwoSlides.ArmHeight height2= INTAKE;
+        OuttakeTwoSlides.ArmHeight height = INTAKE;
         OuttakeTwoSlides.ClawPositions clawPosition1 = GRAB;
         OuttakeTwoSlides.ClawPositions clawPosition2 = GRAB;
         OuttakeTwoSlides.RotatePositions rotatePosition1 = INTAKEPOS;
-        OuttakeTwoSlides.RotatePositions rotatePosition2 = INTAKEPOS;
 
-        boolean buttonMode1 = false;
-        boolean buttonMode2 = false;
+        boolean buttonMode = false;
 
         waitForStart();
 
@@ -47,66 +43,50 @@ public class TwoSlides extends LinearOpMode {
 
         while (opModeIsActive()) {
             double y = gamepad1.left_stick_y;
-            double x = -gamepad1.right_stick_x; //Drivetrain rotate, not rotate Servo
-            double rotate = -gamepad1.left_stick_x;
-            double slidePower1 = gamepad1.right_trigger - gamepad1.left_trigger;
-            double slidePower2 = gamepad2.right_trigger - gamepad2.left_trigger;
+            double x = -gamepad1.left_stick_x;
+            double rotate = gamepad1.right_stick_x; //Drivetrain rotate, not rotate Servo
+            double slidePower = gamepad2.right_trigger - gamepad2.left_trigger;
 
-
-            boolean release1 = gamepad1.right_bumper;
-            boolean grab1 = gamepad1.left_bumper;
-            boolean intakePos = gamepad1.dpad_left;
-            boolean movePos = gamepad1.dpad_down;
-            boolean outtakePos = gamepad1.dpad_right;
+            boolean release1 = gamepad2.right_bumper;
+            boolean grab1 = gamepad2.left_bumper;
+            boolean intakePos = gamepad2.dpad_left;
+            boolean movePos = gamepad2.dpad_down;
+            boolean outtakePos = gamepad2.dpad_right;
             boolean release2 = gamepad2.right_bumper;
             boolean grab2 = gamepad2.left_bumper;
 
-            boolean intakeBtn1 = gamepad1.x;
-            boolean low1 = gamepad1.a;
-            boolean mid1 = gamepad1.b;
-            boolean high1 = gamepad1.y;
-            boolean intakeBtn2 = gamepad2.x;
-            boolean low2 = gamepad2.a;
-            boolean mid2 = gamepad2.b;
-            boolean high2 = gamepad2.y;
+            boolean intakeBtn = gamepad1.x;
+            boolean low = gamepad1.a;
+            boolean mid = gamepad1.b;
+            boolean high = gamepad1.y;
 
+            double hookPower = gamepad1.left_trigger - gamepad1.right_trigger;
+            double intakePower = 0;
+
+            if(gamepad1.left_bumper){
+                intakePower = 1;
+            } else if (gamepad1.right_bumper) {
+                intakePower = -1;
+            }
 
             DrivetrainAlex.maxSpeed = 1;
 
-            if (intakeBtn1) {
-                buttonMode1 = true;
-                height1 = INTAKE;
-            } else if (low1) {
-                buttonMode1 = true;
-                height1 = BOTTOM;
-            } else if (mid1) {
-                buttonMode1 = true;
-                height1 = FIRSTLINE;
-            } else if (high1) {
-                buttonMode1 = true;
-                height1 = SECONDLINE;
+            if (intakeBtn) {
+                buttonMode = true;
+                height = INTAKE;
+            } else if (low) {
+                buttonMode = true;
+                height = BOTTOM;
+            } else if (mid) {
+                buttonMode = true;
+                height = FIRSTLINE;
+            } else if (high) {
+                buttonMode = true;
+                height = SECONDLINE;
             }
 
-            if (intakeBtn2) {
-                buttonMode2 = true;
-                height2 = INTAKE;
-            } else if (low2) {
-                buttonMode2 = true;
-                height2 = BOTTOM;
-            } else if (mid2) {
-                buttonMode2 = true;
-                height2 = FIRSTLINE;
-            } else if (high2) {
-                buttonMode2 = true;
-                height2 = SECONDLINE;
-            }
-
-            if (Math.abs(slidePower1) > 0.1) {
-                buttonMode1 = false;
-            }
-
-            if (Math.abs(slidePower2) > 0.1) {
-                buttonMode2 = false;
+            if (Math.abs(slidePower) > 0.1) {
+                buttonMode = false;
             }
 
             if(release1){
@@ -129,14 +109,15 @@ public class TwoSlides extends LinearOpMode {
                 rotatePosition1 = OUTTAKEPOS;
             }
 
+            intake.setPower(intakePower);
+            hook.setPower(hookPower);
             drivetrain.drive(y, x, rotate);
-            outtake.updateLeft(buttonMode1, slidePower1, height1, telemetry);
-            outtake.updateRight(buttonMode2,slidePower2,height2,telemetry);
+            outtake.update(buttonMode, slidePower, height, telemetry);
             outtake.updateLeftClaw(clawPosition1);
             outtake.updateRightClaw(clawPosition2);
             outtake.updateRotate(rotatePosition1);
-            telemetry.addData("Slide Position", outtake.slideLeft.getCurrentPosition());
-            telemetry.addData("Slide Power", slidePower1);
+            telemetry.addData("Slide Position", outtake.slides.getCurrentPosition());
+            telemetry.addData("Slide Power", slidePower);
             telemetry.addData("LeftPos", outtake.leftRotate.getPosition());
             telemetry.addData("RightPos", outtake.rightRotate.getPosition());
             telemetry.update();

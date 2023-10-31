@@ -10,16 +10,17 @@ import static org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide.Rotat
 import static org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide.RotatePositions.MOVEPOS;
 import static org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide.RotatePositions.OUTTAKEPOS;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.robotParts.DrivetrainAlex;
 import org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide;
-import org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide;
 
+@Disabled
 @TeleOp
-public class SingleSlideDrive extends LinearOpMode {
+public class OutdatedSingleSlideDrive extends LinearOpMode {
     DrivetrainAlex drivetrain = new DrivetrainAlex();
     OuttakeSingleSlide outtake = new OuttakeSingleSlide();
 
