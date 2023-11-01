@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class DrivetrainAlex extends RobotPart{
 
     AlexDistanceSensorUtil distanceSensor = new AlexDistanceSensorUtil();
+
     private DcMotorEx leftFront;
     private DcMotorEx rightFront;
     private DcMotorEx leftBack;
@@ -21,8 +22,9 @@ public class DrivetrainAlex extends RobotPart{
         leftBack = map.get(DcMotorEx.class, "left_back");
         rightBack = map.get(DcMotorEx.class, "right_back");
 
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

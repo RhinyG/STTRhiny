@@ -8,17 +8,19 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class OuttakePlusSequence extends RobotPart{
+public class OuttakeSingleSlide extends RobotPart{
 
     Servo leftClaw;
-    Servo leftRotate;
+    public Servo leftRotate;
     Servo rightClaw;
-    Servo rightRotate;
+    public Servo rightRotate;
     public DcMotorEx slideLeft;
     public DcMotorEx slideRight;
-    int upperLimitLeft = 2150; //2400 but can shoot up to 130 more than limit
-    int upperLimitRight = 12700;
+    int upperLimit = 2150; //2400 but can shoot up to 130 more than limit
     int lowerLimit = 0;
+    int clawCmdPass = 0;
+    int rotateCmdPass = 0;
+    int slidesCmdPass = 0;
 
     public enum ArmHeight {
         INTAKE(0),
@@ -85,32 +87,19 @@ public class OuttakePlusSequence extends RobotPart{
      *
      * @param position
      */
-    public void updateLeftRotate(RotatePositions position) {
-        double leftClawPos = 0;
+    public void updateRotate(RotatePositions position) {
+        double leftRotatePos;
+        double rightRotatePos = 0;
         if (position == RotatePositions.INTAKEPOS) {
-            leftClawPos = 0.5;
+            rightRotatePos = 0.2;
         } else if (position == RotatePositions.MOVEPOS) {
-            leftClawPos = 0.2; //0.5
+            rightRotatePos = 0.5; //0.5
         } else if (position == RotatePositions.OUTTAKEPOS) {
-            leftClawPos = 1.0;
+            rightRotatePos = 1.0;
         }
-        leftClaw.setPosition(leftClawPos);
-    }
-
-    /**
-     * Same as above
-     * @param position
-     */
-    public void updateRightRotate(RotatePositions position) {
-        double rightClawPos = 0;
-        if (position == RotatePositions.INTAKEPOS) {
-            rightClawPos = 0.5;
-        } else if (position == RotatePositions.MOVEPOS) {
-            rightClawPos = 0.8;
-        } else if (position == RotatePositions.OUTTAKEPOS) {
-            rightClawPos = 0;
-        }
-        rightClaw.setPosition(rightClawPos);
+        leftRotatePos = 1 - rightRotatePos;
+        leftClaw.setPosition(leftRotatePos);
+        rightClaw.setPosition(rightRotatePos);
     }
 
     /**
@@ -118,13 +107,13 @@ public class OuttakePlusSequence extends RobotPart{
      * @param position
      */
     public void updateLeftClaw(ClawPositions position) {
-        double leftRotatePos = 0;
-        if (position == ClawPositions.GRAB) {
-            leftRotatePos = 0.22;
-        } else if (position == ClawPositions.RELEASE) {
-            leftRotatePos = 0.35;
+        double leftClawPos = 0;
+        if (position == ClawPositions.RELEASE) {
+            leftClawPos = 1.0;
+        } else if (position == ClawPositions.GRAB) {
+            leftClawPos = 0.5;
         }
-        leftRotate.setPosition(leftRotatePos);
+        leftRotate.setPosition(leftClawPos);
     }
 
     /**
@@ -132,13 +121,13 @@ public class OuttakePlusSequence extends RobotPart{
      * @param position
      */
     public void updateRightClaw(ClawPositions position) {
-        double rightRotatePos = 0;
-        if (position == ClawPositions.GRAB) {
-            rightRotatePos = 0.4;
-        } else if (position == ClawPositions.RELEASE) {
-            rightRotatePos = 0.5;
+        double rightClawPos = 0;
+        if (position == ClawPositions.RELEASE) {
+            rightClawPos = 1.0;
+        } else if (position == ClawPositions.GRAB) {
+            rightClawPos = 0.5;
         }
-        rightRotate.setPosition(rightRotatePos);
+        rightRotate.setPosition(rightClawPos);
     }
 
     /**
@@ -148,10 +137,12 @@ public class OuttakePlusSequence extends RobotPart{
      * @param telemetry
      * @return
      */
-    public double goToHeightLeft(int position, Telemetry telemetry) {
+    public double goToHeight(int position, Telemetry telemetry) {
         double margin = 100;
         double currentPosLeft = slideLeft.getCurrentPosition();
+        double currentPosRight = slideRight.getCurrentPosition();
         double distanceLeft = Math.abs(currentPosLeft - position);
+        double distanceRight = Math.abs(currentPosRight - position);
         if (currentPosLeft < position) {
             if (distanceLeft > margin) {
                 slideLeft.setPower(1);
@@ -167,17 +158,11 @@ public class OuttakePlusSequence extends RobotPart{
             }
             telemetry.addLine("down");
         } else if (position == 0 && currentPosLeft <= 0) {
-            slideLeft.setPower(0);
+            setPower(0);
         } else {
-            slideLeft.setPower(0.01);
+            setPower(0.01);
         }
         //so delete this then
-        return distanceLeft;
-    }
-    public double goToHeightRight(int position, Telemetry telemetry) {
-        double margin = 100;
-        double currentPosRight = slideRight.getCurrentPosition();
-        double distanceRight = Math.abs(currentPosRight - position);
         if (currentPosRight < position) {
             if (distanceRight > margin) {
                 slideRight.setPower(1);
@@ -193,74 +178,82 @@ public class OuttakePlusSequence extends RobotPart{
             }
             telemetry.addLine("down");
         } else if (position == 0 && currentPosRight <= 0) {
-            slideRight.setPower(0);
+            setPower(0);
         } else {
-            slideRight.setPower(0.01);
+            setPower(0.01);
         }
-        return distanceRight;
+        return distanceLeft;
     }
+
     /**
      * From Reza
      * @param btns if True, buttonmode is on (and arm will go to predetermined position). If false, it's on manual.
      * @param power power for manual mode
-     * @param heightLeft predetermined height for buttonmode
+     * @param height predetermined height for buttonmode
      * @param telemetry necessary otherwise NPE
      */
 
-    public void updateLeft(boolean btns, double power, ArmHeight heightLeft, Telemetry telemetry) {
+    public void updateSlides(boolean btns, double power, ArmHeight height, Telemetry telemetry) {
         double distanceLeft = 0;
+        double distanceRight = 0;
         if (btns) {
-            distanceLeft = goToHeightLeft(heightLeft.getPosition(), telemetry);
+            distanceLeft = goToHeight(height.getPosition(), telemetry);
+            distanceRight = goToHeight(height.getPosition(), telemetry);
             telemetry.addData("arm", slideLeft.getCurrentPosition());
-            telemetry.addData("arm goal", heightLeft.getPosition());
-            telemetry.addLine(String.valueOf(heightLeft));
+            telemetry.addData("arm goal", height.getPosition());
+            telemetry.addLine(String.valueOf(height));
             telemetry.addData("arm power", slideLeft.getPower());
         } else {
             int position = slideLeft.getCurrentPosition();
 
             if (position <= lowerLimit && power <= 0) {
-                slideLeft.setPower(0);
+                setPower(0);
             }
-            else if (position >= upperLimitLeft && power >= 0) {
-                slideLeft.setPower(0);
+            else if (position >= upperLimit && power >= 0) {
+                setPower(0);
             } else {
-                slideLeft.setPower(power);
+                setPower(power);
             }
             telemetry.addData("arm", position);
             telemetry.addData("arm power", slideLeft.getPower());
             telemetry.addData("distance to goal", distanceLeft);
         }
     }
-
-    public void updateRight(boolean btns, double power, ArmHeight heightRight, Telemetry telemetry) {
-        double distanceRight = 0;
-        if (btns) {
-            distanceRight = goToHeightRight(heightRight.getPosition() * 6, telemetry);
-        } else {
-            int position = slideRight.getCurrentPosition();
-
-            if (position <= lowerLimit && power <= 0) {
-                slideRight.setPower(0);
-            }
-            else if (position >= upperLimitRight && power >= 0) {
-                slideRight.setPower(0);
-            } else {
-                slideRight.setPower(power);
-            }
-            telemetry.addData("arm", position);
-            telemetry.addData("arm power", slideLeft.getPower());
-            telemetry.addData("distance to goal", distanceRight);
-        }
-    }
-//    public void sequenceAttempt(Telemetry telemetry){
-//        updateLeftClaw(ClawPositions.RELEASE);
-//        updateLeftRotate(RotatePositions.MOVEPOS);
-//        goToHeight(0,telemetry);
-//        updateLeftRotate(RotatePositions.INTAKEPOS);
-//        updateLeftClaw(ClawPositions.GRAB);
-//        updateLeftRotate(RotatePositions.MOVEPOS);
-//        goToHeight(1300,telemetry);
-//        updateLeftRotate(RotatePositions.OUTTAKEPOS);
-//        updateLeftClaw(ClawPositions.RELEASE);
+//    public void sequenceInit(){
+//        int clawCmdPass = 0;
+//        int rotateCmdPass = 0;
+//        int armCmdPass = 0;
+//    }
+//    public void updateSequence(Telemetry telemetry){
+//        switch(clawCmdPass){
+//            case 0:
+//                updateLeftClaw(ClawPositions.RELEASE);
+//                updateRightClaw(ClawPositions.RELEASE);
+//            case 1:
+//                updateLeftClaw(ClawPositions.RELEASE);
+//                updateRightClaw(ClawPositions.RELEASE);
+//            case 2:
+//                updateLeftClaw(ClawPositions.GRAB);
+//                updateRightClaw(ClawPositions.GRAB);
+//            case 3:
+//                updateLeftClaw(ClawPositions.RELEASE);
+//                updateRightClaw(ClawPositions.RELEASE);
+//        }
+//        switch(rotateCmdPass){
+//            case 0:
+//                updateRotate(RotatePositions.MOVEPOS);
+//            case 1:
+//                updateRotate(RotatePositions.INTAKEPOS);
+//            case 2:
+//                updateRotate(RotatePositions.MOVEPOS);
+//            case 3:
+//                updateRotate(RotatePositions.OUTTAKEPOS);
+//        }
+//        switch(slidesCmdPass) {
+//            case 1:
+//                updateSlides(true,0,ArmHeight.BOTTOM,telemetry);
+//            case 2:
+//                updateSlides(true,0,ArmHeight.FIRSTLINE,telemetry);
+//        }
 //    }
 }

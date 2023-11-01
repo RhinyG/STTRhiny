@@ -1,30 +1,20 @@
 package org.firstinspires.ftc.teamcode.auton;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.openftc.apriltag.AprilTagDetection;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
-
-import java.util.ArrayList;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.hardware.IMU;
 
-@Autonomous
-public class SanderAttempt extends LinearOpMode {
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
+@Autonomous(name = "OdomTest", group = "Test")
+public class OdometryTest extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     //private PsrAutoUtil robot = new PsrAutoUtil(this);
     private DcMotor leftFront;
@@ -43,40 +33,10 @@ public class SanderAttempt extends LinearOpMode {
     int prev_odo_centerY;
     int rotations = 0;
 
-    public static double cmPerTick = 0.0028;
+    public static double cmPerTickY = 0.0028;
     public static double cmPerTickX = 0.0018;
 
     public static int SleepAfterCmd = 125;//was 300
-//
-//
-//
-//    //OpenCvCamera camera;
-//    //AprilTagDetectionPipeline aprilTagDetectionPipeline;
-//
-//    //public static double FEET_PER_METER = 3.28084;
-//
-//    // Lens intrinsics
-//    // UNITS ARE PIXELS
-//    // NOTE: this calibration is for the C920 webcam at 800x448.
-//    // You will need to do your own calibration for other configurations!
-//    double fx = 578.272;
-//    double fy = 578.272;
-//    double cx = 402.145;
-//    double cy = 221.506;
-//
-//    // UNITS ARE METERS
-//    double tagsize = 0.166;
-//
-//    int Left = 9;
-//    int Middle = 10;
-//    int Right = 11;
-//
-//    int TargetZone;
-//    public static int LeftZone = 52;
-//    public static int MidZone = 10;
-//    public static int RightZone = 55;
-//
-//    AprilTagDetection tagOfInterest = null;
 
     @Override
     public void runOpMode() {
@@ -99,26 +59,16 @@ public class SanderAttempt extends LinearOpMode {
 //        {
 //            findTeamProp();
 //        }
-        Forward(10, 0, 0.3, 10);
-        Forward(113, 0, 0.5, 10);
-        RotateRight(40, 0.3);
-        Forward(23, 37, 0.3, 10);
-        Backward(15, 35, 0.3, 10);
-        RotateLeft(0, 0.4);
-
+        Left(100, 0, 0.3);
+        RotateLeft(90,0.5);
         sleep(30000);
-
-        /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
-        while (opModeIsActive()) {
-            sleep(20);
-        }
     }
 
     public void initMotors() {
         leftFront = hardwareMap.get(DcMotor.class, "left_front");
         rightFront = hardwareMap.get(DcMotor.class, "right_front");
         leftBack = hardwareMap.get(DcMotor.class, "left_back");
-        rightBack = hardwareMap.get(DcMotor.class, "left_back");
+        rightBack = hardwareMap.get(DcMotor.class, "right_back");
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -168,11 +118,11 @@ public class SanderAttempt extends LinearOpMode {
         double turn;
 
         reset_odometry();
-        double y = get_odo_x_cm();
+        double x = get_odo_x_cm();
         double startDriveTime = System.currentTimeMillis();
         double relativeDriveTime = (System.currentTimeMillis() - startDriveTime) / 1000;
-        while (y < distance_cm && opModeIsActive() && relativeDriveTime < maxDriveTime) {
-            if ((distance_cm - y) < 30) {
+        while (x < distance_cm && opModeIsActive() && relativeDriveTime < maxDriveTime) {
+            if ((distance_cm - x) < 30) {
                 if (speed > 0) {
                     speed = 0.2;
                 } else {
@@ -189,7 +139,7 @@ public class SanderAttempt extends LinearOpMode {
             rightFront.setPower(speed - turn);
 
             telemetry.addData("currentheading", getCurrentHeading());
-            y = get_odo_x_cm();
+            x = get_odo_x_cm();
             relativeDriveTime = (System.currentTimeMillis() - startDriveTime) / 1000;
         }
         Stop();
@@ -204,10 +154,10 @@ public class SanderAttempt extends LinearOpMode {
         double turn;
 
         reset_odometry();
-        double x = get_odo_y_cm();
+        double y = get_odo_y_cm();
 
-        while (x < distance_cm && opModeIsActive()) {
-            if ((distance_cm - x) < 15) //was 30
+        while (y < distance_cm && opModeIsActive()) {
+            if ((distance_cm - y) < 15) //was 30
             {
                 if (speed > 0) {
                     speed = 0.2;
@@ -224,7 +174,7 @@ public class SanderAttempt extends LinearOpMode {
             rightFront.setPower(speed - turn);
 
             telemetry.addData("currentheading", getCurrentHeading());
-            x = get_odo_y_cm();
+            y = get_odo_y_cm();
         }
         Stop();
     }
@@ -265,122 +215,25 @@ public class SanderAttempt extends LinearOpMode {
     }
 
     public double get_odo_y_cm() {
-        double current_odo_y = leftFront.getCurrentPosition() - prev_odo_centerY;
-        double distance = current_odo_y * cmPerTickX;
+        double current_odo_y = rightFront.getCurrentPosition() - prev_odo_centerY;
+        double distance = current_odo_y * cmPerTickY;
         telemetry.addData("Distance", distance);
         telemetry.update();
         return Math.abs(distance);
     }
 
     public double get_odo_x_cm() {
-        double current_odo_leftY = rightFront.getCurrentPosition() - prev_odo_leftX;
-        double current_odo_rightY = leftBack.getCurrentPosition() - prev_odo_rightX;
-        double distance = Math.abs((current_odo_leftY + current_odo_rightY) / (2)) * cmPerTick;
+        double current_odo_leftX = leftBack.getCurrentPosition() - prev_odo_leftX;
+        double current_odo_rightX = rightBack.getCurrentPosition() - prev_odo_rightX;
+        double distance = Math.abs((current_odo_leftX + current_odo_rightX) / (2)) * cmPerTickX;
         telemetry.addData("Distance", distance);
         telemetry.update();
         return distance;
     }
 
     public void reset_odometry() {
-        prev_odo_leftX = rightFront.getCurrentPosition();
-        prev_odo_rightX = leftBack.getCurrentPosition();
-        prev_odo_centerY = leftFront.getCurrentPosition();
-
+        prev_odo_leftX = leftBack.getCurrentPosition();
+        prev_odo_rightX = rightBack.getCurrentPosition();
+        prev_odo_centerY = rightFront.getCurrentPosition();
     }
 }
-//    void tagToTelemetry(AprilTagDetection detection)
-//    {
-//        telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
-//        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
-//        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
-//        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
-//        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
-//        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
-//        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
-//    }
-//    void initCamera() {
-//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-//        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-//        aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
-//
-//        camera.setPipeline(aprilTagDetectionPipeline);
-//        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-//        {
-//            @Override
-//            public void onOpened()
-//            {
-//                camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
-//            }
-//
-//            @Override
-//            public void onError(int errorCode)
-//            {
-//
-//            }
-//        });
-//
-//        telemetry.setMsTransmissionInterval(50);
-//    }
-
-    /**
-     * Dit is voor als wij niet distance sensors gaan gebruiken voor het kijken waar de teamprop staat.
-     * Dit heeft anders geen nut om voor de start te gaan kijken...
-     */
-//    void findTeamProp() {
-//        ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-//
-//        if(currentDetections.size() != 0)
-//        {
-//            boolean tagFound = false;
-//
-//            for(AprilTagDetection tag : currentDetections)
-//            {
-//                if(tag.id == Left || tag.id == Middle || tag.id == Right)
-//                {
-//                    tagOfInterest = tag;
-//                    tagFound = true;
-//                    break;
-//                }
-//            }
-//
-//            if(tagFound)
-//            {
-//                telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-//                tagToTelemetry(tagOfInterest);
-//            }
-//            else
-//            {
-//                telemetry.addLine("Don't see tag of interest :(");
-//
-//                if(tagOfInterest == null)
-//                {
-//                    telemetry.addLine("(The tag has never been seen)");
-//                }
-//                else
-//                {
-//                    telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-//                    tagToTelemetry(tagOfInterest);
-//                }
-//            }
-//
-//        }
-//        else
-//        {
-//            telemetry.addLine("Don't see tag of interest :(");
-//
-//            if(tagOfInterest == null)
-//            {
-//                telemetry.addLine("(The tag has never been seen)");
-//            }
-//            else
-//            {
-//                telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-//                tagToTelemetry(tagOfInterest);
-//            }
-//
-//        }
-//
-//        telemetry.update();
-//        sleep(20);
-//    }
-//}
