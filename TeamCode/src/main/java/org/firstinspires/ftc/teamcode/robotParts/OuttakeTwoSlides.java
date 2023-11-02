@@ -87,11 +87,11 @@ public class OuttakeTwoSlides extends RobotPart{
         double leftRotatePos;
         double rightRotatePos = 0;
         if (position == RotatePositions.INTAKEPOS) {
-            rightRotatePos = 0.2;
+            rightRotatePos = 0.35;
         } else if (position == RotatePositions.MOVEPOS) {
-            rightRotatePos = 0.5; //0.5
+            rightRotatePos = 0.0; //0.5
         } else if (position == RotatePositions.OUTTAKEPOS) {
-            rightRotatePos = 1.0;
+            rightRotatePos = 0.8;
         }
         leftRotatePos = 1 - rightRotatePos;
         leftClaw.setPosition(leftRotatePos);
@@ -105,9 +105,9 @@ public class OuttakeTwoSlides extends RobotPart{
     public void updateLeftClaw(ClawPositions position) {
         double leftClawPos = 0;
         if (position == ClawPositions.RELEASE) {
-            leftClawPos = 1.0;
+            leftClawPos = 0.4;
         } else if (position == ClawPositions.GRAB) {
-            leftClawPos = 0.5;
+            leftClawPos = 0.0;
         }
         leftRotate.setPosition(leftClawPos);
     }
@@ -119,9 +119,9 @@ public class OuttakeTwoSlides extends RobotPart{
     public void updateRightClaw(ClawPositions position) {
         double rightClawPos = 0;
         if (position == ClawPositions.RELEASE) {
-            rightClawPos = 1.0;
+            rightClawPos = 0.7;
         } else if (position == ClawPositions.GRAB) {
-            rightClawPos = 0.5;
+            rightClawPos = 0.8;
         }
         rightRotate.setPosition(rightClawPos);
     }

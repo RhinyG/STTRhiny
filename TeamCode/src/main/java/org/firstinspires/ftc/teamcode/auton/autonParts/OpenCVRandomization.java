@@ -1,0 +1,92 @@
+package org.firstinspires.ftc.teamcode.auton.autonParts;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.auton.CamDivideTest;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
+import org.openftc.easyopencv.OpenCvWebcam;
+
+public class OpenCVRandomization{
+    CamDivideTest myOpMode;
+    OpenCvWebcam webcam1 = null;
+
+    public double pos = 0; //Left 0, Middle 1, Right 2
+    double centerAvgFin;
+    double rightAvgFin;
+
+    public OpenCVRandomization(CamDivideTest opMode) {myOpMode = opMode;}
+    public void findScoringPosition() {
+        WebcamName webcamName = myOpMode.hardwareMap.get(WebcamName.class, "Webcam 1");
+        int cameraMonitorViewId = myOpMode.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", myOpMode.hardwareMap.appContext.getPackageName());
+        webcam1 = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+
+        webcam1.setPipeline(new examplePipeline());
+        webcam1.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                webcam1.startStreaming(1280,720, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+
+            }
+        });
+    }
+    class examplePipeline extends OpenCvPipeline {
+        Mat YCbCr = new Mat();
+        Rect midRect = new Rect(260,150, 210, 249);
+        Rect rightRect = new Rect(960, 150, 250, 259);
+
+        Mat outPut = new Mat();
+        Scalar redColor = new Scalar(255.0, 0.0, 0.0);
+        Scalar greenColor = new Scalar(0.0, 255.0, 0.0);
+        public Mat processFrame(Mat input) {
+
+            Imgproc.cvtColor(input, YCbCr, Imgproc.COLOR_RGB2YCrCb);
+
+            input.copyTo(outPut);
+            Imgproc.rectangle(outPut, midRect, redColor, 2);
+            Imgproc.rectangle(outPut, rightRect, redColor, 2);
+            Mat midCrop = YCbCr.submat(midRect);
+            Mat rightCrop = YCbCr.submat(rightRect);
+
+
+            Core.extractChannel(midCrop, midCrop, 2); //Blue: 1, Red: 2
+            Core.extractChannel(rightCrop, rightCrop, 2);
+
+            Scalar centerAvg = Core.mean(midCrop);
+            Scalar rightAvg = Core.mean(rightCrop);
+
+            centerAvgFin = centerAvg.val[0];
+            rightAvgFin = rightAvg.val[0];
+
+            myOpMode.telemetry.addData("valueRight", rightAvgFin);
+            myOpMode.telemetry.addData("valueLeft", centerAvgFin);
+
+            if (Math.abs(centerAvgFin - rightAvgFin) < 3) {
+                myOpMode.telemetry.addData("Conclusion", "left");
+                pos = 0.0;
+            } else if (Math.abs(centerAvgFin - rightAvgFin) > 3 && rightAvgFin < centerAvgFin) {
+                Imgproc.rectangle(outPut, rightRect, greenColor, 2);
+                pos = 2.0;
+                myOpMode.telemetry.addData("Current_Pos", pos);
+                myOpMode.telemetry.addData("Conclusion", "right");
+            } else {
+                Imgproc.rectangle(outPut, midRect, greenColor, 2);
+                pos = 1.0;
+                myOpMode.telemetry.addData("Current_Pos", pos);
+                myOpMode.telemetry.addData("Conclusion", "mid");
+            }
+            myOpMode.telemetry.update();
+            return(outPut);
+        }
+    }
+}

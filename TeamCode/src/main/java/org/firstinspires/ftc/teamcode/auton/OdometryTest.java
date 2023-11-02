@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.auton;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -14,22 +15,21 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-import org.firstinspires.ftc.teamcode.auton.autonParts.autonMethods;
+import org.firstinspires.ftc.teamcode.auton.autonParts.newAutonMethods;
 
 @Autonomous(name = "OdomTest", group = "Test")
 public class OdometryTest extends LinearOpMode {
-    autonMethods methods = new autonMethods();
+    newAutonMethods methods = new newAutonMethods(this);
 
     @Override
     public void runOpMode() {
 
-        methods.initMotors(hardwareMap);
-        methods.calibrateEncoders();
+        methods.init(hardwareMap);
+        methods.resetEncoders();
 
-        methods.calibrateIMU(hardwareMap);
+        methods.resetIMU(hardwareMap);
 
         //initCamera();
-        methods.runtime.reset();
         /*
          * The INIT-loop:
          * This REPLACES waitForStart!
@@ -41,7 +41,7 @@ public class OdometryTest extends LinearOpMode {
 //        {
 //            findTeamProp();
 //        }
-        methods.Left(100, 0, 0.3, telemetry);
+        methods.driveXY(100,100,0.3);
         sleep(30000);
     }
 }

@@ -111,7 +111,7 @@ public class OuttakeSingleSlide extends RobotPart{
         if (position == ClawPositions.RELEASE) {
             leftClawPos = 1.0;
         } else if (position == ClawPositions.GRAB) {
-            leftClawPos = 0.5;
+            leftClawPos = -1;
         }
         leftRotate.setPosition(leftClawPos);
     }
@@ -125,7 +125,7 @@ public class OuttakeSingleSlide extends RobotPart{
         if (position == ClawPositions.RELEASE) {
             rightClawPos = 1.0;
         } else if (position == ClawPositions.GRAB) {
-            rightClawPos = 0.5;
+            rightClawPos = -1.0;
         }
         rightRotate.setPosition(rightClawPos);
     }
