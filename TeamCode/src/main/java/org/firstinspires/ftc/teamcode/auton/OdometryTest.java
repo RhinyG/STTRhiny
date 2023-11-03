@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
+import org.firstinspires.ftc.teamcode.auton.autonParts.autonMethods;
 import org.firstinspires.ftc.teamcode.auton.autonParts.newAutonMethods;
 
 @Autonomous(name = "OdomTest", group = "Test")
@@ -23,9 +24,8 @@ public class OdometryTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
         methods.init(hardwareMap);
-        methods.resetEncoders();
+        methods.calibrateEncoders();
 
         methods.resetIMU(hardwareMap);
 
@@ -41,7 +41,10 @@ public class OdometryTest extends LinearOpMode {
 //        {
 //            findTeamProp();
 //        }
-        methods.driveXY(100,100,0.3);
+        waitForStart();
+        if (opModeIsActive()){
+            methods.driveY(300,0.3,telemetry);
+        }
         sleep(30000);
     }
 }

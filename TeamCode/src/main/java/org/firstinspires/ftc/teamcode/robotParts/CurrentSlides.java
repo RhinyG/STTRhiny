@@ -2,13 +2,12 @@ package org.firstinspires.ftc.teamcode.robotParts;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class OuttakeTwoSlides extends RobotPart{
+public class CurrentSlides extends RobotPart{
 
     Servo leftClaw;
     public Servo leftRotate;
@@ -70,7 +69,7 @@ public class OuttakeTwoSlides extends RobotPart{
         rightClaw = map.get(Servo.class,"rightClaw");
         rightRotate = map.get(Servo.class,"rightRotate");
 
-        slides = map.get(DcMotorEx.class, "slideLeft");
+        slides = map.get(DcMotorEx.class, "slides");
 
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -117,12 +116,12 @@ public class OuttakeTwoSlides extends RobotPart{
      * @param position
      */
     public void updateRightClaw(ClawPositions position) {
-        double rightClawPos = 0;
-        if (position == ClawPositions.RELEASE) {
-            rightClawPos = 0.7;
-        } else if (position == ClawPositions.GRAB) {
-            rightClawPos = 0.8;
-        }
+        double rightClawPos = 0.8;
+//        if (position == ClawPositions.RELEASE) {
+//            rightClawPos = 0.7;
+//        } else if (position == ClawPositions.GRAB) {
+//            rightClawPos = 0.8;
+//        }
         rightRotate.setPosition(rightClawPos);
     }
 

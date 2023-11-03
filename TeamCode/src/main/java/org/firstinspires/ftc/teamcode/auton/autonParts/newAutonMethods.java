@@ -40,15 +40,17 @@ public class newAutonMethods {
 
 
     public void init(HardwareMap map) {
-        FrontL = map.get(DcMotor.class, "leftFront");
-        FrontR = map.get(DcMotor.class, "rightFront");
-        BackL = map.get(DcMotor.class, "leftRear");
-        BackR = map.get(DcMotor.class, "rightRear");
+        FrontL = map.get(DcMotor.class, "left_front");
+        FrontR = map.get(DcMotor.class, "right_front");
+        BackL = map.get(DcMotor.class, "left_back");
+        BackR = map.get(DcMotor.class, "right_back");
         FrontL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        resetEncoders();
+        calibrateEncoders();
 
+        FrontR.setDirection(DcMotorSimple.Direction.REVERSE);
         BackL.setDirection(DcMotorSimple.Direction.REVERSE);
         BackR.setDirection(DcMotorSimple.Direction.REVERSE);
+
         CM_PER_TICK = (2*Math.PI * GEAR_RATIO * WHEEL_RADIUS)/(TICKS_PER_ROTATION);
 //        FrontL.setDirection(DcMotorSimple.Direction.REVERSE);
 //        FrontR.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -59,31 +61,37 @@ public class newAutonMethods {
         resetIMU(map);
     }
     public void driveY(double position, double speed, Telemetry telemetry) {
-        //resetEncoders();
+        //calibrateEncode();
         double Kp = 0.03;
         double turn;
         double heading = current_target_heading;
-        double OdoY_Pos = FrontL.getCurrentPosition();
+        double OdoY_Pos = -FrontL.getCurrentPosition();
         int tick = (int) (position / CM_PER_TICK);
         double dPos = tick - OdoY_Pos;
-        while (!(dPos > -threshold && dPos < threshold)) {
+        while (!(dPos > -threshold && dPos < threshold) && myOpMode.opModeIsActive()) {
             if ((dPos < 0 && speed > 0) || (dPos > 0 && speed < 0)) {
                 speed = -speed;
             }
             turn = Kp*Math.abs(speed)*(getTargetHeading(heading)-getCurrentHeading_DEGREES());
 
             telemetry.addData("tick", tick);
-            telemetry.addData("OdoY", OdoY_Pos);
+            telemetry.addData("PosY", OdoY_Pos*CM_PER_TICK);
             telemetry.addData("dPos", dPos);
             telemetry.addData("speed", speed);
             telemetry.update();
 
-            FrontL.setPower(speed + turn);
-            FrontR.setPower(-speed - turn);
-            BackL.setPower(-speed + turn);
-            BackR.setPower(speed - turn);
+//            FrontL.setPower(speed + turn);
+//            FrontR.setPower(-speed - turn);
+//            BackL.setPower(-speed + turn);
+//            BackR.setPower(speed - turn);
 
-            OdoY_Pos = FrontL.getCurrentPosition();
+            FrontL.setPower(speed + turn);
+            BackL.setPower(speed + turn);
+
+            BackR.setPower(speed - turn);
+            FrontR.setPower(speed - turn);
+
+            OdoY_Pos = -FrontL.getCurrentPosition();
             dPos = tick - OdoY_Pos;
         }
         Stop();
@@ -91,7 +99,7 @@ public class newAutonMethods {
     }
     public void driveX(double position, double speed) {
         speed = speed * -1;
-        //resetEncoders();
+        //calibrateEncode();
         double Kp = 0.03;
         double turn;
         double heading = current_target_heading;
@@ -103,10 +111,14 @@ public class newAutonMethods {
                 speed = -speed;
             }
             turn = Kp*Math.abs(speed)*(getTargetHeading(heading)-getCurrentHeading_DEGREES());
-            FrontL.setPower(-speed - turn);
-            FrontR.setPower(-speed - turn);
-            BackL.setPower(-speed + turn);
-            BackR.setPower(-speed + turn);
+//            FrontL.setPower(-speed - turn);
+//            FrontR.setPower(-speed - turn);
+//            BackL.setPower(-speed + turn);
+//            BackR.setPower(-speed + turn);
+            FrontL.setPower(-1 * speed + turn);
+            BackL.setPower(speed + turn);
+            BackR.setPower(-1 * speed - turn);
+            FrontR.setPower(speed - turn);
             OdoX_Pos = FrontR.getCurrentPosition() * -1;
             dPos = tick - OdoX_Pos;
         }
@@ -114,48 +126,50 @@ public class newAutonMethods {
         myOpMode.sleep(100);
     }
 
-    public void driveXY(double x, double y, double speed) {
-        double Kp = 0.03;
-        double turn;
-        double heading = current_target_heading;
-        double STR = speed;
-        double FWD = speed;
-        double Vx, Vy;
-        double OdoX_Pos = FrontR.getCurrentPosition() * -1;
-        double OdoY_Pos = FrontL.getCurrentPosition() * -1;
-        int tickX = (int) (x / CM_PER_TICK);
-        double dPosX = tickX - OdoX_Pos;
-        int tickY = (int) (y /CM_PER_TICK);
-        double dPosY = tickY - OdoY_Pos;
-        while (((!(dPosX > -200 && dPosX < 200)) || !(dPosY > -200 && dPosY < 200)) && myOpMode.opModeIsActive()) {
-            Vy = speed * Math.cos(heading) - speed * Math.sin(heading);
-            Vx = speed * Math.sin(heading) + speed * Math.cos(heading);
-            if (!(dPosX > -200 && dPosX < 200)) {
-                STR = Vx;
-                if ((dPosX > 0 && STR > 0) || (dPosX < 0 && STR < 0)) {
-                    STR = -STR;
-                }
-            }
-            if (!(dPosY > -200 && dPosY < 200)) {
-
-                if ((dPosY > 0 && FWD > 0) || (dPosX < 0 && FWD < 0)) {
-                    FWD = -FWD;
-                }
-
-            }
-            turn = Kp*Math.abs(speed)*(getTargetHeading(heading)-getCurrentHeading_DEGREES());
-            FrontL.setPower(FWD + STR - turn);
-            FrontR.setPower(FWD - STR + turn);
-            BackL.setPower(FWD - STR + turn);
-            BackR.setPower(FWD + STR - turn);
-
-            OdoX_Pos = FrontR.getCurrentPosition() * -1;
-            OdoY_Pos = FrontL.getCurrentPosition() * -1;
-            dPosX = tickX - OdoX_Pos;
-            dPosY = tickY - OdoY_Pos;
-        }
-        Stop();
-    }
+//    public void driveXY(double x, double y, double speed, Telemetry telemetry) {
+//        double Kp = 0.03;
+//        double turn;
+//        double heading = current_target_heading;
+//        double STR = speed;
+//        double FWD = speed;
+//        double Vx, Vy;
+//        double OdoX_Pos = FrontR.getCurrentPosition() * -1;
+//        double OdoY_Pos = FrontL.getCurrentPosition() * -1;
+//        int tickX = (int) (x / CM_PER_TICK);
+//        double dPosX = tickX - OdoX_Pos;
+//        int tickY = (int) (y /CM_PER_TICK);
+//        double dPosY = tickY - OdoY_Pos;
+//        while (((!(dPosX > -200 && dPosX < 200)) || !(dPosY > -200 && dPosY < 200)) && myOpMode.opModeIsActive()) {
+//            Vy = speed * Math.cos(heading) - speed * Math.sin(heading);
+//            Vx = speed * Math.sin(heading) + speed * Math.cos(heading);
+//            if (!(dPosX > -200 && dPosX < 200)) {
+//                STR = Vx;
+//                if ((dPosX > 0 && STR > 0) || (dPosX < 0 && STR < 0)) {
+//                    STR = -STR;
+//                }
+//            }
+//            if (!(dPosY > -200 && dPosY < 200)) {
+//
+//                if ((dPosY > 0 && FWD > 0) || (dPosX < 0 && FWD < 0)) {
+//                    FWD = -FWD;
+//                }
+//
+//            }
+//            turn = Kp*Math.abs(speed)*(getTargetHeading(heading)-getCurrentHeading_DEGREES());
+//            FrontL.setPower(FWD + STR - turn);
+//            FrontR.setPower(FWD - STR + turn);
+//            BackL.setPower(FWD - STR + turn);
+//            BackR.setPower(FWD + STR - turn);
+//
+//            OdoX_Pos = FrontR.getCurrentPosition() * -1;
+//            telemetry.addData("OdoX", OdoX_Pos);
+//            OdoY_Pos = FrontL.getCurrentPosition() * -1;
+//            telemetry.addData("OdoY", OdoY_Pos);
+//            dPosX = tickX - OdoX_Pos;
+//            dPosY = tickY - OdoY_Pos;
+//        }
+//        Stop();
+//    }
 
 
     public void rotateToHeading(double target_heading, double speed, Telemetry telemetry) {
@@ -179,7 +193,7 @@ public class newAutonMethods {
             telemetry.addData("dHeading",dHeading);
             telemetry.update();
         }
-        resetEncoders();
+        calibrateEncoders();
         Stop();
         current_target_heading = target_heading;
     }
@@ -220,11 +234,11 @@ public class newAutonMethods {
         atagLeft(-speed);
     }
     public void atagX (double distance, double speed) {
-        resetEncoders();
+        calibrateEncoders();
         driveX(distance, speed);
     }
     public void atagY(double distance, double speed, Telemetry telemetry) {
-        resetEncoders();
+        calibrateEncoders();
         driveY(distance, speed, telemetry);
     }
 
@@ -344,7 +358,7 @@ public class newAutonMethods {
         //currentHeading = getTargetHeading((int)(-1*anglesHead.firstAngle));
     }
     public double getTargetHeading(double heading) {
-        if(heading>0&&heading<-180){
+        if(heading> 0 && heading < -180){
             heading =- 360;
         }
 //        if (heading > 180 || head) {
@@ -362,7 +376,7 @@ public class newAutonMethods {
         imu = map.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
     }
-    public void resetEncoders() {
+    public void calibrateEncoders() {
         FrontL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         FrontR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         BackL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

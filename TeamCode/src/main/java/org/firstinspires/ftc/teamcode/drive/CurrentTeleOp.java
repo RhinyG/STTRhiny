@@ -5,22 +5,22 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.robotParts.DrivetrainAlex;
-import org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides;
+import org.firstinspires.ftc.teamcode.robotParts.CurrentSlides;
 
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.ArmHeight.INTAKE;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.ArmHeight.BOTTOM;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.ArmHeight.FIRSTLINE;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.ArmHeight.SECONDLINE;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.RotatePositions.INTAKEPOS;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.RotatePositions.MOVEPOS;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.RotatePositions.OUTTAKEPOS;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.ClawPositions.RELEASE;
-import static org.firstinspires.ftc.teamcode.robotParts.OuttakeTwoSlides.ClawPositions.GRAB;
+import static org.firstinspires.ftc.teamcode.robotParts.CurrentSlides.ArmHeight.INTAKE;
+import static org.firstinspires.ftc.teamcode.robotParts.CurrentSlides.ArmHeight.BOTTOM;
+import static org.firstinspires.ftc.teamcode.robotParts.CurrentSlides.ArmHeight.FIRSTLINE;
+import static org.firstinspires.ftc.teamcode.robotParts.CurrentSlides.ArmHeight.SECONDLINE;
+import static org.firstinspires.ftc.teamcode.robotParts.CurrentSlides.RotatePositions.INTAKEPOS;
+import static org.firstinspires.ftc.teamcode.robotParts.CurrentSlides.RotatePositions.MOVEPOS;
+import static org.firstinspires.ftc.teamcode.robotParts.CurrentSlides.RotatePositions.OUTTAKEPOS;
+import static org.firstinspires.ftc.teamcode.robotParts.CurrentSlides.ClawPositions.RELEASE;
+import static org.firstinspires.ftc.teamcode.robotParts.CurrentSlides.ClawPositions.GRAB;
 
 @TeleOp(name = "IGORGEBRUIKDEZE")
 public class CurrentTeleOp extends LinearOpMode {
     DrivetrainAlex drivetrain = new DrivetrainAlex();
-    OuttakeTwoSlides outtake = new OuttakeTwoSlides();
+    CurrentSlides outtake = new CurrentSlides();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -30,10 +30,10 @@ public class CurrentTeleOp extends LinearOpMode {
         DcMotor intake = hardwareMap.dcMotor.get("intake");
         DcMotor hook = hardwareMap.dcMotor.get("hook");
 
-        OuttakeTwoSlides.ArmHeight height = INTAKE;
-        OuttakeTwoSlides.ClawPositions clawPosition1 = GRAB;
-        OuttakeTwoSlides.ClawPositions clawPosition2 = GRAB;
-        OuttakeTwoSlides.RotatePositions rotatePosition1 = INTAKEPOS;
+        CurrentSlides.ArmHeight height = INTAKE;
+        CurrentSlides.ClawPositions clawPosition1 = GRAB;
+        CurrentSlides.ClawPositions clawPosition2 = GRAB;
+        CurrentSlides.RotatePositions rotatePosition1 = INTAKEPOS;
 
         boolean buttonMode = false;
 
@@ -54,6 +54,7 @@ public class CurrentTeleOp extends LinearOpMode {
             boolean outtakePos = gamepad2.dpad_right;
             boolean release2 = gamepad2.right_bumper;
             boolean grab2 = gamepad2.left_bumper;
+            boolean slowMode = gamepad1.left_stick_button;
 
             boolean intakeBtn = gamepad1.x;
             boolean low = gamepad1.a;
@@ -64,9 +65,9 @@ public class CurrentTeleOp extends LinearOpMode {
             double intakePower = 0;
 
             if(gamepad1.left_bumper){
-                intakePower = 1;
+                intakePower = 0.35;
             } else if (gamepad1.right_bumper) {
-                intakePower = -1;
+                intakePower = -0.35;
             }
 
             DrivetrainAlex.maxSpeed = 1;
@@ -111,7 +112,7 @@ public class CurrentTeleOp extends LinearOpMode {
 
             intake.setPower(intakePower);
             hook.setPower(hookPower);
-            drivetrain.drive(y, x, rotate);
+            drivetrain.drive(y, x, rotate, slowMode);
             outtake.update(buttonMode, slidePower, height, telemetry);
             outtake.updateLeftClaw(clawPosition1);
             outtake.updateRightClaw(clawPosition2);

@@ -145,4 +145,8 @@ public class ArmAlex extends RobotPart {
         }
         return distance;
     }
+
+    public void grabSequence(){
+
+    }
 }

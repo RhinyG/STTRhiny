@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.auton.autonParts;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.auton.CamDivideTest;
+import org.firstinspires.ftc.teamcode.auton.AutonV1;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -14,14 +14,14 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 public class OpenCVRandomization{
-    CamDivideTest myOpMode;
+    AutonV1 myOpMode;
     OpenCvWebcam webcam1 = null;
 
-    public double pos = 0; //Left 0, Middle 1, Right 2
+    public int pos = 0; //Left 0, Middle 1, Right 2
     double centerAvgFin;
     double rightAvgFin;
 
-    public OpenCVRandomization(CamDivideTest opMode) {myOpMode = opMode;}
+    public OpenCVRandomization(AutonV1 opMode) {myOpMode = opMode;}
     public void findScoringPosition() {
         WebcamName webcamName = myOpMode.hardwareMap.get(WebcamName.class, "Webcam 1");
         int cameraMonitorViewId = myOpMode.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", myOpMode.hardwareMap.appContext.getPackageName());
@@ -50,7 +50,7 @@ public class OpenCVRandomization{
         Scalar greenColor = new Scalar(0.0, 255.0, 0.0);
         public Mat processFrame(Mat input) {
 
-            Imgproc.cvtColor(input, YCbCr, Imgproc.COLOR_RGB2YCrCb);
+            Imgproc.cvtColor(input, YCbCr, Imgproc.COLOR_RGB2HSV);
 
             input.copyTo(outPut);
             Imgproc.rectangle(outPut, midRect, redColor, 2);
@@ -59,8 +59,8 @@ public class OpenCVRandomization{
             Mat rightCrop = YCbCr.submat(rightRect);
 
 
-            Core.extractChannel(midCrop, midCrop, 2); //Blue: 1, Red: 2
-            Core.extractChannel(rightCrop, rightCrop, 2);
+            Core.extractChannel(midCrop, midCrop, 0); //Blue: 1, Red: 2
+            Core.extractChannel(rightCrop, rightCrop, 0);
 
             Scalar centerAvg = Core.mean(midCrop);
             Scalar rightAvg = Core.mean(rightCrop);
@@ -71,17 +71,17 @@ public class OpenCVRandomization{
             myOpMode.telemetry.addData("valueRight", rightAvgFin);
             myOpMode.telemetry.addData("valueLeft", centerAvgFin);
 
-            if (Math.abs(centerAvgFin - rightAvgFin) < 3) {
+            if (Math.abs(centerAvgFin - rightAvgFin) < 20) {
                 myOpMode.telemetry.addData("Conclusion", "left");
-                pos = 0.0;
-            } else if (Math.abs(centerAvgFin - rightAvgFin) > 3 && rightAvgFin < centerAvgFin) {
+                pos = 0;
+            } else if (Math.abs(centerAvgFin - rightAvgFin) > 20 && rightAvgFin > centerAvgFin) {
                 Imgproc.rectangle(outPut, rightRect, greenColor, 2);
-                pos = 2.0;
+                pos = 2;
                 myOpMode.telemetry.addData("Current_Pos", pos);
                 myOpMode.telemetry.addData("Conclusion", "right");
             } else {
                 Imgproc.rectangle(outPut, midRect, greenColor, 2);
-                pos = 1.0;
+                pos = 1;
                 myOpMode.telemetry.addData("Current_Pos", pos);
                 myOpMode.telemetry.addData("Conclusion", "mid");
             }

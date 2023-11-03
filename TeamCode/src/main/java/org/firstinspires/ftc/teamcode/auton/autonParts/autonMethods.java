@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.auton.autonParts;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -14,6 +15,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class autonMethods {
+    private LinearOpMode myOpMode;
+
     public ElapsedTime runtime = new ElapsedTime();
     //private PsrAutoUtil robot = new PsrAutoUtil(this);
     private DcMotor leftFront;
@@ -36,6 +39,7 @@ public class autonMethods {
     public static double cmPerTickX = 0.0018;
 
     public static int SleepAfterCmd = 125;//was 300
+
     public void initMotors(HardwareMap map) {
         leftFront = map.get(DcMotor.class, "left_front");
         rightFront = map.get(DcMotor.class, "right_front");
