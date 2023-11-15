@@ -7,15 +7,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class CurrentSlides extends RobotPart{
+public class CurrentOuttake extends RobotPart{
 
-    Servo leftClaw;
+    public Servo claw;
     public Servo leftRotate;
-    Servo rightClaw;
     public Servo rightRotate;
     public DcMotorEx slides;
-    int upperLimit = 2150; //2400 but can shoot up to 130 more than limit
+    int upperLimit = 2250; //2400 but can shoot up to 130 more than limit
     int lowerLimit = 0;
+    int sequenceStep = 1;
 
     public enum ArmHeight {
         INTAKE(0),
@@ -32,29 +32,29 @@ public class CurrentSlides extends RobotPart{
         }
     }
     public enum ClawPositions {
-        RELEASE(1),
-        GRAB(2);
+        RELEASE(0.45),
+        GRAB(0.1);
 
-        private int position;
+        private double position;
 
-        public int getPosition() {
+        public double getPosition() {
             return this.position;
         }
 
-        ClawPositions(int position) {
+        ClawPositions(double position) {
             this.position = position;
         }
     }
     public enum RotatePositions {
-        INTAKEPOS(1),
-        MOVEPOS(2),
-        OUTTAKEPOS(3);
+        INTAKEPOS(0.36),
+        MOVEPOS(0.26),
+        OUTTAKEPOS(0.8);
 
-        private int position;
-        public int getPosition() {
+        private double position;
+        public double getPosition() {
             return this.position;
         }
-        RotatePositions(int position) {
+        RotatePositions(double position) {
             this.position = position;
         }
     }
@@ -64,10 +64,12 @@ public class CurrentSlides extends RobotPart{
      * @param map
      */
     public void init(HardwareMap map) {
-        leftClaw = map.get(Servo.class, "leftClaw");
+        claw = map.get(Servo.class, "claw");
         leftRotate = map.get(Servo.class, "leftRotate");
-        rightClaw = map.get(Servo.class,"rightClaw");
         rightRotate = map.get(Servo.class,"rightRotate");
+
+        claw.setPosition(ClawPositions.RELEASE.getPosition());
+        updateRotate(RotatePositions.MOVEPOS);
 
         slides = map.get(DcMotorEx.class, "slides");
 
@@ -84,45 +86,10 @@ public class CurrentSlides extends RobotPart{
      */
     public void updateRotate(RotatePositions position) {
         double leftRotatePos;
-        double rightRotatePos = 0;
-        if (position == RotatePositions.INTAKEPOS) {
-            rightRotatePos = 0.35;
-        } else if (position == RotatePositions.MOVEPOS) {
-            rightRotatePos = 0.0; //0.5
-        } else if (position == RotatePositions.OUTTAKEPOS) {
-            rightRotatePos = 0.8;
-        }
+        double rightRotatePos = position.getPosition();
         leftRotatePos = 1 - rightRotatePos;
-        leftClaw.setPosition(leftRotatePos);
-        rightClaw.setPosition(rightRotatePos);
-    }
-
-    /**
-     *
-     * @param position
-     */
-    public void updateLeftClaw(ClawPositions position) {
-        double leftClawPos = 0;
-        if (position == ClawPositions.RELEASE) {
-            leftClawPos = 0.4;
-        } else if (position == ClawPositions.GRAB) {
-            leftClawPos = 0.0;
-        }
-        leftRotate.setPosition(leftClawPos);
-    }
-
-    /**
-     * Same as above
-     * @param position
-     */
-    public void updateRightClaw(ClawPositions position) {
-        double rightClawPos = 0.8;
-//        if (position == ClawPositions.RELEASE) {
-//            rightClawPos = 0.7;
-//        } else if (position == ClawPositions.GRAB) {
-//            rightClawPos = 0.8;
-//        }
-        rightRotate.setPosition(rightClawPos);
+        leftRotate.setPosition(leftRotatePos);
+        rightRotate.setPosition(rightRotatePos);
     }
 
     /**
@@ -162,17 +129,17 @@ public class CurrentSlides extends RobotPart{
      * From Reza
      * @param btns if True, buttonmode is on (and arm will go to predetermined position). If false, it's on manual.
      * @param power power for manual mode
-     * @param heightLeft predetermined height for buttonmode
+     * @param height predetermined height for buttonmode
      * @param telemetry necessary otherwise NPE
      */
 
-    public void update(boolean btns, double power, ArmHeight heightLeft, Telemetry telemetry) {
-        double distanceLeft = 0;
+    public void updateSlide(boolean btns, double power, ArmHeight height, Telemetry telemetry) {
+        double distance = 0;
         if (btns) {
-            distanceLeft = goToHeight(heightLeft.getPosition(), telemetry);
+            distance = goToHeight(height.getPosition(), telemetry);
             telemetry.addData("arm", slides.getCurrentPosition());
-            telemetry.addData("arm goal", heightLeft.getPosition());
-            telemetry.addLine(String.valueOf(heightLeft));
+            telemetry.addData("arm goal", height.getPosition());
+            telemetry.addLine(String.valueOf(height));
             telemetry.addData("arm power", slides.getPower());
         } else {
             int position = slides.getCurrentPosition();
@@ -187,9 +154,30 @@ public class CurrentSlides extends RobotPart{
             }
             telemetry.addData("arm", position);
             telemetry.addData("arm power", slides.getPower());
-            telemetry.addData("distance to goal", distanceLeft);
+            telemetry.addData("distance to goal", distance);
         }
     }
+
+    public void sequenceThree(){
+        switch(sequenceStep){
+            case 1:
+                updateRotate(RotatePositions.MOVEPOS);
+                sequenceStep++;
+            case 2:
+                claw.setPosition(ClawPositions.RELEASE.getPosition());
+                sequenceStep++;
+        }
+    }
+
+//    public void sequenceTwo(boolean start){
+//        boolean newSequence = sequenceStart;
+//        if(start != sequenceStart){
+//            newSequence = start;
+//        }
+//        if(sequenceStart){
+//
+//        }
+//    }
 //    public void sequenceAttempt(Telemetry telemetry){
 //        updateLeftClaw(ClawPositions.RELEASE);
 //        updateLeftRotate(RotatePositions.MOVEPOS);

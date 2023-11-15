@@ -2,38 +2,44 @@ package org.firstinspires.ftc.teamcode.auton;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.auton.autonParts.OpenCVRandomization;
 import org.firstinspires.ftc.teamcode.auton.autonParts.newAutonMethods;
 
 @Autonomous(name = "AutonV1")
 public class AutonV1 extends LinearOpMode {
-    OpenCVRandomization random = new OpenCVRandomization(this);
+    OpenCVRandomization camera = new OpenCVRandomization(this);
     newAutonMethods methods = new newAutonMethods(this);
 
-    public void initAuton() {
-        random.findScoringPosition();
-    }
-
-
-
     public void runOpMode() {
-        initAuton();
-        double localPos = random.pos;
+        methods.init(hardwareMap);
+        methods.calibrateEncoders();
 
+        methods.resetIMU(hardwareMap);
+        camera.findScoringPosition();
+        // rotateToHeading(); is in radialen, en kijk of je assen kloppen de XYZ van imu, anders doet ie niks
         waitForStart();
-
-        if (localPos == 0) {
-            //place pixel and go back
-            methods.driveX();
-        } else if ( localPos == 1) {
-            //place pixel and go back
-            methods.driveY(80/0.75,0.2,telemetry);
-        } else {
-            //place pixel and go back
+        if (opModeIsActive()) {
+            telemetry.addData("localPos", camera.pos);
+            if (camera.pos == 0) {
+                methods.driveY(-20, 0.3, telemetry);
+                methods.driveX(50, 0.3, telemetry);
+            } else if (camera.pos == 1) {
+                methods.driveY(-50, 0.3, telemetry);
+                methods.driveX(15, 0.3, telemetry);
+                methods.driveY(-80, 0.3, telemetry);
+                methods.driveY(-50, 0.3, telemetry);
+                methods.driveX(0, 0.3, telemetry);
+            } else if (camera.pos == 2){
+                methods.driveX(20,0.3, telemetry);
+                methods.driveY(-50, 0.3, telemetry);
+                methods.rotateToHeading(0.5*Math.PI, 0.2, telemetry);
+                methods.driveY(-80, 0.3, telemetry);
+                methods.driveY(-50, 0.3, telemetry);
+            }
+            if (camera.pos == 1 || camera.pos == 2) {}
+            //rest of shit
+            sleep(30000);
         }
-        //rest of shit
-        telemetry.update();
     }
 }

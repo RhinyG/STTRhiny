@@ -43,7 +43,8 @@ public class OdometryTest extends LinearOpMode {
 //        }
         waitForStart();
         if (opModeIsActive()){
-            methods.driveY(300,0.3,telemetry);
+            methods.rotateToHeading(3, 0.3, telemetry);
+            methods.driveY(40,0.3, telemetry);
         }
         sleep(30000);
     }

@@ -93,7 +93,7 @@ public class OuttakeSingleSlide extends RobotPart{
         if (position == RotatePositions.INTAKEPOS) {
             rightRotatePos = 0.2;
         } else if (position == RotatePositions.MOVEPOS) {
-            rightRotatePos = 0.5; //0.5
+            rightRotatePos = 0.3; //0.5
         } else if (position == RotatePositions.OUTTAKEPOS) {
             rightRotatePos = 1.0;
         }
