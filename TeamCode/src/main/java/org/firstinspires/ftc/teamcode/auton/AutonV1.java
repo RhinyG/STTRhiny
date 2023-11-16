@@ -17,7 +17,7 @@ public class AutonV1 extends LinearOpMode {
 
         methods.resetIMU(hardwareMap);
         camera.findScoringPosition();
-        // rotateToHeading(); is in radialen, en kijk of je assen kloppen de XYZ van imu, anders doet ie niks
+        // kijk of je assen kloppen de XYZ van imu, anders doet ie niks
         waitForStart();
         if (opModeIsActive()) {
             telemetry.addData("localPos", camera.pos);

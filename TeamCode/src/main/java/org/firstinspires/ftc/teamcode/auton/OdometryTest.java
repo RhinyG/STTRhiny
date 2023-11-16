@@ -10,21 +10,24 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.checkerframework.checker.units.qual.Current;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-import org.firstinspires.ftc.teamcode.auton.autonParts.autonMethods;
 import org.firstinspires.ftc.teamcode.auton.autonParts.newAutonMethods;
+import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
 
 @Autonomous(name = "OdomTest", group = "Test")
 public class OdometryTest extends LinearOpMode {
     newAutonMethods methods = new newAutonMethods(this);
+    CurrentOuttake slides = new CurrentOuttake();
 
     @Override
     public void runOpMode() {
         methods.init(hardwareMap);
+        slides.init(hardwareMap);
         methods.calibrateEncoders();
 
         methods.resetIMU(hardwareMap);
@@ -43,8 +46,10 @@ public class OdometryTest extends LinearOpMode {
 //        }
         waitForStart();
         if (opModeIsActive()){
-            methods.rotateToHeading(3, 0.3, telemetry);
-            methods.driveY(40,0.3, telemetry);
+            methods.driveX(50,0.3,telemetry);
+            methods.rotateToHeading(-90,0.3,telemetry);
+            methods.driveY(50,0.3,telemetry);
+//            methods.rotateToHeadingTWO(-90, 0.3, telemetry);
         }
         sleep(30000);
     }

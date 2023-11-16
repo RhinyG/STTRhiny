@@ -48,7 +48,7 @@ public class CurrentOuttake extends RobotPart{
     public enum RotatePositions {
         INTAKEPOS(0.36),
         MOVEPOS(0.26),
-        OUTTAKEPOS(0.8);
+        OUTTAKEPOS(0.7);
 
         private double position;
         public double getPosition() {
