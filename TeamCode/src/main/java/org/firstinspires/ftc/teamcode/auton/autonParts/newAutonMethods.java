@@ -19,12 +19,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class newAutonMethods {
     private LinearOpMode myOpMode;
+//    private ElapsedTime runtime = new ElapsedTime();
 
     public DcMotor FrontL;
     public DcMotor FrontR;
     public DcMotor BackL;
     public DcMotor BackR;
 
+    final public int robotLength_cm = 39;
+    final public int robotWidth_cm = 40;
+    final public double gravityConstant = 1.5;
 
     double current_target_heading = 0;
     BNO055IMU imu;
@@ -35,7 +39,7 @@ public class newAutonMethods {
     double TICKS_PER_ROTATION = 8192;
     double OURTICKS_PER_CM;
     double threshold = 250;
-    final double odoMultiplier = 5.0/3.0;
+    final double odoMultiplier = 1.76;
 
     private DcMotor encoderX, encoderY;
 
@@ -47,7 +51,6 @@ public class newAutonMethods {
         BackL = map.get(DcMotor.class, "left_back");
         BackR = map.get(DcMotor.class, "right_back");
         FrontL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        calibrateEncoders();
 
         FrontR.setDirection(DcMotorSimple.Direction.REVERSE);
         BackL.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -61,11 +64,15 @@ public class newAutonMethods {
 //        encoderY = map.dcMotor.get("leftRear");
         resetIMU(map);
     }
+
+    public void driveY (double position){
+        driveY(position,0.3, myOpMode.telemetry);
+    }
 //    positive = forward
     public void driveY(double position, double speed, Telemetry telemetry) {
-        //calibrateEncode();
+        calibrateEncoders();
         double Kp = 0.03;
-        double turn;
+        double turn = 0;
         double heading = current_target_heading;
         double OdoY_Pos = -FrontL.getCurrentPosition();
         double tick = (int) (position * OURTICKS_PER_CM);
@@ -74,12 +81,14 @@ public class newAutonMethods {
             if ((dPos < 0 && speed > 0) || (dPos > 0 && speed < 0)) {
                 speed = -speed;
             }
-            turn = Kp*Math.abs(speed)*(getTargetHeading(heading)-getCurrentHeading_DEGREES());
+            turn = Kp*Math.abs(speed)*(/*getTargetHeading*/(heading)-getCurrentHeading_DEGREES());
 
             telemetry.addData("tick", tick);
             telemetry.addData("PosY", OdoY_Pos/OURTICKS_PER_CM);
             telemetry.addData("dPos", dPos);
             telemetry.addData("speed", speed);
+            telemetry.addData("CurrentHeading", getCurrentHeading_DEGREES());
+            telemetry.addData("TargetHeading", /*getTargetHeading*/(heading));
             telemetry.update();
 
 //            FrontL.setPower(speed + turn);
@@ -99,31 +108,39 @@ public class newAutonMethods {
         Stop();
         myOpMode.sleep(100);
     }
+    public void driveX(double position){
+        driveX(position,0.3, myOpMode.telemetry);
+    }
     //positive = right
     public void driveX(double position, double speed, Telemetry telemetry) {
         speed = speed * -1;
-        //calibrateEncode();
+        calibrateEncoders();
         double Kp = 0.03;
         double turn;
         double heading = current_target_heading;
         double OdoX_Pos = -FrontR.getCurrentPosition();
-        double tick = position * OURTICKS_PER_CM;
+        //double OdoY_Pos = -FrontL.getCurrentPosition();
+        double tick = (int) (position * OURTICKS_PER_CM);
         double dPos = tick - OdoX_Pos;
         while (!(dPos > -threshold && dPos < threshold) && myOpMode.opModeIsActive()) {
             if ((dPos > 0 && speed > 0) || (dPos < 0 && speed < 0)) {
                 speed = -speed;
             }
-            turn = Kp*Math.abs(speed)*(getTargetHeading(heading)-getCurrentHeading_DEGREES());
+            turn = Kp*Math.abs(speed)*(/*getTargetHeading*/(heading)-getCurrentHeading_DEGREES());
 
             telemetry.addData("tick", tick);
             telemetry.addData("PosX", OdoX_Pos/OURTICKS_PER_CM);
             telemetry.addData("dPos", dPos);
             telemetry.addData("speed", speed);
+            telemetry.addData("Turn",turn);
             telemetry.update();
+
             FrontL.setPower(-speed + turn);
             FrontR.setPower(speed - turn);
-            BackL.setPower(speed + turn);
-            BackR.setPower(-speed - turn);
+            BackL.setPower(gravityConstant * (speed + turn));
+            BackR.setPower(gravityConstant * (-speed - turn));
+
+            //OdoY_Pos = -FrontL.getCurrentPosition();
             OdoX_Pos = -FrontR.getCurrentPosition();
             dPos = tick - OdoX_Pos;
         }
@@ -176,6 +193,9 @@ public class newAutonMethods {
 //        Stop();
 //    }
 
+    public void rotateToHeading(double target_heading){
+        rotateToHeading(target_heading,0.2, myOpMode.telemetry);
+    }
     //positive = clockwise
     public void rotateToHeading(double target_heading, double speed, Telemetry telemetry) {
         double current_heading = -getCurrentHeading_DEGREES();
@@ -185,12 +205,12 @@ public class newAutonMethods {
         telemetry.addData("dHeading",dHeading);
         telemetry.update();
         while (!(Math.abs(dHeading) < 15) && myOpMode.opModeIsActive()) {
-            direction = checkDirection(current_heading-target_heading);
+            direction = 1; //checkDirection(current_heading-target_heading);
 
             FrontL.setPower(-speed * direction);
             FrontR.setPower(speed * direction);
-            BackL.setPower(-speed * direction);
-            BackR.setPower(speed * direction);
+            BackL.setPower(gravityConstant * (-speed * direction));
+            BackR.setPower(gravityConstant * speed * direction);
 
             current_heading = getCurrentHeading_DEGREES();
             dHeading = target_heading - current_heading;
@@ -211,34 +231,34 @@ public class newAutonMethods {
 
     //Movements for aprilTags following
 
-    public void atagForward(double speed) {
-        double Kp = 0.03;
-        double turn;
-        double heading = current_target_heading;
-        turn = Kp*Math.abs(speed)*(getTargetHeading(heading)-getCurrentHeading_DEGREES());
-
-        FrontL.setPower(-speed + turn);
-        FrontR.setPower(speed - turn);
-        BackL.setPower(speed + turn);
-        BackR.setPower(-speed - turn);
-    }
-    public void atagBackward(double speed) {
-        atagForward(-speed);
-    }
-    public void atagLeft(double speed) {
-        double Kp = 0.03;
-        double turn;
-        double heading = current_target_heading;
-        turn = Kp*Math.abs(speed)*(getTargetHeading(heading)-getCurrentHeading_DEGREES());
-
-        FrontL.setPower(speed + turn);
-        FrontR.setPower(speed - turn);
-        BackL.setPower(speed + turn);
-        BackR.setPower(speed - turn);
-    }
-    public void atagRight(double speed) {
-        atagLeft(-speed);
-    }
+//    public void atagForward(double speed) {
+//        double Kp = 0.03;
+//        double turn;
+//        double heading = current_target_heading;
+//        turn = Kp*Math.abs(speed)*(getTargetHeading(heading)-getCurrentHeading_DEGREES());
+//
+//        FrontL.setPower(-speed + turn);
+//        FrontR.setPower(speed - turn);
+//        BackL.setPower(speed + turn);
+//        BackR.setPower(-speed - turn);
+//    }
+//    public void atagBackward(double speed) {
+//        atagForward(-speed);
+//    }
+//    public void atagLeft(double speed) {
+//        double Kp = 0.03;
+//        double turn;
+//        double heading = current_target_heading;
+//        turn = Kp*Math.abs(speed)*(getTargetHeading(heading)-getCurrentHeading_DEGREES());
+//
+//        FrontL.setPower(speed + turn);
+//        FrontR.setPower(speed - turn);
+//        BackL.setPower(speed + turn);
+//        BackR.setPower(speed - turn);
+//    }
+//    public void atagRight(double speed) {
+//        atagLeft(-speed);
+//    }
     public void atagX (double distance, double speed, Telemetry telemetry) {
         calibrateEncoders();
         driveX(distance, speed, telemetry);
@@ -299,7 +319,7 @@ public class newAutonMethods {
                 STR = speed / (Vy + Vx) * Vx * checkDirection(target_x_cm - cur_x);
             else STR = 0;
 
-            turn = Kp*Math.abs(speed)*(getTargetHeading(heading)-getCurrentHeading());
+            turn = Kp*Math.abs(speed)*(/*getTargetHeading*/(heading)-getCurrentHeading());
 
             FrontL.setPower(FWD + STR + turn);
             FrontR.setPower(FWD - STR + turn);
@@ -330,28 +350,28 @@ public class newAutonMethods {
         BackR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public double getCurrentHeading() { //Threaded
+    public double getCurrentHeading() { //Threaded // orig yzx
         anglesHead   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.YZX, AngleUnit.RADIANS);
         return (anglesHead.firstAngle);
         //currentHeading = getTargetHeading((int)(-1*anglesHead.firstAngle));
     }
 
     //XZY
-    public double getCurrentHeading_DEGREES() { //Threaded
-        anglesHead   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XZY, AngleUnit.DEGREES);
-        return -1 * (anglesHead.firstAngle);
+    public double getCurrentHeading_DEGREES() { //Threaded // orig xzy
+        anglesHead   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return -(anglesHead.firstAngle);
         //currentHeading = getTargetHeading((int)(-1*anglesHead.firstAngle));
     }
 
-    public double getTargetHeading(double heading) {
-        if(heading> 0 && heading < -180){
-            heading =- 360;
-        }
-//        if (heading > 180 || head) {
-//            heading = 360 - heading;
+//    public double getTargetHeading(double heading) {
+//        if(heading > 0 && heading < -180){
+//            heading =- 360;
 //        }
-        return heading;
-    }
+////        if (heading > 180 || head) {
+////            heading = 360 - heading;
+////        }
+//        return heading;
+//    }
     public void resetIMU(HardwareMap map) {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.mode = BNO055IMU.SensorMode.IMU;

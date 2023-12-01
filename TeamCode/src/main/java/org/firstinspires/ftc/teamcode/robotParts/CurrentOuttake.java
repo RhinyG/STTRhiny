@@ -13,7 +13,7 @@ public class CurrentOuttake extends RobotPart{
     public Servo leftRotate;
     public Servo rightRotate;
     public DcMotorEx slides;
-    int upperLimit = 2250; //2400 but can shoot up to 130 more than limit
+    int upperLimit = 2300; //2400 but can shoot up to 130 more than limit
     int lowerLimit = 0;
     int sequenceStep = 1;
 
@@ -32,8 +32,8 @@ public class CurrentOuttake extends RobotPart{
         }
     }
     public enum ClawPositions {
-        RELEASE(0.45),
-        GRAB(0.1);
+        RELEASE(0.36),
+        GRAB(0.53);
 
         private double position;
 
@@ -46,9 +46,9 @@ public class CurrentOuttake extends RobotPart{
         }
     }
     public enum RotatePositions {
-        INTAKEPOS(0.36),
-        MOVEPOS(0.26),
-        OUTTAKEPOS(0.7);
+        INTAKEPOS(0.525),
+        MOVEPOS(0.575),
+        OUTTAKEPOS(0.175);
 
         private double position;
         public double getPosition() {
@@ -100,17 +100,18 @@ public class CurrentOuttake extends RobotPart{
      * @return
      */
     public double goToHeight(int position, Telemetry telemetry) {
-        double margin = 100;
+        double error = 5.0;
+        double margin = 50.0;
         double currentPosLeft = slides.getCurrentPosition();
         double distance = Math.abs(currentPosLeft - position);
-        if (currentPosLeft < position) {
+        if (currentPosLeft < position + error || currentPosLeft < position - error) {
             if (distance > margin) {
                 slides.setPower(1);
             } else {
                 slides.setPower(1 * (distance/margin) * 0.4);
             }
             telemetry.addLine("up");
-        } else if (currentPosLeft > position) {
+        } else if (currentPosLeft > position + error || currentPosLeft > position - error) {
             if (distance > margin) {
                 slides.setPower(-1);
             } else {

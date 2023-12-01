@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.drive;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.robotParts.DrivetrainAlex;
 import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
@@ -22,20 +23,21 @@ public class CurrentTeleOp extends LinearOpMode {
     DrivetrainAlex drivetrain = new DrivetrainAlex();
     CurrentOuttake outtake = new CurrentOuttake();
 
+    public Servo plane;
+
     @Override
     public void runOpMode() throws InterruptedException {
 
         drivetrain.init(hardwareMap);
         outtake.init(hardwareMap);
         DcMotor intake = hardwareMap.dcMotor.get("intake");
-        DcMotor hook = hardwareMap.dcMotor.get("hook");
+        Servo plane = hardwareMap.servo.get("plane");
 
         CurrentOuttake.ArmHeight height = INTAKE;
         CurrentOuttake.ClawPositions clawPosition = RELEASE;
         CurrentOuttake.RotatePositions rotatePosition = MOVEPOS;
 
         boolean buttonMode = false;
-
 
         waitForStart();
 
@@ -52,14 +54,16 @@ public class CurrentTeleOp extends LinearOpMode {
             boolean outtakePos = gamepad2.dpad_right;
             boolean release = gamepad2.left_bumper;
             boolean grab = gamepad2.right_bumper;
-            boolean slowMode = gamepad1.left_stick_button;
+            double slowMode = gamepad1.right_trigger;
 
             boolean intakeBtn = gamepad2.x;
             boolean low = gamepad2.a;
             boolean mid = gamepad2.b;
             boolean high = gamepad2.y;
 
-            double hookPower = gamepad1.left_trigger - gamepad1.right_trigger;
+            boolean planeLaunch = gamepad1.x;
+            boolean planeReset = gamepad1.y;
+
             double intakePower = 0;
 
             if(gamepad1.left_bumper){
@@ -102,16 +106,23 @@ public class CurrentTeleOp extends LinearOpMode {
                 rotatePosition = OUTTAKEPOS;
             }
 
+            if(planeLaunch){
+                plane.setPosition(0);
+            } else if (planeReset) {
+                plane.setPosition(0.75);
+            }
+
             intake.setPower(intakePower);
-            hook.setPower(hookPower);
             drivetrain.drive(y, x, rotate, slowMode);
             outtake.updateSlide(buttonMode, slidePower, height, telemetry);
             outtake.claw.setPosition(clawPosition.getPosition());
+//            outtake.claw.setPosition(gamepad2.left_stick_y);
             outtake.updateRotate(rotatePosition);
             telemetry.addData("Slide Position", outtake.slides.getCurrentPosition());
             telemetry.addData("Slide Power", slidePower);
             telemetry.addData("LeftPos", outtake.leftRotate.getPosition());
             telemetry.addData("RightPos", outtake.rightRotate.getPosition());
+//            telemetry.addData("servo",gamepad2.left_stick_y);
             telemetry.update();
         }
     }

@@ -23,7 +23,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.IMU;
 
-@Autonomous
+
 public class SanderAttempt extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     //private PsrAutoUtil robot = new PsrAutoUtil(this);

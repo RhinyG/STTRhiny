@@ -1,31 +1,15 @@
-/*
- * Copyright (c) 2021 OpenFTC Team
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+package org.firstinspires.ftc.teamcode.auton.aprilTag;
 
-package org.firstinspires.ftc.teamcode.auton;
-
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+//import org.firstinspires.ftc.teamcode.auton.AprilTagDetectionPipeline;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -34,9 +18,8 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import java.util.ArrayList;
 
 @Disabled
-@Autonomous
-public class AprilTagTry extends LinearOpMode
-{
+@TeleOp
+public class AprilTagTest extends LinearOpMode {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -54,9 +37,17 @@ public class AprilTagTry extends LinearOpMode
     // UNITS ARE METERS
     double tagsize = 0.166;
 
-    // Tag ID 18 from the 36h11 family
-    int LEFT = 1;
-    int MIDDLE = 2;
+    int blueLeft = 1;
+    int blueMiddle = 2;
+    int blueRight = 3;
+    int redLeft = 4;
+    int redMiddle = 5;
+    int redRight = 6;
+    int fieldLeftBig = 7;
+    int fieldLeftSmall = 8;
+    int fieldRightSmall = 9;
+    int fieldRightBig = 10;
+//    int ID_TAG_OF_INTEREST = 18; // Tag ID 18 from the 36h11 family
 
     AprilTagDetection tagOfInterest = null;
 
@@ -99,7 +90,7 @@ public class AprilTagTry extends LinearOpMode
 
                 for(AprilTagDetection tag : currentDetections)
                 {
-                    if(tag.id == LEFT || tag.id == MIDDLE)
+                    if(tag.id == blueLeft || tag.id == blueMiddle || tag.id == blueRight || tag.id == redLeft || tag.id == redMiddle || tag.id == redRight || tag.id == fieldLeftBig || tag.id == fieldLeftSmall || tag.id == fieldRightBig || tag.id == fieldRightSmall)
                     {
                         tagOfInterest = tag;
                         tagFound = true;
@@ -115,11 +106,10 @@ public class AprilTagTry extends LinearOpMode
                 else
                 {
                     telemetry.addLine("Don't see tag of interest :(");
-                    tagOfInterest = null;
 
                     if(tagOfInterest == null)
                     {
-                        telemetry.addLine("PRIDE");
+                        telemetry.addLine("(The tag has never been seen)");
                     }
                     else
                     {
@@ -135,7 +125,7 @@ public class AprilTagTry extends LinearOpMode
 
                 if(tagOfInterest == null)
                 {
-                    telemetry.addLine("PRIDE");
+                    telemetry.addLine("(The tag has never been seen)");
                 }
                 else
                 {
@@ -168,24 +158,32 @@ public class AprilTagTry extends LinearOpMode
         }
 
         /* Actually do something useful */
-
-        if (tagOfInterest == null) {
-            telemetry.addLine("RIGHT");
-            telemetry.update();
-            // trajectory
-        } else if (tagOfInterest.id == LEFT) {
-            telemetry.addLine("LEFT");
-            telemetry.update();
-            // trajectory
+        if(tagOfInterest == null) {
+            /*
+             * Insert your autonomous code here, presumably running some default configuration
+             * since the tag was never sighted during INIT
+             */
         }
-        else if (tagOfInterest.id == MIDDLE) {
-            telemetry.addLine("MIDDLE");
-            telemetry.update();
-            // trajectory
+        else
+        {
+            /*
+             * Insert your autonomous code here, probably using the tag pose to decide your configuration.
+             */
+
+            // e.g.
+            if(tagOfInterest.pose.x <= 20)
+            {
+                // do something
+            }
+            else if(tagOfInterest.pose.x >= 20 && tagOfInterest.pose.x <= 50)
+            {
+                // do something else
+            }
+            else if(tagOfInterest.pose.x >= 50)
+            {
+                // do something else
+            }
         }
-
-
-        // other code
 
 
         /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
@@ -194,12 +192,14 @@ public class AprilTagTry extends LinearOpMode
 
     void tagToTelemetry(AprilTagDetection detection)
     {
+        Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
+
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
         telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
         telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
         telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
-//        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
-//        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
-//        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
+        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
+        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", rot.secondAngle));
+        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", rot.thirdAngle));
     }
 }

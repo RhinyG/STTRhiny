@@ -33,23 +33,25 @@ public class DrivetrainAlex extends RobotPart{
 
     }
 
-    public void drive(double forward, double right, double rotate, boolean slowMode) {
+    public void drive(double forward, double right, double rotate, double slowMode) {
         double leftFrontPower = -forward - right + rotate;
         double rightFrontPower = -forward + right - rotate;
         double rightRearPower = -forward - right - rotate;
         double leftRearPower = -forward + right + rotate;
         double maxPower = 1.0;
+        double slowModeCalc;
 
         maxPower = Math.max(maxPower, Math.abs(leftFrontPower));
         maxPower = Math.max(maxPower, Math.abs(rightFrontPower));
         maxPower = Math.max(maxPower, Math.abs(rightRearPower));
         maxPower = Math.max(maxPower, Math.abs(leftRearPower));
 
-        if(slowMode){
-            leftFront.setPower(0.5 * maxSpeed * (leftFrontPower / maxPower));
-            rightFront.setPower(0.5 * maxSpeed * (rightFrontPower / maxPower));
-            rightBack.setPower(0.5 *maxSpeed * rightRearPower / maxPower);
-            leftBack.setPower(0.5 * maxSpeed * (leftRearPower / maxPower));
+        if(slowMode > 0.5){
+            slowModeCalc = (1.0/slowMode)/2;
+            leftFront.setPower(slowModeCalc * maxSpeed * (leftFrontPower / maxPower));
+            rightFront.setPower(slowModeCalc * maxSpeed * (rightFrontPower / maxPower));
+            rightBack.setPower(slowModeCalc *maxSpeed * rightRearPower / maxPower);
+            leftBack.setPower(slowModeCalc * maxSpeed * (leftRearPower / maxPower));
         } else {
             leftFront.setPower(maxSpeed * (leftFrontPower / maxPower));
             rightFront.setPower(maxSpeed * (rightFrontPower / maxPower));

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auton;
+package org.firstinspires.ftc.teamcode.auton.tests;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -46,11 +46,10 @@ public class OdometryTest extends LinearOpMode {
 //        }
         waitForStart();
         if (opModeIsActive()){
-            methods.driveX(50,0.3,telemetry);
-            methods.rotateToHeading(-90,0.3,telemetry);
-            methods.driveY(50,0.3,telemetry);
-//            methods.rotateToHeadingTWO(-90, 0.3, telemetry);
+            methods.rotateToHeading(-90,0.3, telemetry);
+            methods.driveY(90, 0.3, telemetry);
+            sleep(30000);
         }
-        sleep(30000);
+
     }
 }
