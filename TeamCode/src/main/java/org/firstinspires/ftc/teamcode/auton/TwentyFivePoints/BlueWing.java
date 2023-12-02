@@ -33,14 +33,13 @@ public class BlueWing extends LinearOpMode {
                 methods.driveY(40 - 0.5 * methods.robotLength_cm);
                 methods.driveX(-60);
                 methods.driveY(-160);
-                methods.driveX(10);
                 methods.driveY(-100);
             } else if (finalPos == 1) {
                 methods.driveX(25.5 - 0.5 * methods.robotWidth_cm);
                 methods.driveY(-112 + methods.robotLength_cm);
                 methods.driveY(15);
                 methods.driveX(-15 - 0.5 * methods.robotWidth_cm);
-                methods.driveY(-75);
+                methods.driveY(-82);
                 methods.rotateToHeading(-90);
                 methods.driveY(-160 - 0.5 * methods.robotLength_cm);
                 methods.driveX(10);
@@ -49,7 +48,7 @@ public class BlueWing extends LinearOpMode {
                 methods.driveX(2 - 0.5 * methods.robotWidth_cm);
                 methods.driveY(-90 + 0.5 * methods.robotLength_cm);
                 methods.driveY(15);
-                methods.driveX(35);
+                methods.driveX(30);
                 methods.driveY(-80);
                 methods.rotateToHeading(-90);
                 methods.driveY(-140);

@@ -31,20 +31,23 @@ public class RedBackstage extends LinearOpMode {
                 methods.rotateToHeading(-90);
                 methods.driveY(-30 + 0.5 * methods.robotLength_cm);
                 methods.driveY(90 - 0.5 * methods.robotLength_cm);
-                methods.driveX(60 + 0.5 * methods.robotWidth_cm);
+                methods.driveX(40 + 0.5 * methods.robotWidth_cm);
+                methods.driveY(10);
                 methods.rotateToHeading(90);
             } else if (finalPos == 1) {
                 methods.driveX(25.5 - 0.5 * methods.robotWidth_cm);
                 methods.driveY(-112 + methods.robotLength_cm);
-                methods.driveY(60);
+                methods.driveY(53);
                 methods.driveX(-60);
                 methods.rotateToHeading(90);
+                methods.driveY(-30);
             } else if (finalPos == 2){
                 methods.driveX(-0.5 * methods.robotWidth_cm);
-                methods.driveY(-90 + 0.5 * methods.robotLength_cm);
-                methods.driveY(60);
+                methods.driveY(-82 + 0.5 * methods.robotLength_cm);
+                methods.driveY(50);
                 methods.driveX(-60);
                 methods.rotateToHeading(90);
+                methods.driveY(-10);
             }
             sleep(30000);
         }

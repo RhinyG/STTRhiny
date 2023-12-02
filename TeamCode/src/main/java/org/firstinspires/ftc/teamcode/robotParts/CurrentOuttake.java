@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.robotParts;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -9,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class CurrentOuttake extends RobotPart{
 
+    private LinearOpMode myOpMode;
     public Servo claw;
     public Servo leftRotate;
     public Servo rightRotate;
@@ -17,6 +20,20 @@ public class CurrentOuttake extends RobotPart{
     int lowerLimit = 0;
     int sequenceStep = 1;
 
+//    public enum AutonArmHeight {
+//        INTAKE(0),
+//        BOTTOM(470),
+//        FIRSTLINE(1370),
+//        SECONDLINE(2100);
+//
+//        private int position;
+//        public int getPosition() {
+//            return this.position;
+//        }
+//        AutonArmHeight(int position) {
+//            this.position = position;
+//        }
+//    }
     public enum ArmHeight {
         INTAKE(0),
         BOTTOM(470),
@@ -31,6 +48,7 @@ public class CurrentOuttake extends RobotPart{
             this.position = position;
         }
     }
+
     public enum ClawPositions {
         RELEASE(0.36),
         GRAB(0.53);
@@ -104,14 +122,14 @@ public class CurrentOuttake extends RobotPart{
         double margin = 50.0;
         double currentPosLeft = slides.getCurrentPosition();
         double distance = Math.abs(currentPosLeft - position);
-        if (currentPosLeft < position + error || currentPosLeft < position - error) {
+        if (currentPosLeft < position) {
             if (distance > margin) {
                 slides.setPower(1);
             } else {
                 slides.setPower(1 * (distance/margin) * 0.4);
             }
             telemetry.addLine("up");
-        } else if (currentPosLeft > position + error || currentPosLeft > position - error) {
+        } else if (currentPosLeft > position) {
             if (distance > margin) {
                 slides.setPower(-1);
             } else {
@@ -125,6 +143,36 @@ public class CurrentOuttake extends RobotPart{
         }
         return distance;
     }
+
+//    public double autonGoToHeight(int position, Telemetry telemetry) {
+//        double error = 5.0;
+//        double margin = 50.0;
+//        double currentPosLeft = slides.getCurrentPosition();
+//        double distance = Math.abs(currentPosLeft - position);
+//        while (!(distance > 0) && myOpMode.opModeIsActive()) {
+//            if (currentPosLeft < position + error || currentPosLeft < position - error) {
+//                if (distance > margin) {
+//                    slides.setPower(1);
+//                } else {
+//                    slides.setPower(1 * (distance / margin) * 0.4);
+//                }
+//                telemetry.addLine("up");
+//            } else if (currentPosLeft > position + error || currentPosLeft > position - error) {
+//                if (distance > margin) {
+//                    slides.setPower(-1);
+//                } else {
+//                    slides.setPower(-1 * (distance / margin) * 0.4);
+//                }
+//                telemetry.addLine("down");
+//            } else if (position == 0 && currentPosLeft <= 0) {
+//                setPower(0);
+//            } else {
+//                setPower(0.01);
+//            }
+//        }
+//            return distance;
+//    }
+
 
     /**
      * From Reza

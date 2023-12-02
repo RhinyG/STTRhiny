@@ -7,18 +7,11 @@ import org.firstinspires.ftc.teamcode.auton.autonParts.OpenCVTrussIsLeft;
 import org.firstinspires.ftc.teamcode.auton.autonParts.newAutonMethods;
 import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
 
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.INTAKE;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.BOTTOM;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.FIRSTLINE;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.SECONDLINE;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.INTAKEPOS;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.MOVEPOS;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.OUTTAKEPOS;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ClawPositions.RELEASE;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ClawPositions.GRAB;
 
 @Autonomous(name = "53?")
-public class RedBackstage extends LinearOpMode {
+public class fiftyThreePoints extends LinearOpMode {
     newAutonMethods methods = new newAutonMethods(this);
     OpenCVTrussIsLeft camera = new OpenCVTrussIsLeft(this);
     CurrentOuttake slides = new CurrentOuttake();
@@ -33,10 +26,10 @@ public class RedBackstage extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            slides.goToHeight(FIRSTLINE.getPosition(), telemetry);
+          //  slides.autonGoToHeight(1370, telemetry);
             telemetry.addData("arm", slides.slides.getCurrentPosition());
-            telemetry.addData("arm goal", FIRSTLINE.getPosition());
-            telemetry.addLine(String.valueOf(FIRSTLINE.getPosition()));
+            telemetry.addData("arm goal", 1370);
+            telemetry.addLine(String.valueOf(1370));
             telemetry.addData("arm power", slides.slides.getPower());//            int finalPos = camera.pos;
 //            telemetry.addData("localPos", camera.pos);
 //            if (finalPos == 0) {
