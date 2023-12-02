@@ -144,6 +144,35 @@ public class CurrentOuttake extends RobotPart{
         return distance;
     }
 
+    /**
+     * Merger from Reza's goToHeight and Sander's DriveY to allow goToHeight to work in autonomous.
+     * @param height This is the position you want to go to. In Armheight, not integers.
+     * @param telemetry Necessary otherwise NPE.
+     */
+    public void autonGoToHeight(ArmHeight height, Telemetry telemetry) {
+        double margin = 50.0;
+        int position = height.getPosition();
+        double currentPos = slides.getCurrentPosition();
+        double dPos = Math.abs(currentPos - position);
+        while (!(Math.abs(dPos) < margin) && myOpMode.opModeIsActive()) {
+            if (currentPos < position) {
+                slides.setPower(1);
+                telemetry.addLine("up");
+            } else if (currentPos > position) {
+                slides.setPower(-1);
+                telemetry.addLine("down");
+            } else if (position == 0 && currentPos <= 0) {
+                setPower(0);
+            } else {
+                setPower(0.01);
+            }
+            currentPos = slides.getCurrentPosition();
+            dPos = Math.abs(currentPos - position);
+        }
+        myOpMode.sleep(100);
+    }
+    public void autonGoToHeight(ArmHeight height){autonGoToHeight(height, myOpMode.telemetry);}
+
 //    public double autonGoToHeight(int position, Telemetry telemetry) {
 //        double error = 5.0;
 //        double margin = 50.0;

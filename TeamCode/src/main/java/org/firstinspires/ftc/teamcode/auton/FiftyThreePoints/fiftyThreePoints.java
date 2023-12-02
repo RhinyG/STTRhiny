@@ -14,11 +14,11 @@ import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight
 public class fiftyThreePoints extends LinearOpMode {
     newAutonMethods methods = new newAutonMethods(this);
     OpenCVTrussIsLeft camera = new OpenCVTrussIsLeft(this);
-    CurrentOuttake slides = new CurrentOuttake();
+    CurrentOuttake outtake = new CurrentOuttake();
 
     public void runOpMode() {
         methods.init(hardwareMap);
-        slides.init(hardwareMap);
+        outtake.init(hardwareMap);
         methods.calibrateEncoders();
         methods.resetIMU(hardwareMap);
         camera.findScoringPosition();
@@ -26,11 +26,8 @@ public class fiftyThreePoints extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-          //  slides.autonGoToHeight(1370, telemetry);
-            telemetry.addData("arm", slides.slides.getCurrentPosition());
-            telemetry.addData("arm goal", 1370);
-            telemetry.addLine(String.valueOf(1370));
-            telemetry.addData("arm power", slides.slides.getPower());//            int finalPos = camera.pos;
+            outtake.autonGoToHeight(FIRSTLINE);
+//            int finalPos = camera.pos;
 //            telemetry.addData("localPos", camera.pos);
 //            if (finalPos == 0) {
 //                methods.driveX(25.5 - 0.5 * methods.robotWidth_cm);
