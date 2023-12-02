@@ -13,16 +13,19 @@ import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.BOTTOM;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.FIRSTLINE;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.SECONDLINE;
+
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.INTAKEPOS;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.MOVEPOS;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.OUTTAKEPOS;
+
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ClawPositions.RELEASE;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ClawPositions.GRAB;
+import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ClawPositions.GRABONE;
+import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ClawPositions.GRABTWO;
 
 @TeleOp(name = "IGORGEBRUIKDEZE")
 public class CurrentTeleOp extends LinearOpMode {
     DrivetrainAlex drivetrain = new DrivetrainAlex();
-    CurrentOuttake outtake = new CurrentOuttake();
+    CurrentOuttake outtake = new CurrentOuttake(this);
 
     public Servo plane;
 
@@ -35,7 +38,7 @@ public class CurrentTeleOp extends LinearOpMode {
         Servo plane = hardwareMap.servo.get("plane");
 
         CurrentOuttake.ArmHeight height = INTAKE;
-        CurrentOuttake.ClawPositions clawPosition = RELEASE;
+        CurrentOuttake.ClawPositions clawPosition = GRABONE;
         CurrentOuttake.RotatePositions rotatePosition = MOVEPOS;
 
         boolean buttonMode = false;
@@ -53,8 +56,11 @@ public class CurrentTeleOp extends LinearOpMode {
             boolean intakePos = gamepad2.dpad_left;
             boolean movePos = gamepad2.dpad_down;
             boolean outtakePos = gamepad2.dpad_right;
-            boolean release = gamepad2.left_bumper;
+
+            boolean releaseTwo = gamepad2.left_bumper;
             boolean grab = gamepad2.right_bumper;
+            boolean releaseOne = gamepad2.dpad_up;
+
             double slowMode = gamepad1.right_trigger;
 
             boolean intakeBtn = gamepad2.x;
@@ -93,10 +99,12 @@ public class CurrentTeleOp extends LinearOpMode {
                 buttonMode = false;
             }
 
-            if(release){
+            if(releaseTwo){
                 clawPosition = RELEASE;
+            } else if (releaseOne) {
+                clawPosition = GRABONE;
             } else if (grab) {
-                clawPosition = GRAB;
+                clawPosition = GRABTWO;
             }
 
             if(intakePos){

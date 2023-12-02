@@ -14,7 +14,7 @@ import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight
 public class fiftyThreePoints extends LinearOpMode {
     newAutonMethods methods = new newAutonMethods(this);
     OpenCVTrussIsLeft camera = new OpenCVTrussIsLeft(this);
-    CurrentOuttake outtake = new CurrentOuttake();
+    CurrentOuttake outtake = new CurrentOuttake(this);
 
     public void runOpMode() {
         methods.init(hardwareMap);
@@ -26,7 +26,38 @@ public class fiftyThreePoints extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
+            int finalPos = camera.pos;
+            if (finalPos == 0) {
+                methods.driveX(25.5 - 0.5 * methods.robotWidth_cm);
+                methods.driveY(-90 + 0.5 * methods.robotLength_cm);
+                methods.rotateToHeading(-90);
+                methods.driveY(-30 + 0.5 * methods.robotLength_cm);
+                methods.driveY(90 - 0.5 * methods.robotLength_cm);
+                methods.rotateToHeading(90);
+                outtake.autonGoToHeight(FIRSTLINE);
+                methods.driveX(-10);
+                outtake.updateRotate(CurrentOuttake.RotatePositions.OUTTAKEPOS);
+                methods.driveY(-15, 0.2,telemetry);
+                outtake.claw.setPosition(CurrentOuttake.ClawPositions.RELEASE.getPosition());
+            } else if (finalPos == 1) {
+                methods.driveX(25.5 - 0.5 * methods.robotWidth_cm);
+                methods.driveY(-112 + methods.robotLength_cm);
+                methods.driveY(53);
+                methods.driveX(-60);
+                methods.rotateToHeading(90);
+                methods.driveY(-30);
+            } else if (finalPos == 2){
+                methods.driveX(-0.5 * methods.robotWidth_cm);
+                methods.driveY(-82 + 0.5 * methods.robotLength_cm);
+                methods.driveY(50);
+                methods.driveX(-60);
+                methods.rotateToHeading(90);
+                methods.driveY(-10);
+            }
+            sleep(30000);
             outtake.autonGoToHeight(FIRSTLINE, telemetry);
+            telemetry.addData("DOnE","DONE");
+            telemetry.update();
 //            int finalPos = camera.pos;
 //            telemetry.addData("localPos", camera.pos);
 //            if (finalPos == 0) {

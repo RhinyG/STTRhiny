@@ -51,7 +51,8 @@ public class CurrentOuttake extends RobotPart{
 
     public enum ClawPositions {
         RELEASE(0.36),
-        GRAB(0.53);
+        GRABONE(0.7),
+        GRABTWO(0.53);
 
         private double position;
 
@@ -66,7 +67,7 @@ public class CurrentOuttake extends RobotPart{
     public enum RotatePositions {
         INTAKEPOS(0.525),
         MOVEPOS(0.575),
-        OUTTAKEPOS(0.175);
+        OUTTAKEPOS(0.15);
 
         private double position;
         public double getPosition() {
@@ -77,6 +78,8 @@ public class CurrentOuttake extends RobotPart{
         }
     }
 
+    public CurrentOuttake(LinearOpMode opmode) {myOpMode = opmode;}
+
     /**
      * does something
      * @param map
@@ -86,7 +89,7 @@ public class CurrentOuttake extends RobotPart{
         leftRotate = map.get(Servo.class, "leftRotate");
         rightRotate = map.get(Servo.class,"rightRotate");
 
-        claw.setPosition(ClawPositions.RELEASE.getPosition());
+        claw.setPosition(ClawPositions.GRABONE.getPosition());
         updateRotate(RotatePositions.MOVEPOS);
 
         slides = map.get(DcMotorEx.class, "slides");
@@ -156,19 +159,21 @@ public class CurrentOuttake extends RobotPart{
         double dPos = Math.abs(currentPos - position);
         while (!(Math.abs(dPos) < margin) && myOpMode.opModeIsActive()) {
             if (currentPos < position) {
-                slides.setPower(1);
+                slides.setPower(0.5);
                 telemetry.addLine("up");
             } else if (currentPos > position) {
-                slides.setPower(-1);
+                slides.setPower(-0.5);
                 telemetry.addLine("down");
             } else if (position == 0 && currentPos <= 0) {
-                setPower(0);
+                slides.setPower(0);
             }
             telemetry.addData("arm height", slides.getCurrentPosition());
             telemetry.addData("arm goal", height.getPosition());
+            telemetry.update();
             currentPos = slides.getCurrentPosition();
             dPos = Math.abs(currentPos - position);
         }
+        slides.setPower(0);
         myOpMode.sleep(100);
     }
     public void autonGoToHeight(ArmHeight height){autonGoToHeight(height, myOpMode.telemetry);}
@@ -233,17 +238,6 @@ public class CurrentOuttake extends RobotPart{
             telemetry.addData("arm", position);
             telemetry.addData("arm power", slides.getPower());
             telemetry.addData("distance to goal", distance);
-        }
-    }
-
-    public void sequenceThree(){
-        switch(sequenceStep){
-            case 1:
-                updateRotate(RotatePositions.MOVEPOS);
-                sequenceStep++;
-            case 2:
-                claw.setPosition(ClawPositions.RELEASE.getPosition());
-                sequenceStep++;
         }
     }
 

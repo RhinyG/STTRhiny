@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
 @Autonomous(name = "OdomTest", group = "Test")
 public class OdometryTest extends LinearOpMode {
     newAutonMethods methods = new newAutonMethods(this);
-    CurrentOuttake slides = new CurrentOuttake();
+    CurrentOuttake slides = new CurrentOuttake(this);
 
     @Override
     public void runOpMode() {

@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
 public class BlueWing extends LinearOpMode {
     newAutonMethods methods = new newAutonMethods(this);
     OpenCVTrussIsLeft camera = new OpenCVTrussIsLeft(this);
-    CurrentOuttake slides = new CurrentOuttake();
+    CurrentOuttake slides = new CurrentOuttake(this);
 
     public void runOpMode() {
         methods.init(hardwareMap);

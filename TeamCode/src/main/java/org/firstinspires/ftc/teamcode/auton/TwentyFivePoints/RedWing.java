@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
 public class RedWing extends LinearOpMode {
     newAutonMethods methods = new newAutonMethods(this);
     OpenCVTrussIsRight camera = new OpenCVTrussIsRight(this);
-    CurrentOuttake slides = new CurrentOuttake();
+    CurrentOuttake slides = new CurrentOuttake(this);
 
     public void runOpMode() {
         methods.init(hardwareMap);

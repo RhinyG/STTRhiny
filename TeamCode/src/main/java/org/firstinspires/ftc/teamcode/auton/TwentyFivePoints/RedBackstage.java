@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
 public class RedBackstage extends LinearOpMode {
     newAutonMethods methods = new newAutonMethods(this);
     OpenCVTrussIsLeft camera = new OpenCVTrussIsLeft(this);
-    CurrentOuttake slides = new CurrentOuttake();
+    CurrentOuttake slides = new CurrentOuttake(this);
 
     public void runOpMode() {
         methods.init(hardwareMap);
@@ -31,7 +31,7 @@ public class RedBackstage extends LinearOpMode {
                 methods.rotateToHeading(-90);
                 methods.driveY(-30 + 0.5 * methods.robotLength_cm);
                 methods.driveY(90 - 0.5 * methods.robotLength_cm);
-                methods.driveX(40 + 0.5 * methods.robotWidth_cm);
+                methods.driveX(50 + 0.5 * methods.robotWidth_cm);
                 methods.driveY(10);
                 methods.rotateToHeading(90);
             } else if (finalPos == 1) {
