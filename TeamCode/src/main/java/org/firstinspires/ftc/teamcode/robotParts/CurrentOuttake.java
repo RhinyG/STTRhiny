@@ -163,9 +163,9 @@ public class CurrentOuttake extends RobotPart{
                 telemetry.addLine("down");
             } else if (position == 0 && currentPos <= 0) {
                 setPower(0);
-            } else {
-                setPower(0.01);
             }
+            telemetry.addData("arm height", slides.getCurrentPosition());
+            telemetry.addData("arm goal", height.getPosition());
             currentPos = slides.getCurrentPosition();
             dPos = Math.abs(currentPos - position);
         }
