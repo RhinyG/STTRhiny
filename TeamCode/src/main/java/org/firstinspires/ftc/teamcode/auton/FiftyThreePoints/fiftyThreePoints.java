@@ -26,7 +26,7 @@ public class fiftyThreePoints extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            outtake.autonGoToHeight(FIRSTLINE);
+            outtake.autonGoToHeight(FIRSTLINE, telemetry);
 //            int finalPos = camera.pos;
 //            telemetry.addData("localPos", camera.pos);
 //            if (finalPos == 0) {
