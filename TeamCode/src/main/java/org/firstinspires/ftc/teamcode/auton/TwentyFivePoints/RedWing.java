@@ -27,11 +27,11 @@ public class RedWing extends LinearOpMode {
             int finalPos = camera.pos;
             telemetry.addData("localPos", camera.pos);
             if (finalPos == 0) {
-                methods.driveX(5 + 0.5 * methods.robotWidth_cm);
+                methods.driveX(3 + 0.5 * methods.robotWidth_cm);
                 methods.driveY(-83 + 0.5 * methods.robotLength_cm);
                 methods.driveY(15);
                 methods.driveX(-28);
-                methods.driveY(-78);
+                methods.driveY(-82);
                 methods.rotateToHeading(90);
                 methods.driveY(-140);
                 methods.driveX(-20);
@@ -47,11 +47,11 @@ public class RedWing extends LinearOpMode {
                 methods.driveX(-20);
                 methods.driveY(-100);
             } else if (finalPos == 2){
-                methods.driveX(-25.5 + 0.5 * methods.robotWidth_cm);
+                methods.driveX(-23.5 + 0.5 * methods.robotWidth_cm);
                 methods.driveY(-100 + 0.5 * methods.robotLength_cm);
                 methods.rotateToHeading(95);
-                methods.driveY(-40 + 0.5 * methods.robotLength_cm);
-                methods.driveY(40 - 0.5 * methods.robotLength_cm);
+                methods.driveY(-42 + 0.5 * methods.robotLength_cm);
+                methods.driveY(42 - 0.5 * methods.robotLength_cm);
                 methods.driveX(55);
                 methods.driveY(-160);
                 methods.driveY(-100);

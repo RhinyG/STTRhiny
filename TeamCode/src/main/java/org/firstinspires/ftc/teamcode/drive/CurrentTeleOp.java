@@ -74,7 +74,7 @@ public class CurrentTeleOp extends LinearOpMode {
             double intakePower = 0;
 
             if(gamepad1.left_bumper){
-                intakePower = 0.7;
+                intakePower = 0.2;
             } else if (gamepad1.right_bumper) {
                 intakePower = -0.7;
             }
