@@ -28,7 +28,7 @@ public class newAutonMethods {
 
     final public int robotLength_cm = 39;
     final public int robotWidth_cm = 40;
-    final public double gravityConstant = 1.5;
+    final public double gravityConstant = 1;
 
     double current_target_heading = 0;
     BNO055IMU imu;
@@ -53,7 +53,6 @@ public class newAutonMethods {
         FrontL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         FrontR.setDirection(DcMotorSimple.Direction.REVERSE);
-        BackL.setDirection(DcMotorSimple.Direction.REVERSE);
         BackR.setDirection(DcMotorSimple.Direction.REVERSE);
 
         OURTICKS_PER_CM = odoMultiplier*(TICKS_PER_ROTATION)/(2*Math.PI * GEAR_RATIO * WHEEL_RADIUS);
@@ -74,14 +73,14 @@ public class newAutonMethods {
         double Kp = 0.03;
         double turn = 0;
         double heading = current_target_heading;
-        double OdoY_Pos = -FrontL.getCurrentPosition();
+        double OdoY_Pos = FrontL.getCurrentPosition();
         double tick = (int) (position * OURTICKS_PER_CM);
         double dPos = tick - OdoY_Pos;
         while (!(dPos > -threshold  && dPos < threshold) && myOpMode.opModeIsActive()) {
             if ((dPos < 0 && speed > 0) || (dPos > 0 && speed < 0)) {
                 speed = -speed;
             }
-            turn = Kp*Math.abs(speed)*(/*getTargetHeading*/(heading)-getCurrentHeading_DEGREES());
+            //turn = Kp*Math.abs(speed)*(/*getTargetHeading*/(heading)-getCurrentHeading_DEGREES());
 
             telemetry.addData("tick", tick);
             telemetry.addData("PosY", OdoY_Pos/OURTICKS_PER_CM);
@@ -102,7 +101,7 @@ public class newAutonMethods {
             BackR.setPower(speed - turn);
             FrontR.setPower(speed - turn);
 
-            OdoY_Pos = -FrontL.getCurrentPosition();
+            OdoY_Pos = FrontL.getCurrentPosition();
             dPos = tick - OdoY_Pos;
         }
         Stop();
@@ -116,9 +115,9 @@ public class newAutonMethods {
         speed = speed * -1;
         calibrateEncoders();
         double Kp = 0.03;
-        double turn;
+        double turn = 0;
         double heading = current_target_heading;
-        double OdoX_Pos = -FrontR.getCurrentPosition();
+        double OdoX_Pos = -BackL.getCurrentPosition();
         //double OdoY_Pos = -FrontL.getCurrentPosition();
         double tick = (int) (position * OURTICKS_PER_CM);
         double dPos = tick - OdoX_Pos;
@@ -126,13 +125,13 @@ public class newAutonMethods {
             if ((dPos > 0 && speed > 0) || (dPos < 0 && speed < 0)) {
                 speed = -speed;
             }
-            turn = Kp*Math.abs(speed)*(/*getTargetHeading*/(heading)-getCurrentHeading_DEGREES());
+            //turn = Kp*Math.abs(speed)*(/*getTargetHeading*/(heading)-getCurrentHeading_DEGREES());
 
             telemetry.addData("tick", tick);
             telemetry.addData("PosX", OdoX_Pos/OURTICKS_PER_CM);
             telemetry.addData("dPos", dPos);
             telemetry.addData("speed", speed);
-            telemetry.addData("Turn",turn);
+            //telemetry.addData("Turn",turn);
             telemetry.update();
 
             FrontL.setPower(-speed + turn);
@@ -141,7 +140,7 @@ public class newAutonMethods {
             BackR.setPower(gravityConstant * (-speed - turn));
 
             //OdoY_Pos = -FrontL.getCurrentPosition();
-            OdoX_Pos = -FrontR.getCurrentPosition();
+            OdoX_Pos = -BackL.getCurrentPosition();
             dPos = tick - OdoX_Pos;
         }
         Stop();
@@ -299,7 +298,7 @@ public class newAutonMethods {
     //Autonomous drive in any direction
     public void Drive(double target_x_cm, double target_y_cm, double speed, Telemetry telemetry) {
         double Kp = 0.03;
-        double turn;
+        double turn = 0;
         double heading = getCurrentHeading() + (Math.PI / 2);
         target_x_cm = target_x_cm * OURTICKS_PER_CM;
         target_y_cm = target_y_cm * OURTICKS_PER_CM;

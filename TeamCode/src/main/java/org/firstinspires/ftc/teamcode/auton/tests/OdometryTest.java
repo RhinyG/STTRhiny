@@ -44,12 +44,14 @@ public class OdometryTest extends LinearOpMode {
 //        {
 //            findTeamProp();
 //        }
+
         waitForStart();
         if (opModeIsActive()){
-            methods.rotateToHeading(-90,0.3, telemetry);
-            methods.driveY(90, 0.3, telemetry);
+            telemetry.addData("yo", methods.getCurrentHeading_DEGREES());
+            telemetry.update();
             sleep(30000);
         }
+
 
     }
 }

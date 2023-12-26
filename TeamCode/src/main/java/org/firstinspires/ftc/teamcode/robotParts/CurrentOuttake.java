@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -16,7 +17,7 @@ public class CurrentOuttake extends RobotPart{
     public Servo leftRotate;
     public Servo rightRotate;
     public DcMotorEx slides;
-    int upperLimit = 2300; //2400 but can shoot up to 130 more than limit
+    int upperLimit = 3450; //2400 but can shoot up to 130 more than limit
     int lowerLimit = 0;
     int sequenceStep = 1;
 
@@ -93,6 +94,9 @@ public class CurrentOuttake extends RobotPart{
         updateRotate(RotatePositions.MOVEPOS);
 
         slides = map.get(DcMotorEx.class, "slides");
+
+        slides.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
