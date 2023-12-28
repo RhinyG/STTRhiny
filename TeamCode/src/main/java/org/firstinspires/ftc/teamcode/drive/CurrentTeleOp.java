@@ -10,10 +10,11 @@ import org.firstinspires.ftc.teamcode.robotParts.DrivetrainAlex;
 import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
 
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.INTAKE;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.BOTTOM;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.FIRSTLINE;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.SECONDLINE;
+import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.THIRDLINE;
 
+import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.THIRDLINE;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.INTAKEPOS;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.MOVEPOS;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.OUTTAKEPOS;
@@ -86,13 +87,13 @@ public class CurrentTeleOp extends LinearOpMode {
                 height = INTAKE;
             } else if (low) {
                 buttonMode = true;
-                height = BOTTOM;
+                height = FIRSTLINE;
             } else if (mid) {
                 buttonMode = true;
-                height = FIRSTLINE;
+                height = SECONDLINE;
             } else if (high) {
                 buttonMode = true;
-                height = SECONDLINE;
+                height = THIRDLINE;
             }
 
             if (Math.abs(slidePower) > 0.1) {

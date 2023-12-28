@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.auton.autonParts.OpenCVTrussIsLeft;
 import org.firstinspires.ftc.teamcode.auton.autonParts.newAutonMethods;
 import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
 
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.BOTTOM;
+import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.THIRDLINE;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.FIRSTLINE;
 
 @Autonomous(name = "53?")

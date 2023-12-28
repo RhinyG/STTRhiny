@@ -22,7 +22,7 @@ public class DrivetrainAlex extends RobotPart{
         leftBack = map.get(DcMotorEx.class, "left_back");
         rightBack = map.get(DcMotorEx.class, "right_back");
 
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
         rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
@@ -36,8 +36,8 @@ public class DrivetrainAlex extends RobotPart{
     public void drive(double forward, double right, double rotate, double slowMode) {
         double leftFrontPower = -forward - right + rotate;
         double rightFrontPower = -forward + right - rotate;
-        double rightRearPower = -forward - right - rotate;
         double leftRearPower = -forward + right + rotate;
+        double rightRearPower = -forward - right - rotate;
         double maxPower = 1.0;
         double slowModeCalc;
 
