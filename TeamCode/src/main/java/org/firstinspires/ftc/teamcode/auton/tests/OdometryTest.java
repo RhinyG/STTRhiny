@@ -26,12 +26,13 @@ public class OdometryTest extends LinearOpMode {
         methods.calibrateEncoders();
         methods.resetIMU(hardwareMap);
 
-        /**
-         * check dit nog, zodra confirmation is over gebruik camera ipv distance sensor
-         */
         waitForStart();
         if (opModeIsActive()){
+            methods.driveY(50);
             methods.rotateToHeading(90);
+            slides.SanderArm(700);
+            methods.rotateToHeading(0);
+            methods.driveY(50);
             telemetry.update();
             sleep(30000);
         }

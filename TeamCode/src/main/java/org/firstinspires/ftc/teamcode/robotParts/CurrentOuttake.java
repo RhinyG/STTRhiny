@@ -131,7 +131,7 @@ public class CurrentOuttake extends RobotPart{
 
     /**
      * Merger from Reza's goToHeight and Sander's DriveY to allow goToHeight to work in autonomous.
-     * @param height This is the position you want to go to. In Armheight, not integers.
+     * @param height This is the position you want to go to. In ArmHeight, not integers.
      * @param telemetry Necessary otherwise NPE.
      */
     public void autonGoToHeight(ArmHeight height, Telemetry telemetry) {
@@ -160,6 +160,20 @@ public class CurrentOuttake extends RobotPart{
     }
     public void autonGoToHeight(ArmHeight height){autonGoToHeight(height, myOpMode.telemetry);}
 
+    public void SanderArm(int var){
+        slides.setTargetPosition(var);
+        slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        if(slides.getCurrentPosition() > var) {
+            slides.setPower(-0.3);
+        } else {
+            slides.setPower(0.3);
+        }
+        while (myOpMode.opModeIsActive() && slides.isBusy()) {
+            myOpMode.idle();
+        }
+        slides.setPower(0.2);
+    }
     /**
      * From Reza
      * @param btns if True, buttonmode is on (and arm will go to predetermined position). If false, it's on manual.

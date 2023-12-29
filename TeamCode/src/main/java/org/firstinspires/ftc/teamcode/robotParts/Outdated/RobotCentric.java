@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robotParts;
+package org.firstinspires.ftc.teamcode.robotParts.Outdated;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -11,8 +11,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.robotParts.AlexDistanceSensorUtil;
+import org.firstinspires.ftc.teamcode.robotParts.RobotPart;
 
-public class RobotCentric extends RobotPart{
+public class RobotCentric extends RobotPart {
     private LinearOpMode myOpMode;
 
     AlexDistanceSensorUtil distanceSensor = new AlexDistanceSensorUtil();

@@ -1,14 +1,14 @@
 //package org.firstinspires.ftc.teamcode.drive;
 //
-//import static org.firstinspires.ftc.teamcode.robotParts.ArmAlex.ArmHeightAlex.INTAKE2;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.ArmAlex.ArmHeightAlex.INTAKE2;
 //
 //import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 //import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 //
 //import org.firstinspires.ftc.teamcode.robotParts.AlexDistanceSensorUtil;
-//import org.firstinspires.ftc.teamcode.robotParts.ArmAlex;
+//import org.firstinspires.ftc.teamcode.robotParts.Outdated.ArmAlex;
 //import org.firstinspires.ftc.teamcode.robotParts.DrivetrainAlex;
-//import org.firstinspires.ftc.teamcode.robotParts.IntakeReza;
+//import org.firstinspires.ftc.teamcode.robotParts.Outdated.IntakeReza;
 //
 //@TeleOp
 //public class drivetrainPlusDistanceSensors extends LinearOpMode {

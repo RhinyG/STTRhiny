@@ -1,10 +1,12 @@
-package org.firstinspires.ftc.teamcode.robotParts;
+package org.firstinspires.ftc.teamcode.robotParts.Outdated;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class IntakeReza extends RobotPart{
+import org.firstinspires.ftc.teamcode.robotParts.RobotPart;
+
+public class IntakeReza extends RobotPart {
 
     CRServo intake;
 

@@ -59,11 +59,6 @@ public class newAutonMethods {
         BackR.setDirection(DcMotorSimple.Direction.REVERSE);
 
         OURTICKS_PER_CM = odoMultiplier*(TICKS_PER_ROTATION)/(2*Math.PI * GEAR_RATIO * WHEEL_RADIUS);
-//        FrontL.setDirection(DcMotorSimple.Direction.REVERSE);
-//        FrontR.setDirection(DcMotorSimple.Direction.REVERSE);
-//
-//        encoderX = map.dcMotor.get("leftFront");
-//        encoderY = map.dcMotor.get("leftRear");
         resetIMU(map);
     }
 

@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode.drive;
-//comment for Github
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -14,7 +13,6 @@ import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.SECONDLINE;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.THIRDLINE;
 
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.THIRDLINE;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.INTAKEPOS;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.MOVEPOS;
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.OUTTAKEPOS;
@@ -24,11 +22,9 @@ import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ClawPosit
 import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ClawPositions.GRABTWO;
 
 @TeleOp(name = "IGORGEBRUIKDEZE")
-public class CurrentTeleOp extends LinearOpMode {
+public class LM1TeleOp extends LinearOpMode {
     DrivetrainAlex drivetrain = new DrivetrainAlex();
     CurrentOuttake outtake = new CurrentOuttake(this);
-
-    public Servo plane;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -117,22 +113,20 @@ public class CurrentTeleOp extends LinearOpMode {
             }
 
             if(planeLaunch){
-                plane.setPosition(0);
+                plane.setPosition(0.55);
             } else if (planeReset) {
-                plane.setPosition(0.75);
+                plane.setPosition(0);
             }
 
             intake.setPower(intakePower);
             drivetrain.drive(y, x, rotate, slowMode);
             outtake.updateSlide(buttonMode, slidePower, height, telemetry);
             outtake.claw.setPosition(clawPosition.getPosition());
-//            outtake.claw.setPosition(gamepad2.left_stick_y);
             outtake.updateRotate(rotatePosition);
             telemetry.addData("Slide Position", outtake.slides.getCurrentPosition());
             telemetry.addData("Slide Power", slidePower);
             telemetry.addData("LeftPos", outtake.leftRotate.getPosition());
             telemetry.addData("RightPos", outtake.rightRotate.getPosition());
-//            telemetry.addData("servo",gamepad2.left_stick_y);
             telemetry.update();
         }
     }
