@@ -9,12 +9,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
+import org.firstinspires.ftc.teamcode.robotParts.LM2Outtake;
 import org.firstinspires.ftc.teamcode.robotParts.MecanumDrivetrain;
 
 @TeleOp(name = "LM2 RobotCentric")
 public class LM2TeleOp extends LinearOpMode {
     MecanumDrivetrain drivetrain = new MecanumDrivetrain(this);
-    CurrentOuttake outtake = new CurrentOuttake(this);
+//    CurrentOuttake outtake = new CurrentOuttake(this);
+    LM2Outtake outtake = new LM2Outtake(this);
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -36,6 +38,8 @@ public class LM2TeleOp extends LinearOpMode {
             boolean low = gamepad2.a;
             boolean mid = gamepad2.b;
             boolean high = gamepad2.y;
+            boolean drone = gamepad1.y;
+            boolean drone2 = gamepad1.x;
 
             if (intakeBtn) {
                 buttonMode = true;
@@ -54,13 +58,16 @@ public class LM2TeleOp extends LinearOpMode {
             if (Math.abs(slidePower) > 0.1) {
                 buttonMode = false;
             }
+            if (drone) {
+                outtake.updateDrone(1.0);
+            } else if (drone2) {
+                outtake.updateDrone(0.0);
+            }
 
             drivetrain.RobotCentric();
             outtake.updateSlide(buttonMode, slidePower, height, telemetry);
             telemetry.addData("Slide Position", outtake.slides.getCurrentPosition());
             telemetry.addData("Slide Power", slidePower);
-            telemetry.addData("LeftPos", outtake.leftRotate.getPosition());
-            telemetry.addData("RightPos", outtake.rightRotate.getPosition());
             telemetry.update();
         }
     }
