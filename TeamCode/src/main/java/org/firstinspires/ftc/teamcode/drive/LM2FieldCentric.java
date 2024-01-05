@@ -2,14 +2,11 @@ package org.firstinspires.ftc.teamcode.drive;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
 import org.firstinspires.ftc.teamcode.robotParts.MecanumDrivetrain;
 
 @TeleOp(name = "FieldCentric Test")
-public class FieldCentric extends LinearOpMode {
+public class LM2FieldCentric extends LinearOpMode {
     MecanumDrivetrain drivetrain = new MecanumDrivetrain(this);
     @Override
     public void runOpMode() throws InterruptedException {
@@ -22,9 +19,9 @@ public class FieldCentric extends LinearOpMode {
 
         while (opModeIsActive()) {
             if (gamepad1.right_bumper) {
-                drivetrain.FieldCentric(0.5, hardwareMap, telemetry);
+                drivetrain.FieldCentric(0.5,"Red", telemetry);
             } else {
-                drivetrain.FieldCentric(1.0,hardwareMap, telemetry);
+                drivetrain.FieldCentric(1.0,"Red", telemetry);
             }
             telemetry.update();
         }
