@@ -11,6 +11,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
+import java.util.Objects;
+
 public class MecanumDrivetrain {
     private final LinearOpMode myOpMode;
     public DcMotor FrontL;
@@ -18,7 +20,7 @@ public class MecanumDrivetrain {
     public DcMotor BackL;
     public DcMotor BackR;
     double current_target_heading = 0;
-    IMU imu;
+    public IMU imu;
     double WHEEL_RADIUS = 48;//mm
     double GEAR_RATIO = 1/13.7;
     double TICKS_PER_ROTATION = 8192;
@@ -28,11 +30,13 @@ public class MecanumDrivetrain {
     public MecanumDrivetrain(LinearOpMode opmode) {myOpMode = opmode;}
 
     /**
-     * This methods initialises the mecanum drivetrain and sets all the directions and modes to their correct settings.
+     * This methods initialises the mecanum drivetrain and the IMU and sets all the directions and modes to their correct settings.
      * @param map - Gives a hardwareMap from the opmode for the method to use. Not having this parameter would result in an NPE.
      *            This can alternatively be done with myOpMode.hardwareMap.get but that's longer so we don't.
      */
     public void init(HardwareMap map) {
+        imu = map.get(IMU.class, "imu");
+
         FrontL = map.get(DcMotor.class, "left_front");
         FrontR = map.get(DcMotor.class, "right_front");
         BackL = map.get(DcMotor.class, "left_back");
@@ -46,7 +50,7 @@ public class MecanumDrivetrain {
         FrontL.setDirection(DcMotorSimple.Direction.FORWARD);
         FrontR.setDirection(DcMotorSimple.Direction.FORWARD);
         BackL.setDirection(DcMotorSimple.Direction.FORWARD);
-        BackR.setDirection(DcMotorSimple.Direction.REVERSE);
+        BackR.setDirection(DcMotorSimple.Direction.FORWARD);
 
 //        FrontL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        FrontR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -55,7 +59,12 @@ public class MecanumDrivetrain {
 
         OURTICKS_PER_CM = odoMultiplier*(TICKS_PER_ROTATION)/(2*Math.PI * GEAR_RATIO * WHEEL_RADIUS);
 
-        resetIMU(map);
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
+
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
     }
 
     /**
@@ -256,53 +265,51 @@ public class MecanumDrivetrain {
         BackL.setPower(BackLPower/maxPower);
         BackR.setPower(BackRPower/maxPower);
     }
-
+//TODO: documentation
     public void BackBoardCorrection(double dHeading) {
-        double speed = 0.5;
+        double speed = 0.3;
 
-        if (Math.abs(dHeading) > 2.0){
+        if (Math.abs(dHeading) > 20.0){
             if(dHeading < 0.0){speed = -0.5;}
-            FrontL.setPower(speed);
-            FrontR.setPower(-speed);
-            BackL.setPower(speed);
-            BackR.setPower(-speed);
+            FrontL.setPower(-speed);
+            FrontR.setPower(speed);
+            BackL.setPower(-speed);
+            BackR.setPower(speed);
         } else {
             Stop();
         }
     }
+//TODO: documentation
+    public void IMUBackBoardCorrection(String alliance,double offsetYaw,double offsetZ, Telemetry telemetry) {
+        offsetZ = 1.27 * offsetZ + 0.0471;
 
-    public void IMUBackBoardCorrection() {
-        double margin = 2.0;
-        double speed = 0.5;
+        double offsetX = Math.atan(Math.toRadians(offsetYaw)) * offsetZ;
+
+        double marginYaw = 6.0;
+
         double currentHeading = getCurrentHeadingDegrees();
-        double targetHeading = -90.0;
+
+        double targetHeading;
+        if(Objects.equals(alliance, "Red")){targetHeading = -90.0;}
+        else {targetHeading = 90.0;}
         double dHeading = Math.abs(currentHeading - targetHeading);
+
+        double ROT = 0.3;
+        if (dHeading < marginYaw) {ROT = 0.1;}
         if (currentHeading < targetHeading) {
-            speed = -0.5;
-            if (dHeading > margin) {
-                FrontL.setPower(speed);
-                FrontR.setPower(-speed);
-                BackL.setPower(speed);
-                BackR.setPower(-speed);
-            } else {
-                FrontL.setPower((dHeading/margin) * -0.1);
-                FrontR.setPower((dHeading/margin) * 0.1);
-                BackL.setPower((dHeading/margin) * -0.1);
-                BackR.setPower((dHeading/margin) * 0.1);
-            }
-        } else if (currentHeading > targetHeading) {
-            if (dHeading > margin) {
-                FrontL.setPower(speed);
-                FrontR.setPower(-speed);
-                BackL.setPower(speed);
-                BackR.setPower(-speed);
-            } else {
-                FrontL.setPower((dHeading/margin) * 0.1);
-                FrontR.setPower((dHeading/margin) * -0.1);
-                BackL.setPower((dHeading/margin) * 0.1);
-                BackR.setPower((dHeading/margin) * -0.1);
-            }
+            ROT *= -1;
         }
+
+        double FWD = 0.5*(offsetZ * Math.cos(offsetYaw) - offsetX * Math.sin(offsetYaw));
+        double STR = 0.5*(offsetZ * Math.sin(offsetYaw) + offsetX * Math.cos(offsetYaw));
+
+        telemetry.addData("FWD",FWD);
+        telemetry.addData("STR",STR);
+
+        FrontL.setPower(-FWD + STR + ROT);
+        FrontR.setPower(-FWD - STR - ROT);
+        BackL.setPower(-FWD - STR + ROT);
+        BackR.setPower(-FWD + STR - ROT);
     }
 
     /**
@@ -311,17 +318,32 @@ public class MecanumDrivetrain {
      * complex maneuvering possible. The code itself is a copy of RobotCentric, with correction to FWD, STR and
      * ROT, which need to be relative to the robot.
      * @param speed - Decides at what speed the entire method should function. It's interval is [0, 1].
-     * @param map - Gives a hardwareMap from the opmode for the method to use. Not having this parameter would result in an NPE.
-     *            This can alternatively be done with myOpMode.hardwareMap.get but that's longer so we don't.
      * @param telemetry - Gives telemetry from the opmode for the method to use. Not having this parameter would result in an NPE.
      *                  This can alternatively be done with myOpMode.telemetry.addData but that's longer so we don't.
      */
-    public void FieldCentric(double speed, HardwareMap map, Telemetry telemetry) {
+    public void FieldCentric(double speed,String alliance ,Telemetry telemetry) {
         double theta = getCurrentHeadingRadians();
         double FWD = (myOpMode.gamepad1.left_stick_x * Math.sin(theta) + myOpMode.gamepad1.left_stick_y * Math.cos(theta));
         double STR = (myOpMode.gamepad1.left_stick_x * Math.cos(theta) - myOpMode.gamepad1.left_stick_y * Math.sin(theta));
         double ROT = myOpMode.gamepad1.right_stick_x;
-        double maxPower = 1.0; //TODO: Igor says this felt slow, probably cause that gets too high, print it and look at it.
+        double maxPower = 1.0;
+
+        if (myOpMode.gamepad1.x) {
+            double marginYaw = 6.0;
+
+            double currentHeading = getCurrentHeadingDegrees();
+
+            double targetHeading;
+            if(Objects.equals(alliance, "Red")){targetHeading = 90.0;}
+            else {targetHeading = -90.0;}
+            double dHeading = Math.abs(currentHeading - targetHeading);
+
+            ROT = 0.3;
+            if (dHeading < marginYaw) {ROT = 0.1;}
+            if (currentHeading < targetHeading) {
+                ROT *= -1;
+            }
+        }
 
         double FrontLPower = ((-FWD + STR + ROT) * speed);
         double FrontRPower = ((-FWD - STR - ROT) * speed);
@@ -339,9 +361,10 @@ public class MecanumDrivetrain {
         BackR.setPower(BackRPower/maxPower);
 
         if (myOpMode.gamepad1.right_bumper && myOpMode.gamepad1.left_bumper) {
-            resetIMU(map);
+            imu.resetYaw();
         }
         telemetry.addData("Current heading",getCurrentHeadingDegrees());
+        telemetry.addData("maxPower",maxPower);//TODO: Igor says this felt slow, probably cause that gets too high, print it and look at it.
         telemetry.update();
     }
 
@@ -385,23 +408,6 @@ public class MecanumDrivetrain {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         return (orientation.getYaw(AngleUnit.RADIANS));
     }
-
-    /**
-     * This method resets (or initialises, if it's the first time) the IMU. This is used in init and
-     * FieldCentric.
-     * @param map - Gives a hardwareMap from the opmode for the method to use. Not having this parameter would result in an NPE.
-     *            This can alternatively be done with myOpMode.hardwareMap.get but that's longer so we don't.
-     */
-    public void resetIMU(HardwareMap map) {//TODO: This don't work in FieldCentric
-        imu = map.get(IMU.class, "imu");
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
-        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
-
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
-    }
-
     /**
      * This method resets the encoders to a new zero position, so the next method starts from position zero again.
      */

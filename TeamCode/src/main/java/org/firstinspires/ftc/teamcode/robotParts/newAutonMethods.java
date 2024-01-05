@@ -1,24 +1,16 @@
-package org.firstinspires.ftc.teamcode.auton.autonParts;
+package org.firstinspires.ftc.teamcode.robotParts;
 
-import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class newAutonMethods {
@@ -56,7 +48,9 @@ public class newAutonMethods {
         BackR = map.get(DcMotor.class, "right_back");
 //        FrontL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        BackR.setDirection(DcMotorSimple.Direction.REVERSE);
+        BackR.setDirection(DcMotorSimple.Direction.FORWARD);
+        BackL.setDirection(DcMotorSimple.Direction.FORWARD);
+        FrontR.setDirection(DcMotorSimple.Direction.FORWARD);
 
         OURTICKS_PER_CM = odoMultiplier*(TICKS_PER_ROTATION)/(2*Math.PI * GEAR_RATIO * WHEEL_RADIUS);
         resetIMU(map);
@@ -69,7 +63,7 @@ public class newAutonMethods {
     public void driveY(double position, double speed, Telemetry telemetry) {
         calibrateEncoders();
         double Kp = 0.03;
-        double turn = 0;
+        double turn;
         double heading = current_target_heading;
         double OdoY_Pos = FrontL.getCurrentPosition();
         double tick = (int) (position * OURTICKS_PER_CM);
@@ -78,14 +72,15 @@ public class newAutonMethods {
             if ((dPos < 0 && speed > 0) || (dPos > 0 && speed < 0)) {
                 speed = -speed;
             }
-            //turn = Kp*Math.abs(speed)*(/*getTargetHeading*/(heading)-getCurrentHeading_DEGREES());
+            //TODO: see if turn correction works
+            turn = Kp*Math.abs(speed)*(heading-getCurrentHeading());
 
             telemetry.addData("tick", tick);
             telemetry.addData("PosY", OdoY_Pos/OURTICKS_PER_CM);
             telemetry.addData("dPos", dPos);
             telemetry.addData("speed", speed);
             telemetry.addData("CurrentHeading", getCurrentHeading());
-            telemetry.addData("TargetHeading", /*getTargetHeading*/(heading));
+            telemetry.addData("TargetHeading", heading);
             telemetry.update();
 
 //            FrontL.setPower(speed + turn);
@@ -113,23 +108,22 @@ public class newAutonMethods {
         speed = speed * -1;
         calibrateEncoders();
         double Kp = 0.03;
-        double turn = 0;
+        double turn;
         double heading = current_target_heading;
         double OdoX_Pos = -BackL.getCurrentPosition();
-        //double OdoY_Pos = -FrontL.getCurrentPosition();
         double tick = (int) (position * OURTICKS_PER_CM);
         double dPos = tick - OdoX_Pos;
         while (!(dPos > -threshold && dPos < threshold) && myOpMode.opModeIsActive()) {
             if ((dPos > 0 && speed > 0) || (dPos < 0 && speed < 0)) {
                 speed = -speed;
             }
-            //turn = Kp*Math.abs(speed)*(/*getTargetHeading*/(heading)-getCurrentHeading_DEGREES());
+            //TODO: see if turn correction works
+            turn = Kp*Math.abs(speed)*(heading-getCurrentHeading());
 
             telemetry.addData("tick", tick);
             telemetry.addData("PosX", OdoX_Pos/OURTICKS_PER_CM);
             telemetry.addData("dPos", dPos);
             telemetry.addData("speed", speed);
-            //telemetry.addData("Turn",turn);
             telemetry.update();
 
             FrontL.setPower(-speed + turn);
@@ -137,7 +131,6 @@ public class newAutonMethods {
             BackL.setPower(gravityConstant * (speed + turn));
             BackR.setPower(gravityConstant * (-speed - turn));
 
-            //OdoY_Pos = -FrontL.getCurrentPosition();
             OdoX_Pos = -BackL.getCurrentPosition();
             dPos = tick - OdoX_Pos;
         }
@@ -157,7 +150,7 @@ public class newAutonMethods {
         telemetry.addData("dHeading",dHeading);
         telemetry.update();
         while (!(Math.abs(dHeading) < 1) && myOpMode.opModeIsActive()) {
-            direction = 1; //checkDirection(current_heading-target_heading);
+            direction = checkDirection(current_heading-target_heading);
 
             FrontL.setPower(-speed * direction);
             FrontR.setPower(speed * direction);
@@ -211,47 +204,6 @@ public class newAutonMethods {
         FrontR.setPower((FWD - STR + ROT) * (speed));
         BackL.setPower((FWD - STR - ROT) * (speed));
         BackR.setPower((FWD + STR - ROT) * (speed));
-    }
-    //Autonomous drive in any direction
-    public void Drive(double target_x_cm, double target_y_cm, double speed, Telemetry telemetry) {
-        double Kp = 0.03;
-        double turn = 0;
-        double heading = getCurrentHeading() + (Math.PI / 2);
-        target_x_cm = target_x_cm * OURTICKS_PER_CM;
-        target_y_cm = target_y_cm * OURTICKS_PER_CM;
-        double cur_x = FrontR.getCurrentPosition();
-        double cur_y = FrontL.getCurrentPosition() * -1;
-        telemetry.addData("dX: ", target_x_cm - cur_x);
-        telemetry.addData("dY: ", target_y_cm - cur_y);
-        telemetry.update();
-        double Vy, Vx, FWD, STR;
-        while (myOpMode.opModeIsActive() && (!(target_x_cm - cur_x > -200 && target_x_cm - cur_x < 200) || !(target_y_cm - cur_y > -200 && target_y_cm - cur_y < 200))) {
-            Vy = ((target_x_cm-cur_x) * Math.sin(heading) + (target_y_cm-cur_y) * Math.cos(heading));
-            Vx = ((target_x_cm-cur_x) * Math.cos(heading) - (target_y_cm-cur_y) * Math.sin(heading));
-            if (!(target_y_cm - cur_y > -0.05 && target_y_cm - cur_y < 0.05))
-                FWD = speed / (Vy + Vx) * Vy * checkDirection(target_y_cm - cur_y);
-            else FWD = 0;
-            if (!(target_x_cm - cur_x > -0.05 && target_x_cm - cur_x < 0.05))
-                STR = speed / (Vy + Vx) * Vx * checkDirection(target_x_cm - cur_x);
-            else STR = 0;
-
-            turn = Kp*Math.abs(speed)*(/*getTargetHeading*/(heading)-getCurrentHeading());
-
-            FrontL.setPower(FWD + STR + turn);
-            FrontR.setPower(FWD - STR + turn);
-            BackL.setPower(FWD - STR - turn);
-            BackR.setPower(FWD + STR - turn);
-
-            cur_x = FrontR.getCurrentPosition();
-            cur_y = FrontL.getCurrentPosition() * -1;
-            telemetry.addData("dY: ", target_y_cm - cur_y);
-            telemetry.addData("dX: ", target_x_cm - cur_x);
-            telemetry.addData("FWD: ", FWD);
-            telemetry.addData("STR: ", STR);
-            telemetry.addData("turn: ", turn);
-            telemetry.update();
-        }
-        Stop();
     }
 
     public void Stop(){

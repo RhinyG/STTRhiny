@@ -3,30 +3,25 @@ package org.firstinspires.ftc.teamcode.auton.tests;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.robotParts.OpenCVTrussIsLeft;
 import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 import org.firstinspires.ftc.teamcode.robotParts.PixelManipulation;
 
-@Autonomous(name = "OdomTest", group = "Test")
-public class OdometryTest extends LinearOpMode {
-    newAutonMethods methods = new newAutonMethods(this);
-    PixelManipulation slides = new PixelManipulation(this);
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.FIRSTLINE;
 
-    @Override
+@Autonomous(name = "PixelPlaceTest")
+public class PixelPlaceTest extends LinearOpMode {
+    newAutonMethods methods = new newAutonMethods(this);
+    OpenCVTrussIsLeft camera = new OpenCVTrussIsLeft(this);
+    PixelManipulation outtake = new PixelManipulation(this);
+
     public void runOpMode() {
         methods.init(hardwareMap);
-        slides.init(hardwareMap);
+        outtake.init(hardwareMap);
         methods.calibrateEncoders();
         methods.resetIMU(hardwareMap);
+        camera.findScoringPosition();
 
         waitForStart();
-        if (opModeIsActive()){
-            methods.driveY(50);
-            methods.rotateToHeading(90);
-            slides.SanderArm(700);
-            methods.rotateToHeading(0);
-            methods.driveY(50);
-            telemetry.update();
-            sleep(30000);
-        }
     }
 }

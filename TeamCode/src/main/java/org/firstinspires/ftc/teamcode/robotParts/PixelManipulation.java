@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class CurrentOuttake extends RobotPart{
+public class PixelManipulation extends RobotPart{
 
     private final LinearOpMode myOpMode;
     public Servo claw;
@@ -61,7 +61,7 @@ public class CurrentOuttake extends RobotPart{
         }
     }
 
-    public CurrentOuttake(LinearOpMode opmode) {myOpMode = opmode;}
+    public PixelManipulation(LinearOpMode opmode) {myOpMode = opmode;}
 
     /**
      * Init
@@ -72,7 +72,8 @@ public class CurrentOuttake extends RobotPart{
         leftRotate = map.get(Servo.class, "leftRotate");
         rightRotate = map.get(Servo.class,"rightRotate");
 
-        claw.setPosition(ClawPositions.GRABONE.getPosition());
+        claw.setPosition(0.5);
+//        claw.setPosition(ClawPositions.GRABONE.getPosition());
         updateRotate(RotatePositions.MOVEPOS);
 
         slides = map.get(DcMotorEx.class, "slides");

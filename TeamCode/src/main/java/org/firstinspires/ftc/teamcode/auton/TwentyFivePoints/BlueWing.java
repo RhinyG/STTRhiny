@@ -3,15 +3,15 @@ package org.firstinspires.ftc.teamcode.auton.TwentyFivePoints;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.auton.autonParts.OpenCVTrussIsLeft;
-import org.firstinspires.ftc.teamcode.auton.autonParts.newAutonMethods;
-import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
+import org.firstinspires.ftc.teamcode.robotParts.OpenCVTrussIsLeft;
+import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
+import org.firstinspires.ftc.teamcode.robotParts.PixelManipulation;
 
 @Autonomous(name = "BlueWing")
 public class BlueWing extends LinearOpMode {
     newAutonMethods methods = new newAutonMethods(this);
     OpenCVTrussIsLeft camera = new OpenCVTrussIsLeft(this);
-    CurrentOuttake slides = new CurrentOuttake(this);
+    PixelManipulation slides = new PixelManipulation(this);
 
     public void runOpMode() {
         methods.init(hardwareMap);

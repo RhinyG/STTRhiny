@@ -1,11 +1,14 @@
-package org.firstinspires.ftc.teamcode.robotParts;
+package org.firstinspires.ftc.teamcode.robotParts.Outdated;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class DrivetrainAlex extends RobotPart{
+import org.firstinspires.ftc.teamcode.robotParts.AlexDistanceSensorUtil;
+import org.firstinspires.ftc.teamcode.robotParts.RobotPart;
+
+public class DrivetrainAlex extends RobotPart {
 
     AlexDistanceSensorUtil distanceSensor = new AlexDistanceSensorUtil();
 
@@ -23,8 +26,8 @@ public class DrivetrainAlex extends RobotPart{
         rightBack = map.get(DcMotorEx.class, "right_back");
 
         rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
-
+        leftBack.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightBack.setDirection(DcMotorSimple.Direction.FORWARD);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.drive;
+package org.firstinspires.ftc.teamcode.drive.tests;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 @Disabled
-@TeleOp(name = "Sensor: IMU Orthogonal", group = "Sensor")
+@TeleOp(name = "Sensor: IMU Orthogonal", group = "Tests")
 public class SensorIMUOrthogonal extends LinearOpMode
 {
     IMU imu;

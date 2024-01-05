@@ -1,27 +1,27 @@
 package org.firstinspires.ftc.teamcode.drive;
 
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.FIRSTLINE;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.INTAKE;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.SECONDLINE;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.THIRDLINE;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.FIRSTLINE;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.INTAKE;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.SECONDLINE;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.THIRDLINE;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
+import org.firstinspires.ftc.teamcode.robotParts.PixelManipulation;
 import org.firstinspires.ftc.teamcode.robotParts.MecanumDrivetrain;
 
 @TeleOp(name = "LM2 RobotCentric")
-public class LM2TeleOp extends LinearOpMode {
+public class LM2RobotCentric extends LinearOpMode {
     MecanumDrivetrain drivetrain = new MecanumDrivetrain(this);
-    CurrentOuttake outtake = new CurrentOuttake(this);
+    PixelManipulation outtake = new PixelManipulation(this);
     @Override
     public void runOpMode() throws InterruptedException {
 
         drivetrain.init(hardwareMap);
         outtake.init(hardwareMap);
 
-        CurrentOuttake.ArmHeight height = INTAKE;
+        PixelManipulation.ArmHeight height = INTAKE;
 
         boolean buttonMode = false;
 
