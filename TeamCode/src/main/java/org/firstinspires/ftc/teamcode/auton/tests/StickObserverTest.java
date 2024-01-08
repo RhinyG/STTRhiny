@@ -3,7 +3,7 @@
 //import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 //import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 //
-//import org.firstinspires.ftc.teamcode.auton.autonParts.CVMaster;
+//import org.firstinspires.ftc.teamcode.robotParts.Outdated.CVMaster;
 //
 //@Autonomous(name = "StickObserverTest")
 //

@@ -17,7 +17,6 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 
-@Disabled
 @TeleOp
 public class AprilTagTest extends LinearOpMode {
     OpenCvCamera camera;
@@ -35,7 +34,7 @@ public class AprilTagTest extends LinearOpMode {
     double cy = 221.506;
 
     // UNITS ARE METERS
-    double tagsize = 0.166;
+    double tagsize = 0.0508;
 
     int blueLeft = 1;
     int blueMiddle = 2;
@@ -47,7 +46,6 @@ public class AprilTagTest extends LinearOpMode {
     int fieldLeftSmall = 8;
     int fieldRightSmall = 9;
     int fieldRightBig = 10;
-//    int ID_TAG_OF_INTEREST = 18; // Tag ID 18 from the 36h11 family
 
     AprilTagDetection tagOfInterest = null;
 
@@ -88,14 +86,19 @@ public class AprilTagTest extends LinearOpMode {
             {
                 boolean tagFound = false;
 
-                for(AprilTagDetection tag : currentDetections)
-                {
-                    if(tag.id == blueLeft || tag.id == blueMiddle || tag.id == blueRight || tag.id == redLeft || tag.id == redMiddle || tag.id == redRight || tag.id == fieldLeftBig || tag.id == fieldLeftSmall || tag.id == fieldRightBig || tag.id == fieldRightSmall)
-                    {
-                        tagOfInterest = tag;
-                        tagFound = true;
-                        break;
-                    }
+                for(AprilTagDetection tag : currentDetections) {
+                    Orientation rot = Orientation.getOrientation(tag.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
+
+                    telemetry.addLine(String.format("\nDetected tag ID=%d", tag.id));
+                    telemetry.addLine(String.format("Translation X: %.2f meter", tag.pose.x));
+                    telemetry.addLine(String.format("Translation Y: %.2f meter", tag.pose.y));
+                    telemetry.addLine(String.format("Translation Z: %.2f meter", tag.pose.z));
+                    telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
+                    //                    if(tag.id == blueLeft || tag.id == blueMiddle || tag.id == blueRight || tag.id == redLeft || tag.id == redMiddle || tag.id == redRight || tag.id == fieldLeftBig || tag.id == fieldLeftSmall || tag.id == fieldRightBig || tag.id == fieldRightSmall)
+//                    {
+//                        tagFound = true;
+//                        break;
+//                    }
                 }
 
                 if(tagFound)
@@ -103,20 +106,20 @@ public class AprilTagTest extends LinearOpMode {
                     telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
                     tagToTelemetry(tagOfInterest);
                 }
-                else
-                {
-                    telemetry.addLine("Don't see tag of interest :(");
-
-                    if(tagOfInterest == null)
-                    {
-                        telemetry.addLine("(The tag has never been seen)");
-                    }
-                    else
-                    {
-                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-                        tagToTelemetry(tagOfInterest);
-                    }
-                }
+//                else
+//                {
+//                    telemetry.addLine("Don't see tag of interest :(");
+//
+//                    if(tagOfInterest == null)
+//                    {
+//                        telemetry.addLine("(The tag has never been seen)");
+//                    }
+//                    else
+//                    {
+//                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+//                        tagToTelemetry(tagOfInterest);
+//                    }
+//                }
 
             }
             else
@@ -134,7 +137,6 @@ public class AprilTagTest extends LinearOpMode {
                 }
 
             }
-
             telemetry.update();
             sleep(20);
         }

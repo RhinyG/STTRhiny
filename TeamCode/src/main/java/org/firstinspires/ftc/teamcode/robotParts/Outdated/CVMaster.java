@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode.auton.autonParts;
+package org.firstinspires.ftc.teamcode.robotParts.Outdated;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.auton.autonParts.StickObserverPipeline;
+import org.firstinspires.ftc.teamcode.robotParts.Outdated.StickObserverPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;

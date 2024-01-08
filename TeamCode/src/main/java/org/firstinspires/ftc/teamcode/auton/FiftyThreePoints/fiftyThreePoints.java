@@ -3,18 +3,17 @@ package org.firstinspires.ftc.teamcode.auton.FiftyThreePoints;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.auton.autonParts.OpenCVTrussIsLeft;
-import org.firstinspires.ftc.teamcode.auton.autonParts.newAutonMethods;
-import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
+import org.firstinspires.ftc.teamcode.robotParts.OpenCVTrussIsLeft;
+import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
+import org.firstinspires.ftc.teamcode.robotParts.PixelManipulation;
 
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.BOTTOM;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.FIRSTLINE;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.FIRSTLINE;
 
 @Autonomous(name = "53?")
 public class fiftyThreePoints extends LinearOpMode {
     newAutonMethods methods = new newAutonMethods(this);
     OpenCVTrussIsLeft camera = new OpenCVTrussIsLeft(this);
-    CurrentOuttake outtake = new CurrentOuttake(this);
+    PixelManipulation outtake = new PixelManipulation(this);
 
     public void runOpMode() {
         methods.init(hardwareMap);
@@ -38,9 +37,9 @@ public class fiftyThreePoints extends LinearOpMode {
                 outtake.autonGoToHeight(FIRSTLINE);
                 sleep(500);
                 methods.driveX(-10);
-                outtake.updateRotate(CurrentOuttake.RotatePositions.OUTTAKEPOS);
+                outtake.updateRotate(PixelManipulation.RotatePositions.OUTTAKEPOS);
                 methods.driveY(-15, 0.2,telemetry);
-                outtake.claw.setPosition(CurrentOuttake.ClawPositions.RELEASE.getPosition());
+                outtake.claw.setPosition(PixelManipulation.ClawPositions.RELEASE.getPosition());
             } else if (finalPos == 1) {
                 methods.driveX(25.5 - 0.5 * methods.robotWidth_cm);
                 methods.driveY(-112 + methods.robotLength_cm);

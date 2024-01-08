@@ -1,33 +1,30 @@
 package org.firstinspires.ftc.teamcode.drive;
-//comment for Github
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.robotParts.DrivetrainAlex;
-import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
+import org.firstinspires.ftc.teamcode.robotParts.Outdated.DrivetrainAlex;
+import org.firstinspires.ftc.teamcode.robotParts.PixelManipulation;
 
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.INTAKE;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.BOTTOM;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.FIRSTLINE;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ArmHeight.SECONDLINE;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.INTAKE;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.FIRSTLINE;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.SECONDLINE;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.THIRDLINE;
 
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.INTAKEPOS;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.MOVEPOS;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.RotatePositions.OUTTAKEPOS;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.RotatePositions.INTAKEPOS;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.RotatePositions.MOVEPOS;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.RotatePositions.OUTTAKEPOS;
 
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ClawPositions.RELEASE;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ClawPositions.GRABONE;
-import static org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake.ClawPositions.GRABTWO;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ClawPositions.RELEASE;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ClawPositions.GRABONE;
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ClawPositions.GRABTWO;
 
 @TeleOp(name = "IGORGEBRUIKDEZE")
-public class CurrentTeleOp extends LinearOpMode {
+public class LM1TeleOp extends LinearOpMode {
     DrivetrainAlex drivetrain = new DrivetrainAlex();
-    CurrentOuttake outtake = new CurrentOuttake(this);
-
-    public Servo plane;
+    PixelManipulation outtake = new PixelManipulation(this);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -37,9 +34,9 @@ public class CurrentTeleOp extends LinearOpMode {
         DcMotor intake = hardwareMap.dcMotor.get("intake");
         Servo plane = hardwareMap.servo.get("plane");
 
-        CurrentOuttake.ArmHeight height = INTAKE;
-        CurrentOuttake.ClawPositions clawPosition = GRABONE;
-        CurrentOuttake.RotatePositions rotatePosition = MOVEPOS;
+        PixelManipulation.ArmHeight height = INTAKE;
+        PixelManipulation.ClawPositions clawPosition = GRABONE;
+        PixelManipulation.RotatePositions rotatePosition = MOVEPOS;
 
         boolean buttonMode = false;
 
@@ -86,13 +83,13 @@ public class CurrentTeleOp extends LinearOpMode {
                 height = INTAKE;
             } else if (low) {
                 buttonMode = true;
-                height = BOTTOM;
+                height = FIRSTLINE;
             } else if (mid) {
                 buttonMode = true;
-                height = FIRSTLINE;
+                height = SECONDLINE;
             } else if (high) {
                 buttonMode = true;
-                height = SECONDLINE;
+                height = THIRDLINE;
             }
 
             if (Math.abs(slidePower) > 0.1) {
@@ -116,22 +113,25 @@ public class CurrentTeleOp extends LinearOpMode {
             }
 
             if(planeLaunch){
-                plane.setPosition(0);
+                plane.setPosition(0.55);
             } else if (planeReset) {
-                plane.setPosition(0.75);
+                plane.setPosition(0);
             }
 
             intake.setPower(intakePower);
             drivetrain.drive(y, x, rotate, slowMode);
             outtake.updateSlide(buttonMode, slidePower, height, telemetry);
-            outtake.claw.setPosition(clawPosition.getPosition());
-//            outtake.claw.setPosition(gamepad2.left_stick_y);
+//            outtake.claw.setPosition(clawPosition.getPosition());
+            outtake.claw.setPosition(-gamepad2.left_stick_y);
+            telemetry.addData("wrist",-gamepad2.left_stick_y);
             outtake.updateRotate(rotatePosition);
             telemetry.addData("Slide Position", outtake.slides.getCurrentPosition());
             telemetry.addData("Slide Power", slidePower);
             telemetry.addData("LeftPos", outtake.leftRotate.getPosition());
             telemetry.addData("RightPos", outtake.rightRotate.getPosition());
-//            telemetry.addData("servo",gamepad2.left_stick_y);
+
+            telemetry.addData("x",-gamepad1.left_stick_x);
+            telemetry.addData("z",gamepad1.left_stick_y);
             telemetry.update();
         }
     }

@@ -1,5 +1,5 @@
 //Can move servo's and slides manually but not with buttons
-package org.firstinspires.ftc.teamcode.robotParts;
+package org.firstinspires.ftc.teamcode.robotParts.Outdated;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -8,8 +8,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robotParts.RobotPart;
 
-public class OutdatedOuttake extends RobotPart{
+public class OutdatedOuttake extends RobotPart {
 
     Servo leftClaw;
     Servo leftRotate;

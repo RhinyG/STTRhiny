@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.robotParts;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -9,38 +8,22 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class CurrentOuttake extends RobotPart{
+public class PixelManipulation extends RobotPart{
 
-    private LinearOpMode myOpMode;
+    private final LinearOpMode myOpMode;
     public Servo claw;
     public Servo leftRotate;
     public Servo rightRotate;
     public DcMotorEx slides;
-    int upperLimit = 2300; //2400 but can shoot up to 130 more than limit
+    int upperLimit = 1150;
     int lowerLimit = 0;
-    int sequenceStep = 1;
-
-//    public enum AutonArmHeight {
-//        INTAKE(0),
-//        BOTTOM(470),
-//        FIRSTLINE(1370),
-//        SECONDLINE(2100);
-//
-//        private int position;
-//        public int getPosition() {
-//            return this.position;
-//        }
-//        AutonArmHeight(int position) {
-//            this.position = position;
-//        }
-//    }
     public enum ArmHeight {
         INTAKE(0),
-        BOTTOM(470),
-        FIRSTLINE(1370),
-        SECONDLINE(2100);
+        FIRSTLINE(460),
+        SECONDLINE(700),
+        THIRDLINE(1100);
 
-        private int position;
+        private final int position;
         public int getPosition() {
             return this.position;
         }
@@ -54,7 +37,7 @@ public class CurrentOuttake extends RobotPart{
         GRABONE(0.7),
         GRABTWO(0.53);
 
-        private double position;
+        private final double position;
 
         public double getPosition() {
             return this.position;
@@ -69,7 +52,7 @@ public class CurrentOuttake extends RobotPart{
         MOVEPOS(0.575),
         OUTTAKEPOS(0.165);
 
-        private double position;
+        private final double position;
         public double getPosition() {
             return this.position;
         }
@@ -78,18 +61,19 @@ public class CurrentOuttake extends RobotPart{
         }
     }
 
-    public CurrentOuttake(LinearOpMode opmode) {myOpMode = opmode;}
+    public PixelManipulation(LinearOpMode opmode) {myOpMode = opmode;}
 
     /**
-     * does something
-     * @param map
+     * Init
+     * @param map otherwise NPE
      */
     public void init(HardwareMap map) {
         claw = map.get(Servo.class, "claw");
         leftRotate = map.get(Servo.class, "leftRotate");
         rightRotate = map.get(Servo.class,"rightRotate");
 
-        claw.setPosition(ClawPositions.GRABONE.getPosition());
+        claw.setPosition(0.5);
+//        claw.setPosition(ClawPositions.GRABONE.getPosition());
         updateRotate(RotatePositions.MOVEPOS);
 
         slides = map.get(DcMotorEx.class, "slides");
@@ -102,8 +86,8 @@ public class CurrentOuttake extends RobotPart{
     }
 
     /**
-     *
-     * @param position
+     * This updates the claws to a (new) position
+     * @param position is a value from the enumerator RotatePositions
      */
     public void updateRotate(RotatePositions position) {
         double leftRotatePos;
@@ -116,12 +100,11 @@ public class CurrentOuttake extends RobotPart{
     /**
      * From Reza
      *
-     * @param position
-     * @param telemetry
-     * @return
+     * @param position is the height it should go to.
+     * @param telemetry because otherwise NPE.
+     * @return It returns its current distance to target so that can be used again to set a new target.
      */
     public double goToHeight(int position, Telemetry telemetry) {
-        double error = 5.0;
         double margin = 50.0;
         double currentPosLeft = slides.getCurrentPosition();
         double distance = Math.abs(currentPosLeft - position);
@@ -149,7 +132,7 @@ public class CurrentOuttake extends RobotPart{
 
     /**
      * Merger from Reza's goToHeight and Sander's DriveY to allow goToHeight to work in autonomous.
-     * @param height This is the position you want to go to. In Armheight, not integers.
+     * @param height This is the position you want to go to. In ArmHeight, not integers.
      * @param telemetry Necessary otherwise NPE.
      */
     public void autonGoToHeight(ArmHeight height, Telemetry telemetry) {
@@ -178,36 +161,20 @@ public class CurrentOuttake extends RobotPart{
     }
     public void autonGoToHeight(ArmHeight height){autonGoToHeight(height, myOpMode.telemetry);}
 
-//    public double autonGoToHeight(int position, Telemetry telemetry) {
-//        double error = 5.0;
-//        double margin = 50.0;
-//        double currentPosLeft = slides.getCurrentPosition();
-//        double distance = Math.abs(currentPosLeft - position);
-//        while (!(distance > 0) && myOpMode.opModeIsActive()) {
-//            if (currentPosLeft < position + error || currentPosLeft < position - error) {
-//                if (distance > margin) {
-//                    slides.setPower(1);
-//                } else {
-//                    slides.setPower(1 * (distance / margin) * 0.4);
-//                }
-//                telemetry.addLine("up");
-//            } else if (currentPosLeft > position + error || currentPosLeft > position - error) {
-//                if (distance > margin) {
-//                    slides.setPower(-1);
-//                } else {
-//                    slides.setPower(-1 * (distance / margin) * 0.4);
-//                }
-//                telemetry.addLine("down");
-//            } else if (position == 0 && currentPosLeft <= 0) {
-//                setPower(0);
-//            } else {
-//                setPower(0.01);
-//            }
-//        }
-//            return distance;
-//    }
-
-
+    public void SanderArm(int var){
+        slides.setTargetPosition(var);
+        slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        if(slides.getCurrentPosition() > var) {
+            slides.setPower(-0.3);
+        } else {
+            slides.setPower(0.3);
+        }
+        while (myOpMode.opModeIsActive() && slides.isBusy()) {
+            myOpMode.idle();
+        }
+        slides.setPower(0.2);
+    }
     /**
      * From Reza
      * @param btns if True, buttonmode is on (and arm will go to predetermined position). If false, it's on manual.
@@ -240,25 +207,4 @@ public class CurrentOuttake extends RobotPart{
             telemetry.addData("distance to goal", distance);
         }
     }
-
-//    public void sequenceTwo(boolean start){
-//        boolean newSequence = sequenceStart;
-//        if(start != sequenceStart){
-//            newSequence = start;
-//        }
-//        if(sequenceStart){
-//
-//        }
-//    }
-//    public void sequenceAttempt(Telemetry telemetry){
-//        updateLeftClaw(ClawPositions.RELEASE);
-//        updateLeftRotate(RotatePositions.MOVEPOS);
-//        goToHeight(0,telemetry);
-//        updateLeftRotate(RotatePositions.INTAKEPOS);
-//        updateLeftClaw(ClawPositions.GRAB);
-//        updateLeftRotate(RotatePositions.MOVEPOS);
-//        goToHeight(1300,telemetry);
-//        updateLeftRotate(RotatePositions.OUTTAKEPOS);
-//        updateLeftClaw(ClawPositions.RELEASE);
-//    }
 }

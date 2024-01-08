@@ -4,15 +4,15 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
-import org.firstinspires.ftc.teamcode.auton.autonParts.OpenCVTrussIsRight;
-import org.firstinspires.ftc.teamcode.auton.autonParts.newAutonMethods;
-import org.firstinspires.ftc.teamcode.robotParts.CurrentOuttake;
+import org.firstinspires.ftc.teamcode.robotParts.OpenCVTrussIsRight;
+import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
+import org.firstinspires.ftc.teamcode.robotParts.PixelManipulation;
 
 @Autonomous(name = "RedWing")
 public class RedWing extends LinearOpMode {
     newAutonMethods methods = new newAutonMethods(this);
     OpenCVTrussIsRight camera = new OpenCVTrussIsRight(this);
-    CurrentOuttake slides = new CurrentOuttake(this);
+    PixelManipulation slides = new PixelManipulation(this);
 
     public void runOpMode() {
         methods.init(hardwareMap);

@@ -1,22 +1,22 @@
 //package org.firstinspires.ftc.teamcode.drive;
 //
-//import static org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide.ArmHeight.BOTTOM;
-//import static org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide.ArmHeight.FIRSTLINE;
-//import static org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide.ArmHeight.INTAKE;
-//import static org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide.ArmHeight.SECONDLINE;
-//import static org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide.ClawPositions.GRAB;
-//import static org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide.ClawPositions.RELEASE;
-//import static org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide.RotatePositions.INTAKEPOS;
-//import static org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide.RotatePositions.MOVEPOS;
-//import static org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide.RotatePositions.OUTTAKEPOS;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.OuttakeSingleSlide.ArmHeight.BOTTOM;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.OuttakeSingleSlide.ArmHeight.FIRSTLINE;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.OuttakeSingleSlide.ArmHeight.INTAKE;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.OuttakeSingleSlide.ArmHeight.SECONDLINE;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.OuttakeSingleSlide.ClawPositions.GRAB;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.OuttakeSingleSlide.ClawPositions.RELEASE;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.OuttakeSingleSlide.RotatePositions.INTAKEPOS;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.OuttakeSingleSlide.RotatePositions.MOVEPOS;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.OuttakeSingleSlide.RotatePositions.OUTTAKEPOS;
 //
 //import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 //import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 //import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 //import com.qualcomm.robotcore.hardware.DcMotor;
 //
-//import org.firstinspires.ftc.teamcode.robotParts.DrivetrainAlex;
-//import org.firstinspires.ftc.teamcode.robotParts.OuttakeSingleSlide;
+//import org.firstinspires.ftc.teamcode.robotParts.Outdated.DrivetrainAlex;
+//import org.firstinspires.ftc.teamcode.robotParts.Outdated.OuttakeSingleSlide;
 //
 //@Disabled
 //@TeleOp

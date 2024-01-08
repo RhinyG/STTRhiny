@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auton.autonParts;
+package org.firstinspires.ftc.teamcode.robotParts;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -14,7 +14,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-public class OpenCVTrussIsRight {
+public class OpenCVTrussIsLeft {
     LinearOpMode myOpMode;
     OpenCvWebcam webcam1 = null;
 
@@ -22,7 +22,7 @@ public class OpenCVTrussIsRight {
     double centerAvgFin;
     double rightAvgFin;
 
-    public OpenCVTrussIsRight(LinearOpMode opMode) {myOpMode = opMode;}
+    public OpenCVTrussIsLeft(LinearOpMode opMode) {myOpMode = opMode;}
     public void findScoringPosition() {
         WebcamName webcamName = myOpMode.hardwareMap.get(WebcamName.class, "Webcam 1");
         int cameraMonitorViewId = myOpMode.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", myOpMode.hardwareMap.appContext.getPackageName());
@@ -43,8 +43,8 @@ public class OpenCVTrussIsRight {
     }
     class examplePipeline extends OpenCvPipeline {
         Mat YCbCr = new Mat();
-        Rect midRect = new Rect(470,150, 180, 199);
-        Rect rightRect = new Rect(1060, 140, 220, 300);
+        Rect midRect = new Rect(190,170, 180, 199);
+        Rect rightRect = new Rect(660, 140, 250, 300);
 
         Mat outPut = new Mat();
         Scalar redColor = new Scalar(255.0, 0.0, 0.0);

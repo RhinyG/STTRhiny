@@ -1,11 +1,14 @@
-package org.firstinspires.ftc.teamcode.robotParts;
+package org.firstinspires.ftc.teamcode.robotParts.Outdated;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class DrivetrainAlex extends RobotPart{
+import org.firstinspires.ftc.teamcode.robotParts.AlexDistanceSensorUtil;
+import org.firstinspires.ftc.teamcode.robotParts.RobotPart;
+
+public class DrivetrainAlex extends RobotPart {
 
     AlexDistanceSensorUtil distanceSensor = new AlexDistanceSensorUtil();
 
@@ -22,9 +25,9 @@ public class DrivetrainAlex extends RobotPart{
         leftBack = map.get(DcMotorEx.class, "left_back");
         rightBack = map.get(DcMotorEx.class, "right_back");
 
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftBack.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightBack.setDirection(DcMotorSimple.Direction.FORWARD);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -33,11 +36,12 @@ public class DrivetrainAlex extends RobotPart{
 
     }
 
-    public void drive(double forward, double right, double rotate, double slowMode) {
+    public void drive(double forward, double right, double rotate, double slowModeParameter) {
+        slowModeParameter = 1 - slowModeParameter;
         double leftFrontPower = -forward - right + rotate;
         double rightFrontPower = -forward + right - rotate;
-        double rightRearPower = -forward - right - rotate;
         double leftRearPower = -forward + right + rotate;
+        double rightRearPower = -forward - right - rotate;
         double maxPower = 1.0;
         double slowModeCalc;
 
@@ -46,8 +50,8 @@ public class DrivetrainAlex extends RobotPart{
         maxPower = Math.max(maxPower, Math.abs(rightRearPower));
         maxPower = Math.max(maxPower, Math.abs(leftRearPower));
 
-        if(slowMode > 0.5){
-            slowModeCalc = (1.0/slowMode)/2;
+        if(slowModeParameter < 0.5){
+            slowModeCalc = 0.8 * slowModeParameter + 0.1;
             leftFront.setPower(slowModeCalc * maxSpeed * (leftFrontPower / maxPower));
             rightFront.setPower(slowModeCalc * maxSpeed * (rightFrontPower / maxPower));
             rightBack.setPower(slowModeCalc *maxSpeed * rightRearPower / maxPower);
