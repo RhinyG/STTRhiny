@@ -241,6 +241,9 @@ public class MecanumDrivetrain {
      * relative to the robot. This might be slightly difficult to learn at first but it is not impossible
      * to us. Certain drivers prefer RobotCentric drive.
      * This code has a 'slow mode' toggle and also corrects for input overflow, when motor powers become > 1.
+     * ROT = rotate
+     * STR = strafe
+     * FWD = forward
      */
     public void RobotCentric() {
         double FWD = myOpMode.gamepad1.left_stick_y;
