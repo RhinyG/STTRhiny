@@ -269,21 +269,10 @@ public class MecanumDrivetrain {
         BackR.setPower(BackRPower/maxPower);
     }
 //TODO: documentation
-    public void BackBoardCorrection(double dHeading) {
-        double speed = 0.3;
-
-        if (Math.abs(dHeading) > 20.0){
-            if(dHeading < 0.0){speed = -0.5;}
-            FrontL.setPower(-speed);
-            FrontR.setPower(speed);
-            BackL.setPower(-speed);
-            BackR.setPower(speed);
-        } else {
-            Stop();
-        }
-    }
-//TODO: documentation
     public void IMUBackBoardCorrection(String alliance,double offsetYaw,double offsetZ, Telemetry telemetry) {
+        double STR;
+        double FWD = 0;
+
         offsetZ = 1.27 * offsetZ + 0.0471;
 
         double offsetX = Math.atan(Math.toRadians(offsetYaw)) * offsetZ;
@@ -303,16 +292,23 @@ public class MecanumDrivetrain {
             ROT *= -1;
         }
 
-        double FWD = 0.5*(offsetZ * Math.cos(offsetYaw) - offsetX * Math.sin(offsetYaw));
-        double STR = 0.5*(offsetZ * Math.sin(offsetYaw) + offsetX * Math.cos(offsetYaw));
+        STR = 0.3 * (offsetZ * Math.sin(offsetYaw) + offsetX * Math.cos(offsetYaw));
+
+        if (offsetX <= 0.05) {
+            STR /= 3;
+//            FWD = 0.5*(offsetZ * Math.cos(offsetYaw) - offsetX * Math.sin(offsetYaw));
+        }
 
         telemetry.addData("FWD",FWD);
         telemetry.addData("STR",STR);
+        telemetry.addData("OffsetX",offsetX);
+        telemetry.addData("OffsetZ",offsetZ);
 
-        FrontL.setPower(-FWD + STR + ROT);
-        FrontR.setPower(-FWD - STR - ROT);
-        BackL.setPower(-FWD - STR + ROT);
-        BackR.setPower(-FWD + STR - ROT);
+
+        FrontL.setPower(FWD + STR + ROT);
+        FrontR.setPower(FWD -STR - ROT);
+        BackL.setPower(FWD -STR + ROT);
+        BackR.setPower(FWD + STR - ROT);
     }
 
     /**

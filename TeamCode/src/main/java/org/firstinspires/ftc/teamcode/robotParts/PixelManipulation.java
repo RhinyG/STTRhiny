@@ -72,7 +72,7 @@ public class PixelManipulation extends RobotPart{
         leftRotate = map.get(Servo.class, "leftRotate");
         rightRotate = map.get(Servo.class,"rightRotate");
 
-        claw.setPosition(0.5);
+        claw.setPosition(0.45);
 //        claw.setPosition(ClawPositions.GRABONE.getPosition());
         updateRotate(RotatePositions.MOVEPOS);
 
