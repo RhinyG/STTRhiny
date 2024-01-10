@@ -48,24 +48,28 @@ public class PolarCoordinatesTest extends LinearOpMode {
 
                 switch (outtakePos) {
                     case 1:
+                        wrist.setPosition(0.78);
                         telemetry.addData("OuttakePos", outtakePos);
                         break;
                     case 2:
-                        wrist.setPosition(1);
+                        wrist.setPosition(0.95);
                         telemetry.addData("OuttakePos", outtakePos);
                         break;
                     case 3:
-                        wrist.setPosition(0.08);
+                        wrist.setPosition(0.02);
                         telemetry.addData("OuttakePos", outtakePos);
                         break;
                     case 4:
+                        wrist.setPosition(0.2);
                         telemetry.addData("OuttakePos", outtakePos);
                         break;
                     case 5:
                         telemetry.addData("OuttakePos", outtakePos);
+                        wrist.setPosition(0.37);
                         break;
                     case 6:
                         telemetry.addData("OuttakePos", outtakePos);
+                        wrist.setPosition(0.56);
                         break;
                 }
             } else if (gamepad1.left_stick_button) {
