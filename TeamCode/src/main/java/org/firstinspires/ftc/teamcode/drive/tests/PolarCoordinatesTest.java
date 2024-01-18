@@ -78,8 +78,6 @@ public class PolarCoordinatesTest extends LinearOpMode {
                 telemetry.addData("Going for neutral",outtakePos);
             }
 
-            wrist.setPosition(y);
-
             telemetry.addData("x",x);
             telemetry.addData("y",y);
             telemetry.addData("r",r);

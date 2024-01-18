@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -47,9 +48,9 @@ public class MecanumDrivetrain {
 //        BackL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        BackR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        FrontL.setDirection(DcMotorSimple.Direction.FORWARD);
+        FrontL.setDirection(DcMotorSimple.Direction.REVERSE);
         FrontR.setDirection(DcMotorSimple.Direction.FORWARD);
-        BackL.setDirection(DcMotorSimple.Direction.FORWARD);
+        BackL.setDirection(DcMotorSimple.Direction.REVERSE);
         BackR.setDirection(DcMotorSimple.Direction.FORWARD);
 
 //        FrontL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -65,6 +66,7 @@ public class MecanumDrivetrain {
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
         imu.initialize(new IMU.Parameters(orientationOnRobot));
+        resetYaw();
     }
 
     /**
@@ -248,7 +250,7 @@ public class MecanumDrivetrain {
     public void RobotCentric() {
         double FWD = myOpMode.gamepad1.left_stick_y;
         double STR = myOpMode.gamepad1.left_stick_x;
-        double ROT = myOpMode.gamepad1.right_stick_x;
+        double ROT = 0.5 * myOpMode.gamepad1.right_stick_x;
         double speed = 1.0;
         double maxPower = 1.0;
 
@@ -360,7 +362,7 @@ public class MecanumDrivetrain {
         BackR.setPower(BackRPower/maxPower);
 
         if (myOpMode.gamepad1.right_bumper && myOpMode.gamepad1.left_bumper) {
-            imu.resetYaw();
+            resetYaw();
         }
         telemetry.addData("Current heading",getCurrentHeadingDegrees());
         telemetry.addData("maxPower",maxPower);//TODO: Igor says this felt slow, probably cause that gets too high, print it and look at it.
@@ -394,6 +396,11 @@ public class MecanumDrivetrain {
     public double getCurrentHeadingDegrees() {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         return (orientation.getYaw(AngleUnit.DEGREES));
+    }
+
+    //TODO:documentation
+    public void resetYaw() {
+        imu.resetYaw();
     }
 
     /**

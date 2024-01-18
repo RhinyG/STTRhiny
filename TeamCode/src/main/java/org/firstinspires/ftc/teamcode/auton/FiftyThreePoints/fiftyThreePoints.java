@@ -17,9 +17,8 @@ public class fiftyThreePoints extends LinearOpMode {
 
     public void runOpMode() {
         methods.init(hardwareMap);
-        outtake.init(hardwareMap);
+        outtake.init(hardwareMap, telemetry);
         methods.calibrateEncoders();
-        methods.resetIMU(hardwareMap);
         camera.findScoringPosition();
 
         waitForStart();
@@ -37,7 +36,7 @@ public class fiftyThreePoints extends LinearOpMode {
                 outtake.autonGoToHeight(FIRSTLINE);
                 sleep(500);
                 methods.driveX(-10);
-                outtake.updateRotate(PixelManipulation.RotatePositions.OUTTAKEPOS);
+               // outtake.updateRotate(PixelManipulation.RotatePositions.OUTTAKEPOS);
                 methods.driveY(-15, 0.2,telemetry);
                 outtake.claw.setPosition(PixelManipulation.ClawPositions.RELEASE.getPosition());
             } else if (finalPos == 1) {

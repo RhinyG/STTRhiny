@@ -43,8 +43,8 @@ public class OpenCVTrussIsRight {
     }
     class examplePipeline extends OpenCvPipeline {
         Mat YCbCr = new Mat();
-        Rect midRect = new Rect(470,150, 180, 199);
-        Rect rightRect = new Rect(1060, 140, 220, 300);
+        Rect midRect = new Rect(650,150, 180, 199);
+        Rect leftRect = new Rect(200, 140, 220, 280);
 
         Mat outPut = new Mat();
         Scalar redColor = new Scalar(255.0, 0.0, 0.0);
@@ -55,9 +55,9 @@ public class OpenCVTrussIsRight {
 
             input.copyTo(outPut);
             Imgproc.rectangle(outPut, midRect, redColor, 2);
-            Imgproc.rectangle(outPut, rightRect, redColor, 2);
+            Imgproc.rectangle(outPut, leftRect, redColor, 2);
             Mat midCrop = YCbCr.submat(midRect);
-            Mat rightCrop = YCbCr.submat(rightRect);
+            Mat rightCrop = YCbCr.submat(leftRect);
 
             /**For YCbCr: Blue = 1, Red = 2
              * For HSV: measures intensity so always use 1. No clue what the other values do/measure/are.
@@ -81,13 +81,13 @@ public class OpenCVTrussIsRight {
                 myOpMode.telemetry.addData("Conclusion", "mid");
 
             } else if (Math.abs(centerAvgFin - rightAvgFin) > 30 && rightAvgFin > centerAvgFin) {
-                Imgproc.rectangle(outPut, rightRect, greenColor, 2);
-                pos = 2;
-                myOpMode.telemetry.addData("Current_Pos", pos);
-                myOpMode.telemetry.addData("Conclusion", "right");
-            } else {
-                myOpMode.telemetry.addData("Conclusion", "left");
+                Imgproc.rectangle(outPut, leftRect, greenColor, 2);
                 pos = 0;
+                myOpMode.telemetry.addData("Current_Pos", pos);
+                myOpMode.telemetry.addData("Conclusion", "left");
+            } else {
+                myOpMode.telemetry.addData("Conclusion", "right");
+                pos = 2;
             }
 
             myOpMode.telemetry.addData("pos", pos);

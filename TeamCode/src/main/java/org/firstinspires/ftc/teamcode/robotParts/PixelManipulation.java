@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robotParts;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -12,11 +13,14 @@ public class PixelManipulation extends RobotPart{
 
     private final LinearOpMode myOpMode;
     public Servo claw;
-    public Servo leftRotate;
-    public Servo rightRotate;
+    public Servo wrist;
+    public Servo elbow;
+    public Servo intakeServo;
     public DcMotorEx slides;
+    public DcMotorEx intake;
     int upperLimit = 1150;
     int lowerLimit = 0;
+
     public enum ArmHeight {
         INTAKE(0),
         FIRSTLINE(460),
@@ -32,10 +36,56 @@ public class PixelManipulation extends RobotPart{
         }
     }
 
+    public enum IntakeServoPositions {
+        GROUNDPOS(0),
+        STACKPOS(0.15);
+
+        private final double position;
+        public double getPosition() {
+            return this.position;
+        }
+        IntakeServoPositions(double position) {
+            this.position = position;
+        }
+    }
+
+    public enum ElbowPositions {
+        INTAKEPOS(0.725),
+        MOVEPOS(0.805),
+        CHAINPOS(0.775),
+        OUTTAKEPOS(0.56);
+
+        private final double position;
+        public double getPosition() {
+            return this.position;
+        }
+        ElbowPositions(double position) {
+            this.position = position;
+        }
+    }
+
+    public enum WristPositions {
+        INTAKEPOS(0.45),
+        ONE(0.91),
+        TWO(0.71),
+        THREE(0.58),
+        FOUR(0.32),
+        FIVE(0.18),
+        SIX(0);
+
+        private final double position;
+        public double getPosition() {
+            return this.position;
+        }
+        WristPositions(double position) {
+            this.position = position;
+        }
+    }
+
     public enum ClawPositions {
-        RELEASE(0.36),
-        GRABONE(0.7),
-        GRABTWO(0.53);
+        RELEASE(0.46),
+        GRABONE(0.39),
+        GRABTWO(0.405);
 
         private final double position;
 
@@ -47,19 +97,6 @@ public class PixelManipulation extends RobotPart{
             this.position = position;
         }
     }
-    public enum RotatePositions {
-        INTAKEPOS(0.525),
-        MOVEPOS(0.575),
-        OUTTAKEPOS(0.165);
-
-        private final double position;
-        public double getPosition() {
-            return this.position;
-        }
-        RotatePositions(double position) {
-            this.position = position;
-        }
-    }
 
     public PixelManipulation(LinearOpMode opmode) {myOpMode = opmode;}
 
@@ -67,34 +104,74 @@ public class PixelManipulation extends RobotPart{
      * Init
      * @param map otherwise NPE
      */
-    public void init(HardwareMap map) {
+    public void init(HardwareMap map, Telemetry telemetry) {
+        elbow = map.get(Servo.class,"elbow");
+        wrist = map.get(Servo.class, "wrist");
         claw = map.get(Servo.class, "claw");
-        leftRotate = map.get(Servo.class, "leftRotate");
-        rightRotate = map.get(Servo.class,"rightRotate");
+        intakeServo = map.get(Servo.class, "intakeServo");
 
-        claw.setPosition(0.45);
-//        claw.setPosition(ClawPositions.GRABONE.getPosition());
-        updateRotate(RotatePositions.MOVEPOS);
+        claw.setPosition(ClawPositions.GRABONE.getPosition());
+//        updateElbow(ElbowPositions.MOVEPOS);
+        updateIntakeServo(IntakeServoPositions.GROUNDPOS);
+        updateWrist(0,0, telemetry);
 
         slides = map.get(DcMotorEx.class, "slides");
+        intake = map.get(DcMotorEx.class, "intake");
 
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // from ArmReza code seems do interact with RobotPart.java i don't know really
         motors.put("slideLeft", slides);
+        slides.setDirection(DcMotorSimple.Direction.REVERSE);
         resetEncoders();
     }
 
     /**
      * This updates the claws to a (new) position
-     * @param position is a value from the enumerator RotatePositions
      */
-    public void updateRotate(RotatePositions position) {
-        double leftRotatePos;
-        double rightRotatePos = position.getPosition();
-        leftRotatePos = 1 - rightRotatePos;
-        leftRotate.setPosition(leftRotatePos);
-        rightRotate.setPosition(rightRotatePos);
+    public void updateWrist(double x, double y, Telemetry telemetry) {
+        double theta;
+        double r = Math.sqrt(x * x + y * y);
+        WristPositions outtakePos;
+
+        if (x >= 0 && y >= 0) {
+            theta = Math.atan(y / x);
+        } else if (x<0) {
+            theta = Math.atan(y / x) + Math.PI;
+        } else {
+            theta = Math.atan(y / x) + 2 * Math.PI;
+        }
+
+        if(r > 0.5){
+            if (theta < 2.0/6.0*Math.PI) {
+                outtakePos = WristPositions.ONE;
+            } else if (theta < 4.0/6.0*Math.PI) {
+                outtakePos = WristPositions.TWO;
+            } else if (theta < 6.0/6.0*Math.PI) {
+                outtakePos = WristPositions.THREE;
+            } else if (theta < 8.0/6.0*Math.PI) {
+                outtakePos = WristPositions.FOUR;
+            } else if (theta < 10.0/6.0*Math.PI) {
+                outtakePos = WristPositions.FIVE;
+            } else {
+                outtakePos = WristPositions.SIX;
+            }
+            wrist.setPosition(outtakePos.getPosition());
+
+        } else if (myOpMode.gamepad2.left_stick_button) {
+            outtakePos = WristPositions.INTAKEPOS;
+            wrist.setPosition(outtakePos.getPosition());
+            telemetry.addData("Going for neutral",outtakePos);
+        }
+    }
+
+    public void updateElbow(ElbowPositions position) {
+        elbow.setPosition(position.getPosition());
+    }
+
+    public void updateIntakeServo (IntakeServoPositions position) {
+        intakeServo.setPosition(position.getPosition());
     }
 
     /**
@@ -104,22 +181,22 @@ public class PixelManipulation extends RobotPart{
      * @param telemetry because otherwise NPE.
      * @return It returns its current distance to target so that can be used again to set a new target.
      */
-    public double goToHeight(int position, Telemetry telemetry) {
+    public double goToHeight(int position, double power, Telemetry telemetry) {
         double margin = 50.0;
         double currentPosLeft = slides.getCurrentPosition();
         double distance = Math.abs(currentPosLeft - position);
         if (currentPosLeft < position) {
             if (distance > margin) {
-                slides.setPower(1);
+                slides.setPower(power);
             } else {
-                slides.setPower(1 * (distance/margin) * 0.4);
+                slides.setPower(power * (distance/margin) * 0.4);
             }
             telemetry.addLine("up");
         } else if (currentPosLeft > position) {
             if (distance > margin) {
-                slides.setPower(-1);
+                slides.setPower(-power);
             } else {
-                slides.setPower(-1 * (distance/margin) * 0.4);
+                slides.setPower(-power * (distance/margin) * 0.4);
             }
             telemetry.addLine("down");
         } else if (position == 0 && currentPosLeft <= 0) {
@@ -135,7 +212,8 @@ public class PixelManipulation extends RobotPart{
      * @param height This is the position you want to go to. In ArmHeight, not integers.
      * @param telemetry Necessary otherwise NPE.
      */
-    public void autonGoToHeight(ArmHeight height, Telemetry telemetry) {
+    public void autonGoToHeight(ArmHeight height, Telemetry telemetry) {autonGoToHeight(height, 0.7, myOpMode.telemetry);};
+    public void autonGoToHeight(ArmHeight height, double power, Telemetry telemetry) {
         double margin = 50.0;
         int position = height.getPosition();
         double currentPos = slides.getCurrentPosition();
@@ -148,7 +226,7 @@ public class PixelManipulation extends RobotPart{
                 slides.setPower(-0.5);
                 telemetry.addLine("down");
             } else if (position == 0 && currentPos <= 0) {
-                slides.setPower(0);
+                slides.setPower(0.05);
             }
             telemetry.addData("arm height", slides.getCurrentPosition());
             telemetry.addData("arm goal", height.getPosition());
@@ -156,7 +234,7 @@ public class PixelManipulation extends RobotPart{
             currentPos = slides.getCurrentPosition();
             dPos = Math.abs(currentPos - position);
         }
-        slides.setPower(0);
+        slides.setPower(0.05);
         myOpMode.sleep(100);
     }
     public void autonGoToHeight(ArmHeight height){autonGoToHeight(height, myOpMode.telemetry);}
@@ -186,7 +264,7 @@ public class PixelManipulation extends RobotPart{
     public void updateSlide(boolean btns, double power, ArmHeight height, Telemetry telemetry) {
         double distance = 0;
         if (btns) {
-            distance = goToHeight(height.getPosition(), telemetry);
+            distance = goToHeight(height.getPosition(), 1, telemetry);
             telemetry.addData("arm", slides.getCurrentPosition());
             telemetry.addData("arm goal", height.getPosition());
             telemetry.addLine(String.valueOf(height));
@@ -206,5 +284,8 @@ public class PixelManipulation extends RobotPart{
             telemetry.addData("arm power", slides.getPower());
             telemetry.addData("distance to goal", distance);
         }
+    }
+    public void updateIntake(double power) {
+        intake.setPower(power);
     }
 }

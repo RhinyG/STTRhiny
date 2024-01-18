@@ -43,8 +43,8 @@ public class OpenCVTrussIsLeft {
     }
     class examplePipeline extends OpenCvPipeline {
         Mat YCbCr = new Mat();
-        Rect midRect = new Rect(190,170, 180, 199);
-        Rect rightRect = new Rect(660, 140, 250, 300);
+        Rect midRect = new Rect(370,170, 180, 199);
+        Rect rightRect = new Rect(810, 140, 230, 240);
 
         Mat outPut = new Mat();
         Scalar redColor = new Scalar(255.0, 0.0, 0.0);
@@ -79,7 +79,6 @@ public class OpenCVTrussIsLeft {
                 pos = 1;
                 myOpMode.telemetry.addData("Current_Pos", pos);
                 myOpMode.telemetry.addData("Conclusion", "mid");
-
             } else if (Math.abs(centerAvgFin - rightAvgFin) > 30 && rightAvgFin > centerAvgFin) {
                 Imgproc.rectangle(outPut, rightRect, greenColor, 2);
                 pos = 2;
