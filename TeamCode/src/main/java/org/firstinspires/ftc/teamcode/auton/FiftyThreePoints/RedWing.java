@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auton.TwentyFivePoints;
+package org.firstinspires.ftc.teamcode.auton.FiftyThreePoints;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;

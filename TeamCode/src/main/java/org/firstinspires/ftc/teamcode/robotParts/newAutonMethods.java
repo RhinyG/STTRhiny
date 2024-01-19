@@ -24,7 +24,7 @@ public class newAutonMethods {
 
     final public int robotLength_cm = 39;
     final public int robotWidth_cm = 40;
-    final public double gravityConstant = 1;
+    final public double gravityConstant = 1.35;
 
     double current_target_heading = 0;
     public IMU imu;
@@ -34,7 +34,7 @@ public class newAutonMethods {
     double TICKS_PER_ROTATION = 8192;
     double OURTICKS_PER_CM;
     double threshold = 250;
-    final double odoMultiplier = 1;
+    final double odoMultiplier = 1.17;
 
     private DcMotor encoderX, encoderY;
 
@@ -97,7 +97,7 @@ public class newAutonMethods {
 //            BackR.setPower(speed - turn);
 
             FrontL.setPower(speed + turn);
-            BackL.setPower(speed + turn);
+            BackL.setPower(1.2 * (speed + turn));
 
             BackR.setPower(speed - turn);
             FrontR.setPower(speed - turn);
@@ -136,7 +136,7 @@ public class newAutonMethods {
 
             FrontL.setPower(-speed + turn);
             FrontR.setPower(speed - turn);
-            BackL.setPower(gravityConstant * (speed + turn));
+            BackL.setPower(1.1 * gravityConstant * (speed + turn));
             BackR.setPower(gravityConstant * (-speed - turn));
 
             OdoX_Pos = -BackL.getCurrentPosition();
@@ -154,10 +154,11 @@ public class newAutonMethods {
         double current_heading = -getCurrentHeading();
         double dHeading = target_heading - current_heading;
         double direction;
+        double margin = 1.0;
         telemetry.addData("curHeading", current_heading);
         telemetry.addData("dHeading",dHeading);
         telemetry.update();
-        while (!(Math.abs(dHeading) < 1) && myOpMode.opModeIsActive()) {
+        while (!(Math.abs(dHeading) < margin) && myOpMode.opModeIsActive()) {
             direction = -checkDirection(current_heading-target_heading);
 
             FrontL.setPower(-speed * direction);

@@ -23,18 +23,7 @@ public class OdometryTest extends LinearOpMode {
 
         waitForStart();
         if (opModeIsActive()){
-            slides.claw.setPosition(PixelManipulation.ClawPositions.GRABONE.getPosition());
-            slides.autonGoToHeight(PixelManipulation.ArmHeight.FIRSTLINE);
-            slides.updateElbow(PixelManipulation.ElbowPositions.OUTTAKEPOS);
-            sleep(500);
-            slides.claw.setPosition(PixelManipulation.ClawPositions.RELEASE.getPosition());
-            sleep(300);
-            methods.driveY(0);
-            slides.claw.setPosition(PixelManipulation.ClawPositions.GRABONE.getPosition());
-            slides.updateElbow(PixelManipulation.ElbowPositions.INTAKEPOS);
-            sleep(300);
-            slides.autonGoToHeight(PixelManipulation.ArmHeight.INTAKE);
-            sleep(30000);
+            methods.driveX(90);
         }
     }
 }

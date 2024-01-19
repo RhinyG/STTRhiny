@@ -23,6 +23,7 @@ public class PixelManipulation extends RobotPart{
 
     public enum ArmHeight {
         INTAKE(0),
+        CHAINPOS(100),
         FIRSTLINE(460),
         SECONDLINE(700),
         THIRDLINE(1100);
@@ -50,10 +51,13 @@ public class PixelManipulation extends RobotPart{
     }
 
     public enum ElbowPositions {
-        INTAKEPOS(0.725),
-        MOVEPOS(0.805),
-        CHAINPOS(0.775),
+        INTAKEPOS(0.745),
+        MOVEPOSLOW(0.77),
+        MOVEPOSHIGH(0.83),
+        CHAINPOS(0.78),
+        AUTONSTART(0.52),
         OUTTAKEPOS(0.56);
+
 
         private final double position;
         public double getPosition() {
@@ -65,13 +69,13 @@ public class PixelManipulation extends RobotPart{
     }
 
     public enum WristPositions {
-        INTAKEPOS(0.45),
-        ONE(0.91),
-        TWO(0.71),
-        THREE(0.58),
-        FOUR(0.32),
-        FIVE(0.18),
-        SIX(0);
+        INTAKEPOS(0.63),//0.39 is servo to slides, 0.63 is servo away
+        ONE(0.35),
+        TWO(0.52),
+        THREE(0.72),
+        FOUR(0.91),
+        FIVE(0.208),
+        SIX(0.97);
 
         private final double position;
         public double getPosition() {
@@ -83,9 +87,10 @@ public class PixelManipulation extends RobotPart{
     }
 
     public enum ClawPositions {
-        RELEASE(0.46),
-        GRABONE(0.39),
-        GRABTWO(0.405);
+        RELEASE(0.45),
+        GRABONE(0.34),
+        AUTONSTART(0.29),
+        GRABTWO(0.365);
 
         private final double position;
 
@@ -113,7 +118,7 @@ public class PixelManipulation extends RobotPart{
         claw.setPosition(ClawPositions.GRABONE.getPosition());
 //        updateElbow(ElbowPositions.MOVEPOS);
         updateIntakeServo(IntakeServoPositions.GROUNDPOS);
-        updateWrist(0,0, telemetry);
+        wrist.setPosition(WristPositions.INTAKEPOS.getPosition());
 
         slides = map.get(DcMotorEx.class, "slides");
         intake = map.get(DcMotorEx.class, "intake");
@@ -157,11 +162,12 @@ public class PixelManipulation extends RobotPart{
             } else {
                 outtakePos = WristPositions.SIX;
             }
-            wrist.setPosition(outtakePos.getPosition());
+            telemetry.addData("wristpos",outtakePos);
+//            wrist.setPosition(outtakePos.getPosition());
 
         } else if (myOpMode.gamepad2.left_stick_button) {
             outtakePos = WristPositions.INTAKEPOS;
-            wrist.setPosition(outtakePos.getPosition());
+//            wrist.setPosition(outtakePos.getPosition());
             telemetry.addData("Going for neutral",outtakePos);
         }
     }
@@ -252,6 +258,18 @@ public class PixelManipulation extends RobotPart{
             myOpMode.idle();
         }
         slides.setPower(0.2);
+    }
+
+    public void dropYellowPixel(){
+        autonGoToHeight(PixelManipulation.ArmHeight.FIRSTLINE);
+        myOpMode.sleep(100);
+        claw.setPosition(PixelManipulation.ClawPositions.RELEASE.getPosition());
+        myOpMode.sleep(100);
+        claw.setPosition(PixelManipulation.ClawPositions.GRABONE.getPosition());
+        myOpMode.sleep(100);
+        updateElbow(PixelManipulation.ElbowPositions.MOVEPOSHIGH);
+        myOpMode.sleep(100);
+        autonGoToHeight(PixelManipulation.ArmHeight.INTAKE);
     }
     /**
      * From Reza

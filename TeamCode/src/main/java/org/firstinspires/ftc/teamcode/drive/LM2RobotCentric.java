@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.drive;
 
+import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.CHAINPOS;
 import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.FIRSTLINE;
 import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.INTAKE;
 import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.SECONDLINE;
@@ -33,7 +34,7 @@ public class LM2RobotCentric extends LinearOpMode {
 
         PixelManipulation.ArmHeight height = INTAKE;
         PixelManipulation.ClawPositions clawPosition = RELEASE;
-        PixelManipulation.ElbowPositions elbowPosition = PixelManipulation.ElbowPositions.MOVEPOS;
+        PixelManipulation.ElbowPositions elbowPosition = PixelManipulation.ElbowPositions.MOVEPOSLOW;
         PixelManipulation.IntakeServoPositions intakeServoPostion = PixelManipulation.IntakeServoPositions.GROUNDPOS;
 
         boolean buttonMode = false;
@@ -43,8 +44,8 @@ public class LM2RobotCentric extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            double intakeMotorSuck = gamepad1.right_trigger;
-            double intakeMotorSpit = gamepad1.left_trigger;
+            double intakeServoLow = gamepad1.right_trigger;
+            double intakeServoHigh = gamepad1.left_trigger;
 
             double slidePower = gamepad2.right_trigger - gamepad2.left_trigger;
 
@@ -53,8 +54,8 @@ public class LM2RobotCentric extends LinearOpMode {
             boolean slidesMid = gamepad2.b;
             boolean slidesHigh = gamepad2.y;
 
-            boolean intakeServoLow = gamepad1.left_bumper;
-            boolean intakeServoHigh = gamepad1.right_bumper;
+            boolean intakeMotorSuck = gamepad1.left_bumper;
+            boolean intakeMotorSpit = gamepad1.right_bumper;
 
             boolean elbowIntakePos = gamepad2.dpad_left;
             boolean elbowMovePos = gamepad2.dpad_down;
@@ -74,9 +75,9 @@ public class LM2RobotCentric extends LinearOpMode {
             boolean hookFold = gamepad1.a;
             boolean hookRelease = gamepad1.b;
 
-            if (intakeMotorSuck > 0.1) {
+            if (intakeMotorSpit) {
                 outtake.updateIntake(0.80);
-            } else if (intakeMotorSpit > 0.1) {
+            } else if (intakeMotorSuck) {
                 outtake.updateIntake(-0.5);
             } else {
                 outtake.updateIntake(0.0);
@@ -102,9 +103,9 @@ public class LM2RobotCentric extends LinearOpMode {
 
             outtake.updateSlide(buttonMode, slidePower, height, telemetry);
 
-            if (intakeServoLow) {
+            if (intakeServoLow > 0.1) {
                 intakeServoPostion = PixelManipulation.IntakeServoPositions.GROUNDPOS;
-            } else if (intakeServoHigh) {
+            } else if (intakeServoHigh > 0.1) {
                 intakeServoPostion = PixelManipulation.IntakeServoPositions.STACKPOS;
             }
 
@@ -113,14 +114,18 @@ public class LM2RobotCentric extends LinearOpMode {
             if (elbowIntakePos) {
                 elbowPosition = PixelManipulation.ElbowPositions.INTAKEPOS;
             } else if (elbowMovePos) {
-                elbowPosition = PixelManipulation.ElbowPositions.MOVEPOS;
+                elbowPosition = PixelManipulation.ElbowPositions.MOVEPOSHIGH;
             } else if (elbowOuttakePos) {
                 elbowPosition = PixelManipulation.ElbowPositions.OUTTAKEPOS;
+            }
+            if(elbowPosition == PixelManipulation.ElbowPositions.MOVEPOSHIGH && outtake.slides.getCurrentPosition() < 150) {
+                elbowPosition = PixelManipulation.ElbowPositions.MOVEPOSLOW;
             }
 
             outtake.updateElbow(elbowPosition);
 
-            outtake.updateWrist(wristX,wristY, telemetry);
+//            outtake.updateWrist(wristX,wristY, telemetry);
+            outtake.wrist.setPosition(PixelManipulation.WristPositions.INTAKEPOS.getPosition());
 
             if (clawRelease) {
                 clawPosition = RELEASE;
@@ -129,10 +134,10 @@ public class LM2RobotCentric extends LinearOpMode {
             }
 
             if (clawMoveChain) {
+                outtake.goToHeight(200, 0.4, telemetry);
+                sleep(100);
                 elbowPosition = PixelManipulation.ElbowPositions.CHAINPOS;
-                sleep(90);
-                outtake.autonGoToHeight(FIRSTLINE, 0.4, telemetry);
-                elbowPosition = PixelManipulation.ElbowPositions.MOVEPOS;
+                outtake.goToHeight(460, 0.4, telemetry);
             }
 
             outtake.claw.setPosition(clawPosition.getPosition());

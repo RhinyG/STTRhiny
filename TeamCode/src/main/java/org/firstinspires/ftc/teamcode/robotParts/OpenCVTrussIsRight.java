@@ -43,8 +43,8 @@ public class OpenCVTrussIsRight {
     }
     class examplePipeline extends OpenCvPipeline {
         Mat YCbCr = new Mat();
-        Rect midRect = new Rect(650,150, 180, 199);
-        Rect leftRect = new Rect(200, 140, 220, 280);
+        Rect midRect = new Rect(650,370, 180, 199);
+        Rect leftRect = new Rect(0, 380, 220, 260);
 
         Mat outPut = new Mat();
         Scalar redColor = new Scalar(255.0, 0.0, 0.0);
