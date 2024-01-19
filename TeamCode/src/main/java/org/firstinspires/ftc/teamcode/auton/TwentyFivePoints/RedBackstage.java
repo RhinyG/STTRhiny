@@ -15,9 +15,8 @@ public class RedBackstage extends LinearOpMode {
 
     public void runOpMode() {
         methods.init(hardwareMap);
-        slides.init(hardwareMap);
+        slides.init(hardwareMap, telemetry);
         methods.calibrateEncoders();
-        methods.resetIMU(hardwareMap);
         camera.findScoringPosition();
 
         waitForStart();

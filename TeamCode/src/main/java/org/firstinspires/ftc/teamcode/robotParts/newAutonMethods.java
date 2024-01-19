@@ -27,33 +27,41 @@ public class newAutonMethods {
     final public double gravityConstant = 1;
 
     double current_target_heading = 0;
-    IMU imu;
-    Orientation anglesHead;
+    public IMU imu;
     double WHEEL_RADIUS = 48;//mm
     double ODO_RADIUS = 17.5;//mm?
     double GEAR_RATIO = 1/13.7;
     double TICKS_PER_ROTATION = 8192;
     double OURTICKS_PER_CM;
     double threshold = 250;
-    final double odoMultiplier = 1.76;
+    final double odoMultiplier = 1;
 
     private DcMotor encoderX, encoderY;
 
     public newAutonMethods(LinearOpMode opmode) {myOpMode = opmode;}
 
     public void init(HardwareMap map) {
+        imu = map.get(IMU.class, "imu");
+
         FrontL = map.get(DcMotor.class, "left_front");
         FrontR = map.get(DcMotor.class, "right_front");
         BackL = map.get(DcMotor.class, "left_back");
         BackR = map.get(DcMotor.class, "right_back");
-//        FrontL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         BackR.setDirection(DcMotorSimple.Direction.FORWARD);
-        BackL.setDirection(DcMotorSimple.Direction.FORWARD);
+        BackL.setDirection(DcMotorSimple.Direction.REVERSE);
+        FrontL.setDirection(DcMotorSimple.Direction.REVERSE);
         FrontR.setDirection(DcMotorSimple.Direction.FORWARD);
 
         OURTICKS_PER_CM = odoMultiplier*(TICKS_PER_ROTATION)/(2*Math.PI * GEAR_RATIO * WHEEL_RADIUS);
-        resetIMU(map);
+
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
+
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
+        resetYaw();
     }
 
     public void driveY (double position){
@@ -63,9 +71,9 @@ public class newAutonMethods {
     public void driveY(double position, double speed, Telemetry telemetry) {
         calibrateEncoders();
         double Kp = 0.03;
-        double turn;
+        double turn = 0;
         double heading = current_target_heading;
-        double OdoY_Pos = FrontL.getCurrentPosition();
+        double OdoY_Pos = -FrontL.getCurrentPosition();
         double tick = (int) (position * OURTICKS_PER_CM);
         double dPos = tick - OdoY_Pos;
         while (!(dPos > -threshold  && dPos < threshold) && myOpMode.opModeIsActive()) {
@@ -73,7 +81,7 @@ public class newAutonMethods {
                 speed = -speed;
             }
             //TODO: see if turn correction works
-            turn = Kp*Math.abs(speed)*(heading-getCurrentHeading());
+//            turn = Kp*Math.abs(speed)*(heading-getCurrentHeading());
 
             telemetry.addData("tick", tick);
             telemetry.addData("PosY", OdoY_Pos/OURTICKS_PER_CM);
@@ -94,7 +102,7 @@ public class newAutonMethods {
             BackR.setPower(speed - turn);
             FrontR.setPower(speed - turn);
 
-            OdoY_Pos = FrontL.getCurrentPosition();
+            OdoY_Pos = -FrontL.getCurrentPosition();
             dPos = tick - OdoY_Pos;
         }
         Stop();
@@ -108,7 +116,7 @@ public class newAutonMethods {
         speed = speed * -1;
         calibrateEncoders();
         double Kp = 0.03;
-        double turn;
+        double turn= 0;
         double heading = current_target_heading;
         double OdoX_Pos = -BackL.getCurrentPosition();
         double tick = (int) (position * OURTICKS_PER_CM);
@@ -118,7 +126,7 @@ public class newAutonMethods {
                 speed = -speed;
             }
             //TODO: see if turn correction works
-            turn = Kp*Math.abs(speed)*(heading-getCurrentHeading());
+//            turn = Kp*Math.abs(speed)*(heading-getCurrentHeading());
 
             telemetry.addData("tick", tick);
             telemetry.addData("PosX", OdoX_Pos/OURTICKS_PER_CM);
@@ -150,7 +158,7 @@ public class newAutonMethods {
         telemetry.addData("dHeading",dHeading);
         telemetry.update();
         while (!(Math.abs(dHeading) < 1) && myOpMode.opModeIsActive()) {
-            direction = checkDirection(current_heading-target_heading);
+            direction = -checkDirection(current_heading-target_heading);
 
             FrontL.setPower(-speed * direction);
             FrontR.setPower(speed * direction);
@@ -186,7 +194,7 @@ public class newAutonMethods {
         BackR.setPower((-forward + strafe - rotate) * speed);
 
         if (myOpMode.gamepad1.right_trigger > 0 && myOpMode.gamepad1.left_trigger > 0) {
-            resetIMU(map);
+            resetYaw();
         }
         myOpMode.telemetry.addData("wtf",-forward-strafe+rotate);
         myOpMode.telemetry.addData("Forward",forward);
@@ -223,15 +231,10 @@ public class newAutonMethods {
         return (orientation.getYaw(AngleUnit.DEGREES));
     }
 
-    public void resetIMU(HardwareMap map) {
-        imu = map.get(IMU.class, "imu");
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
-        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
-
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
+    public void resetYaw() {
+        imu.resetYaw();
     }
+
     public void calibrateEncoders() {
         FrontL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         FrontR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

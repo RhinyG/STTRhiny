@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -47,9 +48,9 @@ public class MecanumDrivetrain {
 //        BackL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        BackR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        FrontL.setDirection(DcMotorSimple.Direction.FORWARD);
+        FrontL.setDirection(DcMotorSimple.Direction.REVERSE);
         FrontR.setDirection(DcMotorSimple.Direction.FORWARD);
-        BackL.setDirection(DcMotorSimple.Direction.FORWARD);
+        BackL.setDirection(DcMotorSimple.Direction.REVERSE);
         BackR.setDirection(DcMotorSimple.Direction.FORWARD);
 
 //        FrontL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -65,6 +66,7 @@ public class MecanumDrivetrain {
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
         imu.initialize(new IMU.Parameters(orientationOnRobot));
+        resetYaw();
     }
 
     /**
@@ -241,11 +243,14 @@ public class MecanumDrivetrain {
      * relative to the robot. This might be slightly difficult to learn at first but it is not impossible
      * to us. Certain drivers prefer RobotCentric drive.
      * This code has a 'slow mode' toggle and also corrects for input overflow, when motor powers become > 1.
+     * ROT = rotate
+     * STR = strafe
+     * FWD = forward
      */
     public void RobotCentric() {
         double FWD = myOpMode.gamepad1.left_stick_y;
         double STR = myOpMode.gamepad1.left_stick_x;
-        double ROT = myOpMode.gamepad1.right_stick_x;
+        double ROT = 0.5 * myOpMode.gamepad1.right_stick_x;
         double speed = 1.0;
         double maxPower = 1.0;
 
@@ -266,21 +271,10 @@ public class MecanumDrivetrain {
         BackR.setPower(BackRPower/maxPower);
     }
 //TODO: documentation
-    public void BackBoardCorrection(double dHeading) {
-        double speed = 0.3;
-
-        if (Math.abs(dHeading) > 20.0){
-            if(dHeading < 0.0){speed = -0.5;}
-            FrontL.setPower(-speed);
-            FrontR.setPower(speed);
-            BackL.setPower(-speed);
-            BackR.setPower(speed);
-        } else {
-            Stop();
-        }
-    }
-//TODO: documentation
     public void IMUBackBoardCorrection(String alliance,double offsetYaw,double offsetZ, Telemetry telemetry) {
+        double STR;
+        double FWD = 0;
+
         offsetZ = 1.27 * offsetZ + 0.0471;
 
         double offsetX = Math.atan(Math.toRadians(offsetYaw)) * offsetZ;
@@ -300,16 +294,23 @@ public class MecanumDrivetrain {
             ROT *= -1;
         }
 
-        double FWD = 0.5*(offsetZ * Math.cos(offsetYaw) - offsetX * Math.sin(offsetYaw));
-        double STR = 0.5*(offsetZ * Math.sin(offsetYaw) + offsetX * Math.cos(offsetYaw));
+        STR = 0.3 * (offsetZ * Math.sin(offsetYaw) + offsetX * Math.cos(offsetYaw));
+
+        if (offsetX <= 0.05) {
+            STR /= 3;
+//            FWD = 0.5*(offsetZ * Math.cos(offsetYaw) - offsetX * Math.sin(offsetYaw));
+        }
 
         telemetry.addData("FWD",FWD);
         telemetry.addData("STR",STR);
+        telemetry.addData("OffsetX",offsetX);
+        telemetry.addData("OffsetZ",offsetZ);
 
-        FrontL.setPower(-FWD + STR + ROT);
-        FrontR.setPower(-FWD - STR - ROT);
-        BackL.setPower(-FWD - STR + ROT);
-        BackR.setPower(-FWD + STR - ROT);
+
+        FrontL.setPower(FWD + STR + ROT);
+        FrontR.setPower(FWD -STR - ROT);
+        BackL.setPower(FWD -STR + ROT);
+        BackR.setPower(FWD + STR - ROT);
     }
 
     /**
@@ -361,7 +362,7 @@ public class MecanumDrivetrain {
         BackR.setPower(BackRPower/maxPower);
 
         if (myOpMode.gamepad1.right_bumper && myOpMode.gamepad1.left_bumper) {
-            imu.resetYaw();
+            resetYaw();
         }
         telemetry.addData("Current heading",getCurrentHeadingDegrees());
         telemetry.addData("maxPower",maxPower);//TODO: Igor says this felt slow, probably cause that gets too high, print it and look at it.
@@ -395,6 +396,11 @@ public class MecanumDrivetrain {
     public double getCurrentHeadingDegrees() {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         return (orientation.getYaw(AngleUnit.DEGREES));
+    }
+
+    //TODO:documentation
+    public void resetYaw() {
+        imu.resetYaw();
     }
 
     /**
