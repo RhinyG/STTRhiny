@@ -87,7 +87,8 @@ public class PixelManipulation extends RobotPart{
     }
 
     public enum ClawPositions {
-        RELEASE(0.45),
+        RELEASE(0.435),
+        RELEASEAUTON(0.50),
         GRABONE(0.34),
         AUTONSTART(0.29),
         GRABTWO(0.365);
@@ -221,6 +222,7 @@ public class PixelManipulation extends RobotPart{
     public void autonGoToHeight(ArmHeight height, Telemetry telemetry) {autonGoToHeight(height, 0.7, myOpMode.telemetry);};
     public void autonGoToHeight(ArmHeight height, double power, Telemetry telemetry) {
         double margin = 50.0;
+        power = 0.5;
         int position = height.getPosition();
         double currentPos = slides.getCurrentPosition();
         double dPos = Math.abs(currentPos - position);
@@ -240,7 +242,7 @@ public class PixelManipulation extends RobotPart{
             currentPos = slides.getCurrentPosition();
             dPos = Math.abs(currentPos - position);
         }
-        slides.setPower(0.05);
+        slides.setPower(0);
         myOpMode.sleep(100);
     }
     public void autonGoToHeight(ArmHeight height){autonGoToHeight(height, myOpMode.telemetry);}
@@ -263,7 +265,9 @@ public class PixelManipulation extends RobotPart{
     public void dropYellowPixel(){
         autonGoToHeight(PixelManipulation.ArmHeight.FIRSTLINE);
         myOpMode.sleep(100);
-        claw.setPosition(PixelManipulation.ClawPositions.RELEASE.getPosition());
+        claw.setPosition(ClawPositions.RELEASEAUTON.getPosition());
+        myOpMode.sleep(2000);
+        autonGoToHeight(ArmHeight.SECONDLINE);
         myOpMode.sleep(100);
         claw.setPosition(PixelManipulation.ClawPositions.GRABONE.getPosition());
         myOpMode.sleep(100);

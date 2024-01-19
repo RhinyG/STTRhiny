@@ -250,7 +250,7 @@ public class MecanumDrivetrain {
     public void RobotCentric() {
         double FWD = myOpMode.gamepad1.left_stick_y;
         double STR = myOpMode.gamepad1.left_stick_x;
-        double ROT = 0.5 * myOpMode.gamepad1.right_stick_x;
+        double ROT = 0.8* myOpMode.gamepad1.right_stick_x;
         double speed = 1.0;
         double maxPower = 1.0;
 

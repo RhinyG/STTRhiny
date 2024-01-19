@@ -27,34 +27,40 @@ public class RedBackstage extends LinearOpMode {
             int finalPos = camera.pos;
             telemetry.addData("localPos", camera.pos);
             if (finalPos == 0) {
-                methods.driveY(-110);
+                methods.driveY(-90);
                 methods.rotateToHeading(90);
-                methods.driveY(-45);
+                methods.driveX(-30);
+                methods.driveY(-25);
                 methods.driveY(40);
+                methods.driveX(35);
                 methods.rotateToHeading(-90);
-                methods.driveY(-152);
-                methods.driveX(20);
-//                slides.dropYellowPixel();
-                methods.driveY(-10, 1, telemetry);
-                methods.driveY(10);
+                methods.driveY(-140);
+                slides.dropYellowPixel();
+                methods.driveY(20);
                 methods.driveX(-90);
             } else if (finalPos == 1) {
-                methods.driveX(-10);
-                methods.driveY(-115);
+                methods.driveY(-122);
                 methods.driveY(20);
                 methods.rotateToHeading(-90);
-                methods.driveY(-125);
-                methods.driveX(5);
-//                slides.dropYellowPixel();
+                methods.driveY(-155);
+                methods.driveX(20);
+                methods.driveY(-10);
+                slides.dropYellowPixel();
+                methods.driveY(20);
                 methods.driveX(-80);
+                methods.driveY(-30);
             } else if (finalPos == 2){
-                methods.driveX(15);
+                methods.driveY(-16);
+                methods.driveX(-40);
                 methods.driveY(-90);
+                methods.driveY(30);
                 methods.rotateToHeading(-90);
-                methods.driveY(-110);
-//                slides.dropYellowPixel();
-                methods.driveX(-70);
-                methods.driveY(-20);
+                methods.driveY(-115);
+                methods.driveX(-10);
+                methods.driveY(-4);
+                slides.dropYellowPixel();
+                methods.driveX(-60);
+                methods.driveY(-30);
             }
             slides.autonGoToHeight(PixelManipulation.ArmHeight.INTAKE, 0, telemetry);
             sleep(30000);

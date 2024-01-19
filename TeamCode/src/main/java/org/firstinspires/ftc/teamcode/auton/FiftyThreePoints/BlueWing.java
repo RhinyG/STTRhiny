@@ -25,34 +25,22 @@ public class BlueWing extends LinearOpMode {
             int finalPos = camera.pos;
             telemetry.addData("localPos", camera.pos);
             if (finalPos == 0) {
-                methods.driveX(25.5 - 0.5 * methods.robotWidth_cm);
-                methods.driveY(-90 + 0.5 * methods.robotLength_cm);
-                methods.rotateToHeading(-90);
-                methods.driveY(-40 + 0.5 * methods.robotLength_cm);
-                methods.driveY(40 - 0.5 * methods.robotLength_cm);
-                methods.driveX(-60);
-                methods.driveY(-160);
-                methods.driveY(-100);
+                methods.driveY(-90);
+                methods.rotateToHeading(90);
+                methods.driveX(-30);
+                methods.driveY(-25);
+                methods.driveY(40);
+
             } else if (finalPos == 1) {
-                methods.driveX(25.5 - 0.5 * methods.robotWidth_cm);
-                methods.driveY(-112 + methods.robotLength_cm);
-                methods.driveY(15);
-                methods.driveX(-15 - 0.5 * methods.robotWidth_cm);
-                methods.driveY(-82);
-                methods.rotateToHeading(-90);
-                methods.driveY(-160 - 0.5 * methods.robotLength_cm);
-                methods.driveX(10);
-                methods.driveY(-100);
+                methods.driveY(-122);
+                methods.driveY(20);
+
             } else if (finalPos == 2){
-                methods.driveX(2 - 0.5 * methods.robotWidth_cm);
-                methods.driveY(-90 + 0.5 * methods.robotLength_cm);
-                methods.driveY(15);
-                methods.driveX(30);
-                methods.driveY(-80);
-                methods.rotateToHeading(-90);
-                methods.driveY(-140);
-                methods.driveX(10);
-                methods.driveY(-100);
+                methods.driveY(-16);
+                methods.driveX(-40);
+                methods.driveY(-90);
+                methods.driveY(30);
+
             }
             sleep(30000);
 

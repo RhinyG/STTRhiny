@@ -20,10 +20,12 @@ public class OdometryTest extends LinearOpMode {
         slides.init(hardwareMap, telemetry);
         methods.calibrateEncoders();
         methods.resetYaw();
-
+        slides.claw.setPosition(PixelManipulation.ClawPositions.AUTONSTART.getPosition());
+        slides.updateElbow(PixelManipulation.ElbowPositions.AUTONSTART);
+        slides.wrist.setPosition(0.68);
         waitForStart();
         if (opModeIsActive()){
-            methods.driveX(90);
+            slides.dropYellowPixel();
         }
     }
 }
