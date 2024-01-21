@@ -1,11 +1,6 @@
 package org.firstinspires.ftc.teamcode.drive.tests;
 
-import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.CHAINPOS;
-import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.FIRSTLINE;
 import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.INTAKE;
-import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.SECONDLINE;
-import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.THIRDLINE;
-import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ClawPositions.GRABONE;
 import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ClawPositions.GRABTWO;
 import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ClawPositions.RELEASE;
 
@@ -83,19 +78,19 @@ public class LM2RobotCentric extends LinearOpMode {
                 outtake.updateIntake(0.0);
             }
 
-            if (slidesGrab) {
-                buttonMode = true;
-                height = INTAKE;
-            } else if (slidesLow) {
-                buttonMode = true;
-                height = FIRSTLINE;
-            } else if (slidesMid) {
-                buttonMode = true;
-                height = SECONDLINE;
-            } else if (slidesHigh) {
-                buttonMode = true;
-                height = THIRDLINE;
-            }
+//            if (slidesGrab) {
+//                buttonMode = true;
+//                height = INTAKE;
+//            } else if (slidesLow) {
+//                buttonMode = true;
+//                height = FIRSTLINE;
+//            } else if (slidesMid) {
+//                buttonMode = true;
+//                height = SECONDLINE;
+//            } else if (slidesHigh) {
+//                buttonMode = true;
+//                height = THIRDLINE;
+//            }
 
             if (Math.abs(slidePower) > 0.1) {
                 buttonMode = false;

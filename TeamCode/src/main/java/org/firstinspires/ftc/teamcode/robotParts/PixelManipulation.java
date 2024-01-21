@@ -18,7 +18,7 @@ public class PixelManipulation extends RobotPart{
     public Servo intakeServo;
     public DcMotorEx slides;
     public DcMotorEx intake;
-    int upperLimit = 1150;
+    int upperLimit = 1000;
     int lowerLimit = 0;
 
     public enum ArmHeight {
@@ -51,7 +51,7 @@ public class PixelManipulation extends RobotPart{
     }
 
     public enum ElbowPositions {
-        INTAKEPOS(0.745),
+        INTAKEPOS(0.755),
         MOVEPOSLOW(0.77),
         MOVEPOSHIGH(0.83),
         CHAINPOS(0.78),
@@ -87,7 +87,7 @@ public class PixelManipulation extends RobotPart{
     }
 
     public enum ClawPositions {
-        RELEASE(0.435),
+        RELEASE(0.46),
         RELEASEAUTON(0.50),
         GRABONE(0.34),
         AUTONSTART(0.29),

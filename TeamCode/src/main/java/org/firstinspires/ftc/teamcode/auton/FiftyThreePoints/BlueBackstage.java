@@ -28,23 +28,22 @@ public class BlueBackstage extends LinearOpMode {
             telemetry.addData("localPos", camera.pos);
             if (finalPos == 0) {
                 methods.driveY(-16);
-                methods.driveX(40);
+                methods.driveX(20);
                 methods.driveY(-90);
                 methods.driveY(30);
                 methods.rotateToHeading(90);
-                methods.driveY(-115);
+                methods.driveY(-125);
                 methods.driveX(10);
                 methods.driveY(-4);
                 slides.dropYellowPixel();
                 methods.driveX(60);
                 methods.driveY(-30);
             } else if (finalPos == 1) {
-                methods.driveY(-122);
+                methods.driveY(-119);
                 methods.driveY(20);
                 methods.rotateToHeading(90);
-                methods.driveY(-155);
+                methods.driveY(-145);
                 methods.driveX(-20);
-                methods.driveY(-10);
                 slides.dropYellowPixel();
                 methods.driveY(20);
                 methods.driveX(80);
@@ -57,10 +56,11 @@ public class BlueBackstage extends LinearOpMode {
                 methods.driveY(40);
                 methods.driveX(-35);
                 methods.rotateToHeading(90);
-                methods.driveY(-140);
+                methods.driveY(-135);
                 slides.dropYellowPixel();
                 methods.driveY(20);
                 methods.driveX(90);
+                methods.driveY(30);
             }
             sleep(30000);
         }

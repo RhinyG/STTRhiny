@@ -306,7 +306,6 @@ public class MecanumDrivetrain {
         telemetry.addData("OffsetX",offsetX);
         telemetry.addData("OffsetZ",offsetZ);
 
-
         FrontL.setPower(FWD + STR + ROT);
         FrontR.setPower(FWD -STR - ROT);
         BackL.setPower(FWD -STR + ROT);
