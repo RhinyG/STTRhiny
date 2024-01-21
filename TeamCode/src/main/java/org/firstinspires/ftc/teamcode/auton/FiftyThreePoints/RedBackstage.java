@@ -29,35 +29,33 @@ public class RedBackstage extends LinearOpMode {
             if (finalPos == 0) {
                 methods.driveY(-90);
                 methods.rotateToHeading(90);
-                methods.driveX(-30);
+                methods.driveX(-20);
                 methods.driveY(-25);
                 methods.driveY(40);
                 methods.driveX(35);
                 methods.rotateToHeading(-90);
-                methods.driveY(-140);
+                methods.driveY(-140, 0.2, telemetry, 7000);
                 slides.dropYellowPixel();
                 methods.driveY(20);
                 methods.driveX(-90);
             } else if (finalPos == 1) {
-                methods.driveY(-122);
-                methods.driveY(20);
+                methods.driveY(-110);
+                methods.driveY(30);
                 methods.rotateToHeading(-90);
-                methods.driveY(-155);
-                methods.driveX(20);
-                methods.driveY(-10);
+                methods.driveY(-155, 0.2, telemetry, 6000);
+                methods.driveY(-10, 0.2, telemetry, 2500);
                 slides.dropYellowPixel();
                 methods.driveY(20);
                 methods.driveX(-80);
                 methods.driveY(-30);
             } else if (finalPos == 2){
-                methods.driveY(-16);
-                methods.driveX(-40);
+                methods.driveX(-12);
                 methods.driveY(-90);
                 methods.driveY(30);
                 methods.rotateToHeading(-90);
-                methods.driveY(-115);
-                methods.driveX(-10);
-                methods.driveY(-4);
+                methods.driveY(-115, 0.2, telemetry, 7000);
+                methods.driveX(10);
+                methods.driveY(-4, 0.2, telemetry, 2000);
                 slides.dropYellowPixel();
                 methods.driveX(-60);
                 methods.driveY(-30);

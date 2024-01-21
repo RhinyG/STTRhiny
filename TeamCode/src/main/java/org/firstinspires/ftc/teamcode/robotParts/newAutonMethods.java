@@ -9,13 +9,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class newAutonMethods {
     private LinearOpMode myOpMode;
-//    private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime runtime = new ElapsedTime();
 
     public DcMotor FrontL;
     public DcMotor FrontR;
@@ -65,18 +66,20 @@ public class newAutonMethods {
     }
 
     public void driveY (double position){
-        driveY(position,0.3, myOpMode.telemetry);
+        driveY(position,0.3, myOpMode.telemetry, 10000);
     }
 //    positive = forward
-    public void driveY(double position, double speed, Telemetry telemetry) {
+    public void driveY(double position, double speed, Telemetry telemetry, double stopTime) {
         calibrateEncoders();
+        double beginTime = System.currentTimeMillis();
+        double TimeElapsed = System.currentTimeMillis() - beginTime;
         double Kp = 0.03;
         double turn = 0;
         double heading = current_target_heading;
         double OdoY_Pos = -FrontL.getCurrentPosition();
         double tick = (int) (position * OURTICKS_PER_CM);
         double dPos = tick - OdoY_Pos;
-        while (!(dPos > -threshold  && dPos < threshold) && myOpMode.opModeIsActive()) {
+        while (!(dPos > -threshold  && dPos < threshold) && myOpMode.opModeIsActive() && TimeElapsed < stopTime) {
             if ((dPos < 0 && speed > 0) || (dPos > 0 && speed < 0)) {
                 speed = -speed;
             }
@@ -89,6 +92,7 @@ public class newAutonMethods {
             telemetry.addData("speed", speed);
             telemetry.addData("CurrentHeading", getCurrentHeading());
             telemetry.addData("TargetHeading", heading);
+            telemetry.addData("time", runtime.milliseconds());
             telemetry.update();
 
 //            FrontL.setPower(speed + turn);
@@ -101,6 +105,8 @@ public class newAutonMethods {
 
             BackR.setPower(speed - turn);
             FrontR.setPower(speed - turn);
+
+            TimeElapsed = System.currentTimeMillis() - beginTime;
 
             OdoY_Pos = -FrontL.getCurrentPosition();
             dPos = tick - OdoY_Pos;

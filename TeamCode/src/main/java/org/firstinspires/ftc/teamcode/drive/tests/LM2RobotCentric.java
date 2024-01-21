@@ -60,9 +60,12 @@ public class LM2RobotCentric extends LinearOpMode {
             double wristY = -gamepad2.left_stick_y;
 //TODO idk of deze dpad up nuttig is voor teleop plus igor wil dpad up voor de chain movement
 //            boolean clawGrabOne = gamepad2.dpad_up;
-            boolean clawMoveChain = gamepad2.dpad_up;
+//            boolean clawMoveChain = gamepad2.dpad_up;
+
+
             boolean clawGrabTwo = gamepad2.right_bumper;
             boolean clawRelease = gamepad2.left_bumper;
+            boolean clawIntake = gamepad2.dpad_up;
 
             boolean planeLaunch = gamepad1.x;
             boolean planeReset = gamepad1.y;
@@ -113,7 +116,7 @@ public class LM2RobotCentric extends LinearOpMode {
             } else if (elbowOuttakePos) {
                 elbowPosition = PixelManipulation.ElbowPositions.OUTTAKEPOS;
             }
-            if(elbowPosition == PixelManipulation.ElbowPositions.MOVEPOSHIGH && outtake.slides.getCurrentPosition() < 150) {
+            if(elbowPosition == PixelManipulation.ElbowPositions.MOVEPOSHIGH && outtake.slides.getCurrentPosition() < 180) {
                 elbowPosition = PixelManipulation.ElbowPositions.MOVEPOSLOW;
             }
 
@@ -126,14 +129,16 @@ public class LM2RobotCentric extends LinearOpMode {
                 clawPosition = RELEASE;
             } else if (clawGrabTwo) {
                 clawPosition = GRABTWO;
+            } else if (clawIntake) {
+                clawPosition = PixelManipulation.ClawPositions.INTAKE;
             }
 
-            if (clawMoveChain) {
-                outtake.goToHeight(200, 0.4, telemetry);
-                sleep(100);
-                elbowPosition = PixelManipulation.ElbowPositions.CHAINPOS;
-                outtake.goToHeight(460, 0.4, telemetry);
-            }
+//            if (clawMoveChain) {
+//                outtake.goToHeight(200, 0.4, telemetry);
+//                sleep(100);
+//                elbowPosition = PixelManipulation.ElbowPositions.CHAINPOS;
+//                outtake.goToHeight(460, 0.4, telemetry);
+//            }
 
             outtake.claw.setPosition(clawPosition.getPosition());
 

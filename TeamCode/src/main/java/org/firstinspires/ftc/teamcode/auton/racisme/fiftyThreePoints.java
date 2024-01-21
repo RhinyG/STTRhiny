@@ -37,7 +37,7 @@ public class fiftyThreePoints extends LinearOpMode {
                 sleep(500);
                 methods.driveX(-10);
                // outtake.updateRotate(PixelManipulation.RotatePositions.OUTTAKEPOS);
-                methods.driveY(-15, 0.2,telemetry);
+//                methods.driveY(-15, 0.2,telemetry);
                 outtake.claw.setPosition(PixelManipulation.ClawPositions.RELEASE.getPosition());
             } else if (finalPos == 1) {
                 methods.driveX(25.5 - 0.5 * methods.robotWidth_cm);

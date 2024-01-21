@@ -54,7 +54,7 @@ public class RedWing extends LinearOpMode {
                 methods.driveX(-80);
                 methods.driveY(-30);
             } else if (finalPos == 2){
-                methods.driveY(-90);
+                methods.driveY(-88.5);
                 methods.rotateToHeading(-90);
                 methods.driveX(30);
                 methods.driveX(-25);

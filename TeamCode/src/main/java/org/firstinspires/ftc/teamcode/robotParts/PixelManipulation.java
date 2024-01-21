@@ -51,8 +51,8 @@ public class PixelManipulation extends RobotPart{
     }
 
     public enum ElbowPositions {
-        INTAKEPOS(0.755),
-        MOVEPOSLOW(0.77),
+        INTAKEPOS(0.7475),
+        MOVEPOSLOW(0.765),
         MOVEPOSHIGH(0.83),
         CHAINPOS(0.78),
         AUTONSTART(0.52),
@@ -87,6 +87,7 @@ public class PixelManipulation extends RobotPart{
     }
 
     public enum ClawPositions {
+        INTAKE(0.525),
         RELEASE(0.46),
         RELEASEAUTON(0.50),
         GRABONE(0.34),
