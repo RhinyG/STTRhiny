@@ -83,7 +83,6 @@ public class newAutonMethods {
             if ((dPos < 0 && speed > 0) || (dPos > 0 && speed < 0)) {
                 speed = -speed;
             }
-            //TODO: see if turn correction works
 //            turn = Kp*Math.abs(speed)*(heading-getCurrentHeading());
 
             telemetry.addData("tick", tick);
@@ -131,8 +130,6 @@ public class newAutonMethods {
             if ((dPos > 0 && speed > 0) || (dPos < 0 && speed < 0)) {
                 speed = -speed;
             }
-            //TODO: see if turn correction works
-//            turn = Kp*Math.abs(speed)*(heading-getCurrentHeading());
 
             telemetry.addData("tick", tick);
             telemetry.addData("PosX", OdoX_Pos/OURTICKS_PER_CM);

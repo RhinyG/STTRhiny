@@ -54,7 +54,6 @@ public class BlueWing extends LinearOpMode {
 //                methods.driveY(-30);
             } else if (finalPos == 2){
                 methods.driveX(-16);
-                methods.rotateToHeading(-15);
                 methods.driveY(-90);
                 methods.driveY(30);
 //                methods.driveX(50);

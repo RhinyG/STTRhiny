@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ClawPo
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.robotParts.PixelManipulation;
@@ -18,12 +19,19 @@ public class LM2RobotCentric extends LinearOpMode {
     PixelManipulation outtake = new PixelManipulation(this);
     Servo plane;
     Servo hook;
+    CRServo contServo;
+
+    float leftY, rightY;
+    double cntPower;
 
     @Override
     public void runOpMode() throws InterruptedException {
 
         drivetrain.init(hardwareMap);
         outtake.init(hardwareMap, telemetry);
+//        contServo = hardwareMap.crservo.get("intakeServoidk");
+
+        contServo.resetDeviceConfigurationForOpMode();
         plane = hardwareMap.servo.get("plane");
         hook = hardwareMap.servo.get("hook");
 
@@ -59,6 +67,7 @@ public class LM2RobotCentric extends LinearOpMode {
             double wristX = gamepad2.left_stick_x;
             double wristY = -gamepad2.left_stick_y;
 //TODO idk of deze dpad up nuttig is voor teleop plus igor wil dpad up voor de chain movement
+
 //            boolean clawGrabOne = gamepad2.dpad_up;
 //            boolean clawMoveChain = gamepad2.dpad_up;
 
@@ -73,13 +82,23 @@ public class LM2RobotCentric extends LinearOpMode {
             boolean hookFold = gamepad1.a;
             boolean hookRelease = gamepad1.b;
 
-            if (intakeMotorSpit) {
-                outtake.updateIntake(0.80);
-            } else if (intakeMotorSuck) {
-                outtake.updateIntake(-0.5);
-            } else {
-                outtake.updateIntake(0.0);
+            if(intakeMotorSpit)
+            {
+                cntPower = -0.45;
+                telemetry.addData("Keypad" , "dpad_up clicked. power = " + cntPower);
             }
+            else if(intakeMotorSuck)
+            {
+                cntPower = 0.45;
+                telemetry.addData("Keypad" , "dpad_down clicked. power = " + cntPower);
+            }
+            else
+            {
+                cntPower = 0.0;
+                telemetry.addData("Keypad" , "Nothing pressed. power = " + cntPower);
+
+            }
+
 
 //            if (slidesGrab) {
 //                buttonMode = true;
@@ -153,6 +172,8 @@ public class LM2RobotCentric extends LinearOpMode {
             }else if (hookRelease) {
                 hook.setPosition(1.0);
             }
+
+            contServo.setPower(cntPower);
 
             drivetrain.RobotCentric();
 
