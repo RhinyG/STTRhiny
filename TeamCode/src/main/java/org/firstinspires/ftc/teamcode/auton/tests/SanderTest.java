@@ -22,8 +22,8 @@ public class SanderTest extends LinearOpMode {
                 module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
             }
             drive.drive(0,50);
-            drive.rotateToHeading(90,0.3);
-            drive.drive(0,0, 0.5, 30, 20000);
+            drive.rotateToHeading(180,0.3);
+            drive.drive(0,0, 0.5, 30000, 20000);
             sleep(30000);
         }
     }

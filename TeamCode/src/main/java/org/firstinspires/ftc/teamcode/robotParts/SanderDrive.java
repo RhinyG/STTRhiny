@@ -100,31 +100,27 @@ public class SanderDrive {
     public void drive(double x, double y, double max_speed, double stopTime, double b) {
         resetEncoders();
         beginTime = System.currentTimeMillis();
-        timeElapsedSECONDS = (System.currentTimeMillis() - beginTime) / 1000;
-        odoY_Pos = -FrontL.getCurrentPosition();
-        odoX_Pos = -BackL.getCurrentPosition();
         speed = min_speed + a * (max_speed-min_speed);
         remweg = max_speed * b;
         Kp = 0.1;
         heading = getTargetHeading(current_target_heading);
         theta = Math.toRadians(heading);
         k = 0.1;
-        cur_pos = Math.abs(odoX_Pos) + Math.abs(odoY_Pos);
-        odoDistances = calculateOdoDistance(x-cur_x,y-cur_y,k, Math.toRadians(heading + 90));
+        odoDistances = calculateOdoDistance(x-cur_x,y-cur_y,k, Math.toRadians(-heading + 90));
         X = (int) odoDistances[1];
         Y = (int) odoDistances[0];
         target_x = (int) (X / CM_PER_TICK);
         target_y = (int) (Y / CM_PER_TICK);
-        dPos_x = target_x - odoX_Pos;
-        dPos_y = target_y - odoY_Pos;
-        dPos = Math.abs(dPos_x) + Math.abs(dPos_y);
-        f = (dPos_x * Math.sin(theta) + dPos_y * Math.cos(theta));
-        s = (dPos_x * Math.cos(theta) - dPos_y * Math.sin(theta));
-        FWD = f;
-        STR = s;
-        dHead = getCurrentHeading_DEGREES() - heading;
         double[] arr;
+        updateTargets();
         while ((Math.abs(dPos_x) > marginOfError || Math.abs(dPos_y) > marginOfError || Math.abs(dHead) > heading_error) &&  myOpMode.opModeIsActive() && timeElapsedSECONDS < stopTime) {
+//            if(heading == 0 || heading == 180){
+//                STR = s;
+//                FWD = f;
+//            } else {
+//                STR = f;
+//                FWD = s;
+//            }
             STR = s;
             FWD = f;
             if ((dPos_x < 0 && STR > 0) || (dPos_x > 0 && STR < 0)) {
@@ -134,9 +130,9 @@ public class SanderDrive {
                 FWD = -FWD;
             }
 
-            if (/*cur_pos < 0.5 * remweg &&*/ dPos > 0.5 * remweg) {
+            if (dPos > 0.5 * remweg) {
                 a = 0.5;
-            } else if (/*cur_pos > 2 * remweg &&*/ dPos < 2 * remweg) {
+            } else if (dPos < 2 * remweg) {
                 a = dPos / (remweg);
             } else {
                 a = 1;
@@ -146,7 +142,7 @@ public class SanderDrive {
             fl = (FWD + STR); //FWD: was ++++
             fr = (FWD - STR); //STR: was +--+
             bl = (FWD - STR); //turn: was ++--
-            br = (FWD + STR);
+            br = (FWD + STR); //worked with 0 and 180
 
             myOpMode.telemetry.addData("undiv fl", fl);
             myOpMode.telemetry.addData("undiv fr", fr);
@@ -161,11 +157,13 @@ public class SanderDrive {
                 fr *= division;
                 bl *= division;
                 br *= division;
+                myOpMode.telemetry.addData("div FWD", FWD * division);
+                myOpMode.telemetry.addData("div STR", STR * division);
             }
             arr = null;
             fl += turn; //FWD: - + + -
-            fr += turn; //STR: + + - -
-            bl -= turn;
+            fr -= turn; //STR: + + - -
+            bl += turn;
             br -= turn;
 
             telemetry();
@@ -175,16 +173,7 @@ public class SanderDrive {
             BackL.setPower(bl);
             BackR.setPower(br);
 
-            timeElapsedSECONDS = (System.currentTimeMillis() - beginTime) / 1000;
-            odoY_Pos = -FrontL.getCurrentPosition();
-            odoX_Pos = -BackL.getCurrentPosition();
-            cur_pos = Math.abs(odoX_Pos) + Math.abs(odoY_Pos);
-            dPos_x = target_x - odoX_Pos;
-            dPos_y = target_y - odoY_Pos;
-            f = (dPos_x * Math.sin(theta) + dPos_y * Math.cos(theta));
-            s = (dPos_x * Math.cos(theta) - dPos_y * Math.sin(theta));
-            dHead = getCurrentHeading_DEGREES() - heading;
-            dPos = Math.abs(dPos_x) + Math.abs(dPos_y);
+            updateTargets();
         }
         Stop();
         cur_x = x;
@@ -192,16 +181,31 @@ public class SanderDrive {
         myOpMode.sleep(100);
     }
 
+    public void updateTargets(){
+        timeElapsedSECONDS = (System.currentTimeMillis() - beginTime) / 1000;
+        odoY_Pos = -FrontL.getCurrentPosition();
+        odoX_Pos = -BackL.getCurrentPosition();
+        cur_pos = Math.abs(odoX_Pos) + Math.abs(odoY_Pos);
+        dPos_x = target_x - odoX_Pos;
+        dPos_y = target_y - odoY_Pos;
+        f = (dPos_x * Math.sin(theta) + dPos_y * Math.cos(theta));
+        s = (dPos_x * Math.cos(theta) - dPos_y * Math.sin(theta));
+        dHead = getCurrentHeading_DEGREES() - heading;
+        dPos = Math.abs(dPos_x) + Math.abs(dPos_y);
+    }
+
     public void telemetry() {
         myOpMode.telemetry.addData("fl", fl);
         myOpMode.telemetry.addData("fr", fr);
         myOpMode.telemetry.addData("bl", bl);
         myOpMode.telemetry.addData("br", br);
+        myOpMode.telemetry.addData("target_x", target_x);
+        myOpMode.telemetry.addData("target_y", target_y);
         myOpMode.telemetry.addData("dPos_x", dPos_x);
         myOpMode.telemetry.addData("dPos_y", dPos_y);
         myOpMode.telemetry.addData("FWD", FWD);
         myOpMode.telemetry.addData("STR", STR);
-        myOpMode.telemetry.addData("head", turn);
+        myOpMode.telemetry.addData("turn", turn);
         myOpMode.telemetry.addData("X", odoDistances[1]);
         myOpMode.telemetry.addData("Y", odoDistances[0]);
 
@@ -214,6 +218,12 @@ public class SanderDrive {
         myOpMode.telemetry.addData("Odo_Speed", odo_speed);
         myOpMode.telemetry.addData("VelocityY", FrontR.getVelocity() * CM_PER_TICK);
         myOpMode.telemetry.addData("VelocityX", -FrontL.getVelocity()* CM_PER_TICK);
+        myOpMode.telemetry.addData("odoY_Pos", odoY_Pos);
+        myOpMode.telemetry.addData("odoX_Pos", odoX_Pos);
+        myOpMode.telemetry.addData("currentHeading",getCurrentHeading_DEGREES());
+        myOpMode.telemetry.addData("theta",theta);
+        myOpMode.telemetry.addData("heading",heading);
+
         myOpMode.telemetry.update();
     }
 
