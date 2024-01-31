@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robotParts;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.auton.FiftyThreePoints.RedBackstage;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -17,7 +18,6 @@ import org.openftc.easyopencv.OpenCvWebcam;
 public class OpenCVTrussIsLeft {
     LinearOpMode myOpMode;
     OpenCvWebcam webcam1 = null;
-
     public int pos = 0; //Left 0, Middle 1, Right 2
     double centerAvgFin;
     double rightAvgFin;

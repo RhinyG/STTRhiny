@@ -12,7 +12,6 @@ public class RedBackstage extends LinearOpMode {
     newAutonMethods methods = new newAutonMethods(this);
     OpenCVTrussIsLeft camera = new OpenCVTrussIsLeft(this);
     PixelManipulation slides = new PixelManipulation(this);
-
     public void runOpMode() {
         methods.init(hardwareMap);
         slides.init(hardwareMap, telemetry);
