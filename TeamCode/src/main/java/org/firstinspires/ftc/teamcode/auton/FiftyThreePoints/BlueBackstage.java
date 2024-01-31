@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.robotParts.OpenCVTrussIsRight;
 import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
-import org.firstinspires.ftc.teamcode.robotParts.PixelManipulation;
+import org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation;
 
 @Autonomous(name = "BlueBackstage")
 public class BlueBackstage extends LinearOpMode {

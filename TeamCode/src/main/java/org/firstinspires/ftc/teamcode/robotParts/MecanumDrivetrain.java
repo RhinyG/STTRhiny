@@ -50,7 +50,7 @@ public class MecanumDrivetrain {
 
         FrontL.setDirection(DcMotorSimple.Direction.REVERSE);
         FrontR.setDirection(DcMotorSimple.Direction.FORWARD);
-        BackL.setDirection(DcMotorSimple.Direction.REVERSE);
+        BackL.setDirection(DcMotorSimple.Direction.FORWARD);
         BackR.setDirection(DcMotorSimple.Direction.FORWARD);
 
 //        FrontL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

@@ -6,20 +6,20 @@
 //import com.qualcomm.robotcore.hardware.Servo;
 //
 //import org.firstinspires.ftc.teamcode.robotParts.Outdated.DrivetrainAlex;
-//import org.firstinspires.ftc.teamcode.robotParts.PixelManipulation;
+//import org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation;
 //
-//import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.INTAKE;
-//import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.FIRSTLINE;
-//import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.SECONDLINE;
-//import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.THIRDLINE;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.ArmHeight.INTAKE;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.ArmHeight.FIRSTLINE;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.ArmHeight.SECONDLINE;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.ArmHeight.THIRDLINE;
 //
-//import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.RotatePositions.INTAKEPOS;
-//import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.RotatePositions.MOVEPOS;
-//import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.RotatePositions.OUTTAKEPOS;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.RotatePositions.INTAKEPOS;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.RotatePositions.MOVEPOS;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.RotatePositions.OUTTAKEPOS;
 //
-//import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ClawPositions.RELEASE;
-//import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ClawPositions.GRABONE;
-//import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ClawPositions.GRABTWO;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.ClawPositions.RELEASE;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.ClawPositions.GRABONE;
+//import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.ClawPositions.GRABTWO;
 //
 //@TeleOp(name = "IGORGEBRUIKDEZE")
 //public class LM1TeleOp extends LinearOpMode {

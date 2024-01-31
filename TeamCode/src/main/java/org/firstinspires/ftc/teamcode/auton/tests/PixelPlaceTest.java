@@ -6,9 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.robotParts.OpenCVTrussIsLeft;
 import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
-import org.firstinspires.ftc.teamcode.robotParts.PixelManipulation;
+import org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation;
 
-import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.FIRSTLINE;
 @Disabled
 @Autonomous(name = "PixelPlaceTest")
 public class PixelPlaceTest extends LinearOpMode {

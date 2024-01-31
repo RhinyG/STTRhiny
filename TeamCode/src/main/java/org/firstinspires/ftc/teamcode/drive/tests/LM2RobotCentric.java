@@ -1,15 +1,15 @@
 package org.firstinspires.ftc.teamcode.drive.tests;
 
-import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ArmHeight.INTAKE;
-import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ClawPositions.GRABTWO;
-import static org.firstinspires.ftc.teamcode.robotParts.PixelManipulation.ClawPositions.RELEASE;
+import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.ArmHeight.INTAKE;
+import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.ClawPositions.GRABTWO;
+import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.ClawPositions.RELEASE;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.robotParts.PixelManipulation;
+import org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation;
 import org.firstinspires.ftc.teamcode.robotParts.MecanumDrivetrain;
 
 @TeleOp(name = "LM2 RobotCentric")

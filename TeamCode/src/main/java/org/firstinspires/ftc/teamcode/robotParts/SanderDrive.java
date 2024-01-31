@@ -84,7 +84,7 @@ public class SanderDrive {
         BackR = map.get(DcMotorEx.class, "right_back");
         FrontL.setDirection(DcMotorSimple.Direction.REVERSE);
         FrontR.setDirection(DcMotorSimple.Direction.FORWARD);
-        BackL.setDirection(DcMotorSimple.Direction.REVERSE);
+        BackL.setDirection(DcMotorSimple.Direction.FORWARD);
         BackR.setDirection(DcMotorSimple.Direction.FORWARD);
         resetEncoders();
 
@@ -104,7 +104,7 @@ public class SanderDrive {
         remweg = max_speed * b;
         Kp = 0.1;
         heading = getTargetHeading(current_target_heading);
-        theta = Math.toRadians(heading);
+        theta = Math.toRadians(heading + 90);
         k = 0.1;
         odoDistances = calculateOdoDistance(x-cur_x,y-cur_y,k, Math.toRadians(-heading + 90));
         X = (int) odoDistances[1];
@@ -184,7 +184,7 @@ public class SanderDrive {
     public void updateTargets(){
         timeElapsedSECONDS = (System.currentTimeMillis() - beginTime) / 1000;
         odoY_Pos = -FrontL.getCurrentPosition();
-        odoX_Pos = -BackL.getCurrentPosition();
+        odoX_Pos = -FrontR.getCurrentPosition();
         cur_pos = Math.abs(odoX_Pos) + Math.abs(odoY_Pos);
         dPos_x = target_x - odoX_Pos;
         dPos_y = target_y - odoY_Pos;
@@ -274,7 +274,7 @@ public class SanderDrive {
         double Kp = 0.03;
         double turn;
         double heading = current_target_heading;
-        double OdoX_Pos = -BackL.getCurrentPosition();
+        double OdoX_Pos = -FrontR.getCurrentPosition();
         int tick = (int) (position / CM_PER_TICK);
         double dPos = tick - OdoX_Pos;
         while (!(dPos > -marginOfError && dPos < marginOfError) && myOpMode.opModeIsActive() && timeElapsedSECONDS < stopTime) {
@@ -287,7 +287,7 @@ public class SanderDrive {
             BackL.setPower(-speed + turn);
             BackR.setPower(-speed + turn);
             timeElapsedSECONDS = (System.currentTimeMillis() - beginTime) / 1000;
-            OdoX_Pos = -BackL.getCurrentPosition();
+            OdoX_Pos = -FrontR.getCurrentPosition();
             dPos = tick - OdoX_Pos;
         }
         Stop();
@@ -303,36 +303,6 @@ public class SanderDrive {
     public void drive(double x, double y) {
         drive(x, y, 0.7, 6, 20000);
     }
-//    public void rotateToHeading(double target_heading, Telemetry telemetry){
-//        rotateToHeading(target_heading,0.3, telemetry);
-//    }
-//
-//    public void rotateToHeading(double target_heading, double speed, Telemetry telemetry) {
-//        double current_heading = getCurrentHeading_DEGREES();
-//        double dHeading = target_heading - current_heading;
-//        double direction;
-//        double margin = 1.0;
-//        telemetry.addData("curHeading", current_heading);
-//        telemetry.addData("dHeading",dHeading);
-//        telemetry.update();
-//        while (!(Math.abs(dHeading) < margin) && myOpMode.opModeIsActive()) {
-//            direction = -checkDirection(current_heading-target_heading);
-//
-//            FrontL.setPower(-speed * direction);
-//            FrontR.setPower(speed * direction);
-//            BackL.setPower(-speed * direction);
-//            BackR.setPower(speed * direction);
-//
-//            current_heading = getCurrentHeading_DEGREES();
-//            dHeading = target_heading - current_heading;
-//            telemetry.addData("curHeading", current_heading);
-//            telemetry.addData("dHeading",dHeading);
-//            telemetry.update();
-//        }
-//        resetEncoders();
-//        Stop();
-//        current_target_heading = target_heading;
-//    }
 
     public void rotateToHeading(double target_heading, double speed) {
         double current_heading = getTargetHeading(getCurrentHeading_DEGREES());
@@ -341,7 +311,7 @@ public class SanderDrive {
         myOpMode.telemetry.addData("curHeading", current_heading);
         myOpMode.telemetry.addData("dHeading",dHeading);
         myOpMode.telemetry.update();
-        while (!(dHeading> -.5 && dHeading < .5) && myOpMode.opModeIsActive() && timeElapsedSECONDS < 10) {
+        while (!(dHeading> -.5 && dHeading < .5) && myOpMode.opModeIsActive()) {
             direction = -checkDirection(current_heading-target_heading);
 
             FrontL.setPower(speed * direction);

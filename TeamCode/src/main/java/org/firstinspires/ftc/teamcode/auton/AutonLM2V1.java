@@ -5,7 +5,7 @@
 //
 //import org.firstinspires.ftc.teamcode.robotParts.OpenCVTrussIsLeft;
 //import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
-//import org.firstinspires.ftc.teamcode.robotParts.PixelManipulation;
+//import org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation;
 //
 //@Autonomous(name = "RedBackstage")
 //public class AutonLM2V1 extends LinearOpMode {
