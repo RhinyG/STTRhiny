@@ -37,8 +37,6 @@ public class newAutonMethods {
     double threshold = 250;
     final double odoMultiplier = 1.17;
 
-    private DcMotor encoderX, encoderY;
-
     public newAutonMethods(LinearOpMode opmode) {myOpMode = opmode;}
 
     public void init(HardwareMap map) {
@@ -49,10 +47,10 @@ public class newAutonMethods {
         BackL = map.get(DcMotor.class, "left_back");
         BackR = map.get(DcMotor.class, "right_back");
 
-        BackR.setDirection(DcMotorSimple.Direction.FORWARD);
-        BackL.setDirection(DcMotorSimple.Direction.REVERSE);
         FrontL.setDirection(DcMotorSimple.Direction.REVERSE);
         FrontR.setDirection(DcMotorSimple.Direction.FORWARD);
+        BackL.setDirection(DcMotorSimple.Direction.FORWARD);
+        BackR.setDirection(DcMotorSimple.Direction.FORWARD);
 
         OURTICKS_PER_CM = odoMultiplier*(TICKS_PER_ROTATION)/(2*Math.PI * GEAR_RATIO * WHEEL_RADIUS);
 
@@ -83,7 +81,7 @@ public class newAutonMethods {
             if ((dPos < 0 && speed > 0) || (dPos > 0 && speed < 0)) {
                 speed = -speed;
             }
-//            turn = Kp*Math.abs(speed)*(heading-getCurrentHeading());
+            turn = Kp*Math.abs(speed)*(heading-getCurrentHeading());
 
             telemetry.addData("tick", tick);
             telemetry.addData("PosY", OdoY_Pos/OURTICKS_PER_CM);
@@ -130,6 +128,7 @@ public class newAutonMethods {
             if ((dPos > 0 && speed > 0) || (dPos < 0 && speed < 0)) {
                 speed = -speed;
             }
+            turn = Kp*Math.abs(speed)*(heading-getCurrentHeading());
 
             telemetry.addData("tick", tick);
             telemetry.addData("PosX", OdoX_Pos/OURTICKS_PER_CM);
@@ -139,8 +138,8 @@ public class newAutonMethods {
 
             FrontL.setPower(-speed + turn);
             FrontR.setPower(speed - turn);
-            BackL.setPower(1.1 * gravityConstant * (speed + turn));
-            BackR.setPower(gravityConstant * (-speed - turn));
+            BackL.setPower(speed + turn);
+            BackR.setPower(-speed - turn);
 
             OdoX_Pos = -BackL.getCurrentPosition();
             dPos = tick - OdoX_Pos;
