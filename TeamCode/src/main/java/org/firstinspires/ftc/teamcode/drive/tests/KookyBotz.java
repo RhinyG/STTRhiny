@@ -1,7 +1,18 @@
 package org.firstinspires.ftc.teamcode.drive.tests;
 
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmExtendPos.FULL;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmExtendPos.ZERO;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.INTAKEGROUND;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.OUTTAKEBACK;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.OUTTAKEFRONT;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.GRABLEFT;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.GRABRIGHT;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.RELEASELEFT;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.RELEASERIGHT;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.robotParts.MecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.robotParts.Crumblz;
@@ -12,11 +23,15 @@ public class KookyBotz extends LinearOpMode {
     MecanumDrivetrain drivetrain = new MecanumDrivetrain(this);
     Crumblz arm = new Crumblz(this);
 
-    boolean slideButtonMode = false;
+    boolean extendButtonMode = false;
     boolean rotateButtonMode = false;
+    int holdSlides = 0;
+    boolean holdSlideButton = false;
 
-    Crumblz.ArmExtendPos extendPos = Crumblz.ArmExtendPos.ZERO;
-    Crumblz.ArmRotatePos rotatePos = Crumblz.ArmRotatePos.INTAKEGROUND;
+    Crumblz.ArmExtendPos extendPos = ZERO;
+    Crumblz.ArmRotatePos rotatePos = INTAKEGROUND;
+    Crumblz.ClawPositions leftPos = RELEASELEFT;
+    Crumblz.ClawPositions rightPos = RELEASERIGHT;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -29,28 +44,83 @@ public class KookyBotz extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            double armSlidePower = gamepad1.right_trigger - gamepad1.left_trigger;
+            boolean RotateIntakeButton = gamepad2.a;
+            boolean RotateOuttakeButton = gamepad2.b;
+            double armRotatePower = -gamepad2.left_stick_x;
 
-            double armRotatePower;
-            boolean armRotatePositive = gamepad1.right_bumper;
-            boolean armRotateNegative = gamepad1.left_bumper;
+            boolean ExtendFullyButton = gamepad1.x;
+            boolean ExtendNoneButton = gamepad1.y;
 
-            if(armRotateNegative) {
-                armRotatePower = -1;
+            boolean leftOpen = gamepad2.dpad_left;
+            boolean leftClose = gamepad2.dpad_up;
+            boolean rightOpen = gamepad2.dpad_right;
+            boolean rightClose = gamepad2.dpad_down;
+
+            if (RotateIntakeButton) {
+                rotateButtonMode = true;
+                holdSlides = arm.armExtend.getCurrentPosition();
+                rotatePos = INTAKEGROUND;
+            } else if (RotateOuttakeButton) {
+                rotateButtonMode = true;
+                holdSlides = arm.armExtend.getCurrentPosition();
+                rotatePos = OUTTAKEFRONT;
+            }
+
+            if (Math.abs(armRotatePower) > 0.1) {
                 rotateButtonMode = false;
             }
-            else if(armRotatePositive) {
-                armRotatePower = 1;
-                rotateButtonMode = false;
-            }
-            else {
-                armRotatePower = 0;
-                rotateButtonMode = false;
+
+            double IgorArmExtendPower = 0.7*(gamepad1.right_trigger - gamepad1.left_trigger);
+            double DeanArmExtendPower = 0.7*(gamepad2.right_trigger - gamepad2.left_trigger);
+            double armExtendPower;
+
+            if (Math.abs(IgorArmExtendPower) > 0.1 && Math.abs(DeanArmExtendPower) > 0.1) {
+                if (arm.armRotate.getCurrentPosition() > 3100){
+                    armExtendPower = DeanArmExtendPower;
+                } else {
+                    armExtendPower = IgorArmExtendPower;
+                }
+            } else if (Math.abs(IgorArmExtendPower) > 0.1) {
+                armExtendPower = IgorArmExtendPower;
+            } else {
+                armExtendPower = DeanArmExtendPower;
             }
 
-            drivetrain.RobotCentric();
-//            arm.updateSlide(slideButtonMode,armSlidePower,extendPos,telemetry);
-            arm.updateRotate(rotateButtonMode,armRotatePower,rotatePos,telemetry);
+            if (ExtendFullyButton) {
+                extendButtonMode = true;
+                extendPos = FULL;
+            } else if (ExtendNoneButton) {
+                extendButtonMode = true;
+                extendPos = ZERO;
+            }
+
+            if (Math.abs(IgorArmExtendPower) > 0.1 || Math.abs(DeanArmExtendPower) > 0.1) {
+                extendButtonMode = false;
+            }
+
+            if (leftOpen) {
+                leftPos = RELEASELEFT;
+            }
+            if (leftClose) {
+                leftPos = GRABLEFT;
+            }
+            if (rightOpen) {
+                rightPos = RELEASERIGHT;
+            }
+            if (rightClose) {
+                rightPos = GRABRIGHT;
+            }
+
+            arm.updateElbow();
+            arm.updateClaw(leftPos,rightPos);
+            arm.updateSlide(extendButtonMode,armExtendPower,extendPos,telemetry);
+            arm.updateRotate(rotateButtonMode, armRotatePower, rotatePos, holdSlides, telemetry);
+            if (arm.armRotate.getCurrentPosition() < 2000){
+                drivetrain.RobotCentric(-1);
+            } else {
+                drivetrain.RobotCentric(1);
+            }
+
             telemetry.update();
         }
     }

@@ -16,7 +16,7 @@ public class BlueBackstage extends LinearOpMode {
     public void runOpMode() {
         methods.init(hardwareMap);
         slides.init(hardwareMap, telemetry);
-        methods.calibrateEncoders();
+        methods.resetEncoders();
         methods.resetYaw();
         camera.findScoringPosition();
         slides.claw.setPosition(PixelManipulation.ClawPositions.AUTONSTART.getPosition());

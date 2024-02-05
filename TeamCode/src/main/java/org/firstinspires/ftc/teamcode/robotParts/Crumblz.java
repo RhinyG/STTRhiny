@@ -12,17 +12,17 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Crumblz extends RobotPart {
 
     private final LinearOpMode myOpMode;
-    public Servo claw;
+    public Servo clawLeft;
+    public Servo clawRight;
     public Servo wrist;
     public Servo elbow;
     public DcMotorEx armExtend;
     public DcMotorEx armRotate;
 
     public enum ArmRotatePos {
-        INTAKEGROUND(-1150),
-        INTAKESTACKTHREE(-1075),
-        INTAKESTACKFIVE(-1000),
-        OUTTAKE(500);
+        INTAKEGROUND(4000),
+        OUTTAKEFRONT(2300),
+        OUTTAKEBACK(800);
 
         private final int position;
         public int getPosition() {
@@ -35,9 +35,9 @@ public class Crumblz extends RobotPart {
 
     public enum ArmExtendPos {
         ZERO(0),
-        ONETHIRD(300),
-        TWOTHIRDS(600),
-        FULL(1000);
+        ONETHIRD(260),
+        TWOTHIRDS(520),
+        FULL(780);
 
         private final int position;
         public int getPosition() {
@@ -48,9 +48,9 @@ public class Crumblz extends RobotPart {
 
     public enum ArmLimits {
         SLIDELOWER(0),
-        SLIDEUPPER(1000),
+        SLIDEUPPER(950),
         ROTATELOWER(0),
-        ROTATEUPPER(2850);
+        ROTATEUPPER(3900);
 
         private final int position;
         public int getPosition() {
@@ -62,12 +62,9 @@ public class Crumblz extends RobotPart {
     }
 
     public enum ElbowPositions {
-        INTAKEPOS(0.7475),
-        MOVEPOSLOW(0.765),
-        MOVEPOSHIGH(0.83),
-        CHAINPOS(0.78),
-        AUTONSTART(0.52),
-        OUTTAKEPOS(0.56);
+        INTAKEPOS(0.13),//0.15
+        OUTTAKEFRONTSIDEPOS(0.13),
+        FOLDPOS(0);
 
 
         private final double position;
@@ -98,8 +95,10 @@ public class Crumblz extends RobotPart {
     }
 
     public enum ClawPositions {
-        RELEASE(0.46),
-        GRAB(0.365);
+        RELEASELEFT(0.69),
+        GRABLEFT(0.555),
+        RELEASERIGHT(0.38),
+        GRABRIGHT(0.51);
 
         private final double position;
 
@@ -121,7 +120,8 @@ public class Crumblz extends RobotPart {
     public void init(HardwareMap map) {
         elbow = map.get(Servo.class,"elbow");
         wrist = map.get(Servo.class, "wrist");
-        claw = map.get(Servo.class, "claw");
+        clawLeft = map.get(Servo.class, "clawLeft");
+        clawRight = map.get(Servo.class, "clawRight");
 
         wrist.setPosition(WristPositions.INTAKEPOS.getPosition());
 
@@ -143,8 +143,9 @@ public class Crumblz extends RobotPart {
     /**
      * This updates the claws to a (new) position
      */
-    public void updateClaw(ClawPositions position) {
-        claw.setPosition(position.getPosition());
+    public void updateClaw(ClawPositions positionLeft, ClawPositions positionRight) {
+        clawLeft.setPosition(positionLeft.getPosition());
+        clawRight.setPosition(positionRight.getPosition());
     }
 
     public void updateWrist(double x, double y, Telemetry telemetry) {
@@ -182,8 +183,22 @@ public class Crumblz extends RobotPart {
         }
     }
 
-    public void updateElbow(ElbowPositions position) {
-        elbow.setPosition(position.getPosition());
+    //0.64 rotate 48, 0.707 rotate 790
+    //servo pos = (0.707-0.64)/(790-48) * armRotate.getCurrentPosition + b
+    // b = 0.707 - (0.707-0.64)/(790-48) * 790 = 0.635
+    //servo pos = (0.707-0.64)/(790-48) * armRotate.getCurrentPosition + 0.635
+    public void updateElbow() {
+        double position;
+        if (armRotate.getCurrentPosition() > 3800){
+            position = ElbowPositions.INTAKEPOS.getPosition();
+        } else if (armRotate.getCurrentPosition() < 150){
+            position = ElbowPositions.FOLDPOS.getPosition();
+        } else if (armRotate.getCurrentPosition() < 2000) {
+            position = (0.707-0.64)/(790-48) * armRotate.getCurrentPosition() + 0.635;
+        } else {
+            position = ElbowPositions.OUTTAKEFRONTSIDEPOS.getPosition();
+        }
+        elbow.setPosition(position);
     }
 
     public double slidesGoToHeight(int position, double power, Telemetry telemetry) {
@@ -215,29 +230,33 @@ public class Crumblz extends RobotPart {
     public void updateSlide(boolean buttonMode, double power, Crumblz.ArmExtendPos height, Telemetry telemetry) {
         double distance = 0;
         if (buttonMode) {
-            distance = slidesGoToHeight(height.getPosition(), 1, telemetry);
+            distance = slidesGoToHeight(height.getPosition(), 0.7, telemetry);
             telemetry.addData("slide", armExtend.getCurrentPosition());
             telemetry.addData("slide goal", height.getPosition());
             telemetry.addLine(String.valueOf(height));
             telemetry.addData("arm power", armExtend.getPower());
         } else {
             int position = armExtend.getCurrentPosition();
+            boolean limitReached;
 
-            if (position <= ArmLimits.SLIDELOWER.getPosition() && power <= 0) {
-                setPower(0);
-            }
-            else if (position >= ArmLimits.SLIDEUPPER.getPosition() && power >= 0) {
-                setPower(0);
+            if ((position <= ArmLimits.SLIDELOWER.getPosition() && power <= 0)|| (position >= ArmLimits.SLIDEUPPER.getPosition() && power >= 0)) {
+                limitReached = true;
             } else {
-                armExtend.setPower(power);
+                limitReached = false;
             }
-            telemetry.addData("slide", position);
+
+            if (!limitReached) {
+                armExtend.setPower(power);
+            } else {
+                armExtend.setPower(0);
+            }
+            telemetry.addData("slide pos", position);
             telemetry.addData("slide power", armExtend.getPower());
             telemetry.addData("distance to goal", distance);
         }
     }
     public double rotateToPos(int position, double power, Telemetry telemetry) {
-        double margin = 50.0;
+        double margin = 60.0;
         double currentPosLeft = armRotate.getCurrentPosition();
         double distance = Math.abs(currentPosLeft - position);
         if (currentPosLeft < position) {
@@ -262,28 +281,50 @@ public class Crumblz extends RobotPart {
         return distance;
     }
 
-    public void updateRotate(boolean buttonMode, double power, Crumblz.ArmRotatePos height, Telemetry telemetry) {
+    public void updateRotate(boolean buttonMode, double power, Crumblz.ArmRotatePos height, int holdSlides, Telemetry telemetry) {
         double distance = 0;
         if (buttonMode) {
             distance = rotateToPos(height.getPosition(), 1, telemetry);
+            if(distance > 100){
+                slidesGoToHeight(holdSlides,0.7,telemetry);
+            }
             telemetry.addData("rotate", armRotate.getCurrentPosition());
             telemetry.addData("rotate goal", height.getPosition());
             telemetry.addLine(String.valueOf(height));
             telemetry.addData("rotate power", armRotate.getPower());
         } else {
             int position = armRotate.getCurrentPosition();
+            boolean limitReached;
 
-            if (position <= ArmLimits.ROTATELOWER.getPosition() && power <= 0) {
-                setPower(0);
-            }
-            else if (position >= ArmLimits.ROTATEUPPER.getPosition() && power >= 0) {
-                setPower(0);
+            if ((position <= ArmLimits.ROTATELOWER.getPosition() && power <= 0)|| (position >= ArmLimits.ROTATEUPPER.getPosition() && power >= 0)) {
+                limitReached = true;
             } else {
+                limitReached = false;
+            }
+
+            if (!limitReached) {
                 armRotate.setPower(power);
+            } else {
+                armRotate.setPower(0);
             }
             telemetry.addData("rotate", position);
             telemetry.addData("rotate power", armRotate.getPower());
             telemetry.addData("distance to goal", distance);
         }
+    }
+
+    public void secretRotate(double power, Telemetry telemetry) {
+        int position = armRotate.getCurrentPosition();
+        armRotate.setPower(power);
+
+        telemetry.addData("rotate", position);
+        telemetry.addData("rotate power", armRotate.getPower());
+    }
+    public void secretSlide(double power, Telemetry telemetry) {
+        int position = armExtend.getCurrentPosition();
+        armExtend.setPower(power);
+        armExtend.setPower(0);
+        telemetry.addData("slide", position);
+        telemetry.addData("slide power", armExtend.getPower());
     }
 }

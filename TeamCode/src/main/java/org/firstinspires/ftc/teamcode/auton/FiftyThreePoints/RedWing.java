@@ -17,7 +17,7 @@ public class RedWing extends LinearOpMode {
     public void runOpMode() {
         methods.init(hardwareMap);
         slides.init(hardwareMap, telemetry);
-        methods.calibrateEncoders();
+        methods.resetEncoders();
 
         camera.findScoringPosition();
         // kijk of je assen kloppen de XYZ van imu, anders doet ie niks

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robotParts;
+package org.firstinspires.ftc.teamcode.robotParts.Outdated;
 //for github
 //TODO: import acmerobotics to access FTC dashboard
 //import com.acmerobotics.dashboard.config.Config;
@@ -82,6 +82,7 @@ public class SanderDrive {
         FrontR = map.get(DcMotorEx.class, "right_front");
         BackL = map.get(DcMotorEx.class, "left_back");
         BackR = map.get(DcMotorEx.class, "right_back");
+
         FrontL.setDirection(DcMotorSimple.Direction.REVERSE);
         FrontR.setDirection(DcMotorSimple.Direction.FORWARD);
         BackL.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -104,7 +105,7 @@ public class SanderDrive {
         remweg = max_speed * b;
         Kp = 0.1;
         heading = getTargetHeading(current_target_heading);
-        theta = Math.toRadians(heading + 90);
+        theta = Math.toRadians(90);
         k = 0.1;
         odoDistances = calculateOdoDistance(x-cur_x,y-cur_y,k, Math.toRadians(-heading + 90));
         X = (int) odoDistances[1];
@@ -114,13 +115,6 @@ public class SanderDrive {
         double[] arr;
         updateTargets();
         while ((Math.abs(dPos_x) > marginOfError || Math.abs(dPos_y) > marginOfError || Math.abs(dHead) > heading_error) &&  myOpMode.opModeIsActive() && timeElapsedSECONDS < stopTime) {
-//            if(heading == 0 || heading == 180){
-//                STR = s;
-//                FWD = f;
-//            } else {
-//                STR = f;
-//                FWD = s;
-//            }
             STR = s;
             FWD = f;
             if ((dPos_x < 0 && STR > 0) || (dPos_x > 0 && STR < 0)) {
@@ -131,7 +125,7 @@ public class SanderDrive {
             }
 
             if (dPos > 0.5 * remweg) {
-                a = 0.5;
+                a = 0.3;
             } else if (dPos < 2 * remweg) {
                 a = dPos / (remweg);
             } else {
@@ -142,7 +136,7 @@ public class SanderDrive {
             fl = (FWD + STR); //FWD: was ++++
             fr = (FWD - STR); //STR: was +--+
             bl = (FWD - STR); //turn: was ++--
-            br = (FWD + STR); //worked with 0 and 180
+            br = (FWD + STR); //worked with 0
 
             myOpMode.telemetry.addData("undiv fl", fl);
             myOpMode.telemetry.addData("undiv fr", fr);
@@ -226,6 +220,7 @@ public class SanderDrive {
 
         myOpMode.telemetry.update();
     }
+
 
     public void atagDrive(double x, double y, double speed, double stopTime, double b) {
         resetEncoders();

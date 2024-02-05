@@ -4,7 +4,7 @@ package org.firstinspires.ftc.teamcode.auton.tests;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import org.firstinspires.ftc.teamcode.robotParts.SanderDrive;
+import org.firstinspires.ftc.teamcode.robotParts.Outdated.SanderDrive;
 
 import java.util.List;
 
@@ -21,8 +21,7 @@ public class SanderTest extends LinearOpMode {
             for (LynxModule module : allHubs) {
                 module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
             }
-            drive.drive(0,50);
-            drive.drive(50,50);
+            drive.drive(50,0, 0.4, 300, 20000);
             sleep(30000);
         }
     }
