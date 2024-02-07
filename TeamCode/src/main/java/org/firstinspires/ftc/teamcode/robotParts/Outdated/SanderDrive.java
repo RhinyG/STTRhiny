@@ -36,7 +36,7 @@ public class SanderDrive {
     double TICKS_PER_ROTATION = 8192;
     double odoMultiplier = (38.6/69.5);
     double CM_PER_TICK = (odoMultiplier * 2*Math.PI * GEAR_RATIO * WHEEL_RADIUS)/(TICKS_PER_ROTATION); //about 1/690
-    double marginOfError = 200;
+    double threshold = 250;
     double heading_error = 2;
     double min_speed = 0.15;
     double beginTime;
@@ -85,7 +85,7 @@ public class SanderDrive {
 
         FrontL.setDirection(DcMotorSimple.Direction.REVERSE);
         FrontR.setDirection(DcMotorSimple.Direction.FORWARD);
-        BackL.setDirection(DcMotorSimple.Direction.FORWARD);
+        BackL.setDirection(DcMotorSimple.Direction.REVERSE);
         BackR.setDirection(DcMotorSimple.Direction.FORWARD);
         resetEncoders();
 
@@ -101,7 +101,6 @@ public class SanderDrive {
     public void drive(double x, double y, double max_speed, double stopTime, double b) {
         resetEncoders();
         beginTime = System.currentTimeMillis();
-        speed = min_speed + a * (max_speed-min_speed);
         remweg = max_speed * b;
         Kp = 0.1;
         heading = getTargetHeading(current_target_heading);
@@ -114,7 +113,7 @@ public class SanderDrive {
         target_y = (int) (Y / CM_PER_TICK);
         double[] arr;
         updateTargets();
-        while ((Math.abs(dPos_x) > marginOfError || Math.abs(dPos_y) > marginOfError || Math.abs(dHead) > heading_error) &&  myOpMode.opModeIsActive() && timeElapsedSECONDS < stopTime) {
+        while ((Math.abs(dPos_x) > threshold || Math.abs(dPos_y) > threshold || Math.abs(dHead) > heading_error) &&  myOpMode.opModeIsActive() && timeElapsedSECONDS < stopTime) {
             STR = s;
             FWD = f;
             if ((dPos_x < 0 && STR > 0) || (dPos_x > 0 && STR < 0)) {
@@ -177,8 +176,8 @@ public class SanderDrive {
 
     public void updateTargets(){
         timeElapsedSECONDS = (System.currentTimeMillis() - beginTime) / 1000;
-        odoY_Pos = -FrontL.getCurrentPosition();
-        odoX_Pos = -FrontR.getCurrentPosition();
+        odoY_Pos = FrontL.getCurrentPosition();
+        odoX_Pos = FrontR.getCurrentPosition();
         cur_pos = Math.abs(odoX_Pos) + Math.abs(odoY_Pos);
         dPos_x = target_x - odoX_Pos;
         dPos_y = target_y - odoY_Pos;
@@ -222,13 +221,13 @@ public class SanderDrive {
     }
 
 
-    public void atagDrive(double x, double y, double speed, double stopTime, double b) {
-        resetEncoders();
-        cur_y = 0;
-        cur_x = 0;
-        current_target_heading = 180;
-        drive(-x, -y, speed, stopTime, b);
-    }
+//    public void atagDrive(double x, double y, double speed, double stopTime, double b) {
+//        resetEncoders();
+//        cur_y = 0;
+//        cur_x = 0;
+//        current_target_heading = 180;
+//        drive(-x, -y, speed, stopTime, b);
+//    }
 
     public void driveY(double position, double speed, double stopTime) {
         beginTime = System.currentTimeMillis();
@@ -240,7 +239,7 @@ public class SanderDrive {
         double OdoY_Pos = -FrontL.getCurrentPosition();
         int tick = (int) (position / CM_PER_TICK);
         double dPos = tick - OdoY_Pos;
-        while (!(dPos < Math.abs(marginOfError)) && myOpMode.opModeIsActive() && timeElapsedSECONDS < stopTime) {
+        while (!(dPos > -threshold && dPos < threshold) && myOpMode.opModeIsActive() && timeElapsedSECONDS < stopTime) {
             if ((dPos < 0 && speed > 0) || (dPos > 0 && speed < 0)) {
                 speed = -speed;
             }
@@ -272,7 +271,7 @@ public class SanderDrive {
         double OdoX_Pos = -FrontR.getCurrentPosition();
         int tick = (int) (position / CM_PER_TICK);
         double dPos = tick - OdoX_Pos;
-        while (!(dPos > -marginOfError && dPos < marginOfError) && myOpMode.opModeIsActive() && timeElapsedSECONDS < stopTime) {
+        while (!(dPos > -threshold  && dPos < threshold) && myOpMode.opModeIsActive() && timeElapsedSECONDS < stopTime) {
             if ((dPos > 0 && speed > 0) || (dPos < 0 && speed < 0)) {
                 speed = -speed;
             }
@@ -295,9 +294,9 @@ public class SanderDrive {
     public void driveX(double position, double speed) {
         driveX(position, speed, standardStopTime);
     }
-    public void drive(double x, double y) {
-        drive(x, y, 0.7, 6, 20000);
-    }
+//    public void drive(double x, double y) {
+//        drive(x, y, 0.7, 6, 20000);
+//    }
 
     public void rotateToHeading(double target_heading, double speed) {
         double current_heading = getTargetHeading(getCurrentHeading_DEGREES());
@@ -310,14 +309,18 @@ public class SanderDrive {
             direction = -checkDirection(current_heading-target_heading);
 
             FrontL.setPower(speed * direction);
-            FrontR.setPower(-speed * direction);
+            FrontR.setPower(speed * direction);
             BackL.setPower(speed * direction);
-            BackR.setPower(-speed * direction);
+            BackR.setPower(speed * direction);
 
             current_heading = getTargetHeading(getCurrentHeading_DEGREES());
             dHeading = target_heading - current_heading;
             myOpMode.telemetry.addData("curHeading", current_heading);
             myOpMode.telemetry.addData("dHeading",dHeading);
+            myOpMode.telemetry.addData("FL power", FrontL.getPower());
+            myOpMode.telemetry.addData("FR power", FrontR.getPower());
+            myOpMode.telemetry.addData("BL power", BackL.getPower());
+            myOpMode.telemetry.addData("BR power", BackR.getPower());
             myOpMode.telemetry.update();
         }
         resetEncoders();

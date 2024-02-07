@@ -20,9 +20,9 @@ public class Crumblz extends RobotPart {
     public DcMotorEx armRotate;
 
     public enum ArmRotatePos {
-        INTAKEGROUND(4000),
-        OUTTAKEFRONT(2300),
-        OUTTAKEBACK(800);
+        INTAKEGROUND(0),
+        OUTTAKEFRONT(1300),
+        OUTTAKEBACK(3300);
 
         private final int position;
         public int getPosition() {
@@ -48,9 +48,9 @@ public class Crumblz extends RobotPart {
 
     public enum ArmLimits {
         SLIDELOWER(0),
-        SLIDEUPPER(950),
+        SLIDEUPPER(900),
         ROTATELOWER(0),
-        ROTATEUPPER(3900);
+        ROTATEUPPER(3050);
 
         private final int position;
         public int getPosition() {
@@ -62,9 +62,10 @@ public class Crumblz extends RobotPart {
     }
 
     public enum ElbowPositions {
-        INTAKEPOS(0.13),//0.15
-        OUTTAKEFRONTSIDEPOS(0.13),
-        FOLDPOS(0);
+        INTAKEPOS(0.1),//0.15
+        OUTTAKEFRONTSIDEPOS(0.1),
+        OUTTAKEBACKSIDEPOS(0.8),
+        FOLDPOS(0.8);
 
 
         private final double position;
@@ -96,9 +97,9 @@ public class Crumblz extends RobotPart {
 
     public enum ClawPositions {
         RELEASELEFT(0.69),
-        GRABLEFT(0.555),
+        GRABLEFT(0.47),
         RELEASERIGHT(0.38),
-        GRABRIGHT(0.51);
+        GRABRIGHT(0.58);
 
         private final double position;
 
@@ -124,6 +125,7 @@ public class Crumblz extends RobotPart {
         clawRight = map.get(Servo.class, "clawRight");
 
         wrist.setPosition(WristPositions.INTAKEPOS.getPosition());
+        elbow.setPosition(ElbowPositions.FOLDPOS.getPosition());
 
         armExtend = map.get(DcMotorEx.class, "armExtend");
         armRotate = map.get(DcMotorEx.class, "armRotate");
@@ -189,14 +191,12 @@ public class Crumblz extends RobotPart {
     //servo pos = (0.707-0.64)/(790-48) * armRotate.getCurrentPosition + 0.635
     public void updateElbow() {
         double position;
-        if (armRotate.getCurrentPosition() > 3800){
+        if (armRotate.getCurrentPosition() < 300) {
             position = ElbowPositions.INTAKEPOS.getPosition();
-        } else if (armRotate.getCurrentPosition() < 150){
-            position = ElbowPositions.FOLDPOS.getPosition();
-        } else if (armRotate.getCurrentPosition() < 2000) {
-            position = (0.707-0.64)/(790-48) * armRotate.getCurrentPosition() + 0.635;
-        } else {
+        } else if (armRotate.getCurrentPosition() < 1600) {
             position = ElbowPositions.OUTTAKEFRONTSIDEPOS.getPosition();
+        } else {
+            position = ElbowPositions.OUTTAKEBACKSIDEPOS.getPosition();
         }
         elbow.setPosition(position);
     }
@@ -248,6 +248,7 @@ public class Crumblz extends RobotPart {
             if (!limitReached) {
                 armExtend.setPower(power);
             } else {
+
                 armExtend.setPower(0);
             }
             telemetry.addData("slide pos", position);
@@ -283,6 +284,7 @@ public class Crumblz extends RobotPart {
 
     public void updateRotate(boolean buttonMode, double power, Crumblz.ArmRotatePos height, int holdSlides, Telemetry telemetry) {
         double distance = 0;
+        double slideHeight = armExtend.getCurrentPosition();
         if (buttonMode) {
             distance = rotateToPos(height.getPosition(), 1, telemetry);
             if(distance > 100){
@@ -303,7 +305,11 @@ public class Crumblz extends RobotPart {
             }
 
             if (!limitReached) {
-                armRotate.setPower(power);
+                if (slideHeight > 700) {
+                    armRotate.setPower(0.5 * power);
+                }else {
+                    armRotate.setPower(power);
+                }
             } else {
                 armRotate.setPower(0);
             }

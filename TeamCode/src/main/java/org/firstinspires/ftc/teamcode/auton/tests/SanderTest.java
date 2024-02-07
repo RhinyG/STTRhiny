@@ -21,7 +21,7 @@ public class SanderTest extends LinearOpMode {
             for (LynxModule module : allHubs) {
                 module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
             }
-            drive.drive(50,0, 0.4, 300, 20000);
+            drive.drive(0,50, 0.3, 30, 20000);
             sleep(30000);
         }
     }

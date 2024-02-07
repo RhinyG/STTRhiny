@@ -56,6 +56,9 @@ public class KookyBotz extends LinearOpMode {
             boolean rightOpen = gamepad2.dpad_right;
             boolean rightClose = gamepad2.dpad_down;
 
+            Crumblz.ClawPositions currentLeft = leftPos;
+            Crumblz.ClawPositions currentRight = rightPos;
+
             if (RotateIntakeButton) {
                 rotateButtonMode = true;
                 holdSlides = arm.armExtend.getCurrentPosition();
@@ -63,7 +66,7 @@ public class KookyBotz extends LinearOpMode {
             } else if (RotateOuttakeButton) {
                 rotateButtonMode = true;
                 holdSlides = arm.armExtend.getCurrentPosition();
-                rotatePos = OUTTAKEFRONT;
+                rotatePos = OUTTAKEBACK;
             }
 
             if (Math.abs(armRotatePower) > 0.1) {
@@ -120,7 +123,6 @@ public class KookyBotz extends LinearOpMode {
             } else {
                 drivetrain.RobotCentric(1);
             }
-
             telemetry.update();
         }
     }

@@ -15,8 +15,11 @@ public class OdometryTest extends LinearOpMode {
         drive.init(hardwareMap);
         waitForStart();
         if (opModeIsActive()){
-            drive.driveY(50);
-            drive.driveX(50);
+            drive.driveDean(0,100,0.3,telemetry,8000);
+            drive.driveDean(100,0,0.3,telemetry,8000);
+            drive.driveDean(0,-100,0.3,telemetry,8000);
+            drive.driveDean(-100,0,0.3,telemetry,8000);
+            sleep(30000);
         }
     }
 }

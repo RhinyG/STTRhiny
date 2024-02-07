@@ -18,7 +18,7 @@ public class PixelPlaceTest extends LinearOpMode {
     public void runOpMode() {
         methods.init(hardwareMap);
         outtake.init(hardwareMap, telemetry);
-        methods.resetEncoders();
+        methods.calibrateEncoders();
         camera.findScoringPosition();
 
         waitForStart();
