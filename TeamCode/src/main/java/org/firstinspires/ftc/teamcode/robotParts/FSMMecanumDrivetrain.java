@@ -56,6 +56,7 @@ public class FSMMecanumDrivetrain {
     double b = 1;
     double heading;
     double dHeading;
+    double direction;
 
     public FSMMecanumDrivetrain(LinearOpMode opmode) {myOpMode = opmode;}
     Telemetry telemetry = myOpMode.telemetry;
@@ -232,8 +233,10 @@ public class FSMMecanumDrivetrain {
                 break;
             case 2:
                 Stop();
-                myOpMode.sleep(100);
-                state++;
+                beginTime = System.currentTimeMillis();
+                if (System.currentTimeMillis() > 100 + beginTime) {
+                    state++;
+                }
                 break;
         }
     }
@@ -247,14 +250,12 @@ public class FSMMecanumDrivetrain {
         dPos = Math.abs(dPosX) + Math.abs(dPosY);
     }
     public void FSMRotate(double target_heading, double speed) {
+        target_heading *= -1;
         switch (rotateState) {
             case 0:
-                target_heading *= -1;
-                double current_heading = getCurrentHeading();
-                dHeading = target_heading - current_heading;
-                double direction;
+                dHeading = target_heading - getCurrentHeading();
                 rotateThreshold = 0.5;
-                telemetry.addData("curHeading", current_heading);
+                telemetry.addData("curHeading", getCurrentHeading());
                 telemetry.addData("dHeading",dHeading);
                 rotateState++;
                 break;
@@ -271,9 +272,8 @@ public class FSMMecanumDrivetrain {
                     BackL.setPower((-speed * direction));
                     BackR.setPower(speed * direction);
 
-                    current_heading = getCurrentHeading();
-                    dHeading = target_heading - current_heading;
-                    telemetry.addData("curHeading", current_heading);
+                    dHeading = target_heading - getCurrentHeading();
+                    telemetry.addData("curHeading", getCurrentHeading());
                     telemetry.addData("dHeading",dHeading);
                 } else {
                     rotateState++;
@@ -281,9 +281,12 @@ public class FSMMecanumDrivetrain {
                 break;
             case 2:
                 calibrateEncoders();
-                Stop();
                 current_target_heading = target_heading;
-                state++;
+                Stop();
+                beginTime = System.currentTimeMillis();
+                if (System.currentTimeMillis() > 100 + beginTime) {
+                    state++;
+                }
                 break;
         }
     }
