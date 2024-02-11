@@ -126,7 +126,6 @@ public class Crumblz extends RobotPart {
         motors.put("slideLeft", armExtend);
         resetEncoders();
     }
-
     /**
      * This updates the claws to a (new) position
      */
@@ -134,7 +133,7 @@ public class Crumblz extends RobotPart {
         clawLeft.setPosition(positionLeft.getPosition());
         clawRight.setPosition(positionRight.getPosition());
     }
-public void updateWrist(double x, double y) {
+    public void updateWrist(double x, double y) {
         double theta;
         double r = Math.sqrt(x * x + y * y);
         WristPositions outtakePos;
@@ -184,7 +183,6 @@ public void updateWrist(double x, double y) {
         }
         elbow.setPosition(position);
     }
-
     public double slidesGoToHeight(int position, double power) {
         double margin = 50.0;
         double currentPos = armExtend.getCurrentPosition();
@@ -210,7 +208,6 @@ public void updateWrist(double x, double y) {
         }
         return distance;
     }
-
     public void updateSlide(boolean buttonMode, double power, Crumblz.ArmExtendPos height) {
         double distance = 0;
         if (buttonMode) {
@@ -261,7 +258,6 @@ public void updateWrist(double x, double y) {
         }
         return distance;
     }
-
     public void updateRotate(boolean buttonMode, double power, Crumblz.ArmRotatePos height, int holdSlides) {
         double distance = 0;
         double slideHeight = armExtend.getCurrentPosition();
@@ -294,7 +290,6 @@ public void updateWrist(double x, double y) {
             telemetry.addData("distance to goal", distance);
         }
     }
-
     public void secretRotate(double power) {
         int position = armRotate.getCurrentPosition();
         armRotate.setPower(power);

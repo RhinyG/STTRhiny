@@ -23,7 +23,6 @@ public class OpenCVTeamPropDetection {
     public int pos = 1; //Left 0, Middle 1, Right 2
     double leftAvgFin;
     double rightAvgFin;
-
     public OpenCVTeamPropDetection(LinearOpMode opMode) {
         myOpMode = opMode;
         telemetry = myOpMode.telemetry;

@@ -18,12 +18,10 @@ public class FSMMecanumDrivetrain {
     public int rotateState = 0;
     private final LinearOpMode myOpMode;
     private final ElapsedTime runtime = new ElapsedTime();
-
     public DcMotor FrontL;
     public DcMotor FrontR;
     public DcMotor BackL;
     public DcMotor BackR;
-
     double current_target_heading = 0;
     public IMU imu;
     double WHEEL_RADIUS = 48;//mm
@@ -33,7 +31,6 @@ public class FSMMecanumDrivetrain {
     double threshold = 250;
     double rotateThreshold = 0.5;
     double odoMultiplier = (69.5/38.6);
-
     double beginTime;
     double TimeElapsed;
     double OdoY_Pos;
@@ -49,13 +46,12 @@ public class FSMMecanumDrivetrain {
     double ROT;
     double speed;
     double min_speed = 0.13;
-    double remweg;
+    double brakeDistance;
     double a = 1;
     double b = 1;
     double heading;
     double dHeading;
     double direction;
-
     public FSMMecanumDrivetrain(LinearOpMode opmode) {
         myOpMode = opmode;
         telemetry = myOpMode.telemetry;
@@ -63,7 +59,6 @@ public class FSMMecanumDrivetrain {
     }
     Telemetry telemetry;
     HardwareMap map;
-
     public void init() {
         imu = map.get(IMU.class, "imu");
 
@@ -104,20 +99,20 @@ public class FSMMecanumDrivetrain {
         heading = current_target_heading;
         tickY = (int) (y * OURTICKS_PER_CM);
         tickX = (int) (x * OURTICKS_PER_CM);
-        remweg = max_speed * 35000;
+        brakeDistance = max_speed * 35000;
         updateDrive();
         state++;
     }
     public void runFSMDrive(double max_speed, double stopTime) {
         if ((Math.abs(dPosY) > threshold || Math.abs(dPosX) > threshold || Math.abs(dHeading) > 0.5) && myOpMode.opModeIsActive() && TimeElapsed < stopTime) {
 
-            if (Math.abs(dPosY) < remweg) {
-                a = dPosY / remweg;
+            if (Math.abs(dPosY) < brakeDistance) {
+                a = dPosY / brakeDistance;
             } else {
                 a = 1;
             }
-            if (Math.abs(dPosX) < remweg) {
-                b = dPosX / remweg;
+            if (Math.abs(dPosX) < brakeDistance) {
+                b = dPosX / brakeDistance;
             } else {
                 b = 1;
             }
@@ -176,20 +171,20 @@ public class FSMMecanumDrivetrain {
                 heading = current_target_heading;
                 tickY = (int) (y * OURTICKS_PER_CM);
                 tickX = (int) (x * OURTICKS_PER_CM);
-                remweg = max_speed * 35000;
+                brakeDistance = max_speed * 35000;
                 updateDrive();
                 driveState++;
                 break;
             case 1:
                 if ((Math.abs(dPosY) > threshold || Math.abs(dPosX) > threshold || Math.abs(dHeading) > 0.5) && myOpMode.opModeIsActive() && TimeElapsed < stopTime) {
 
-                    if (Math.abs(dPosY) < remweg) {
-                        a = dPosY / remweg;
+                    if (Math.abs(dPosY) < brakeDistance) {
+                        a = dPosY / brakeDistance;
                     } else {
                         a = 1;
                     }
-                    if (Math.abs(dPosX) < remweg) {
-                        b = dPosX / remweg;
+                    if (Math.abs(dPosX) < brakeDistance) {
+                        b = dPosX / brakeDistance;
                     } else {
                         b = 1;
                     }
@@ -295,29 +290,24 @@ public class FSMMecanumDrivetrain {
                 break;
         }
     }
-
     int checkDirection(double val){
         if (val < 0)
             return -1;
         else return 1;
     }
-
     public void Stop(){
         FrontL.setPower(0);
         FrontR.setPower(0);
         BackL.setPower(0);
         BackR.setPower(0);
     }
-
     public double getCurrentHeading() {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         return (orientation.getYaw(AngleUnit.DEGREES));
     }
-
     public void resetYaw() {
         imu.resetYaw();
     }
-
     public void calibrateEncoders() {
         FrontL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         FrontR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
