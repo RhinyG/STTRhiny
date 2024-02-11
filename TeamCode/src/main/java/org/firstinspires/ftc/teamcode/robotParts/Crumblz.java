@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Crumblz extends RobotPart {
-
     private final LinearOpMode myOpMode;
     public Servo clawLeft;
     public Servo clawRight;
@@ -19,12 +18,10 @@ public class Crumblz extends RobotPart {
     public DcMotorEx armExtend;
     public DcMotorEx armRotate;
     public int state = 0;
-
     public enum ArmRotatePos {
         INTAKEGROUND(0),
         OUTTAKEFRONT(1300),
         OUTTAKEBACK(3300);
-
         private final int position;
         public int getPosition() {
             return this.position;
@@ -33,24 +30,20 @@ public class Crumblz extends RobotPart {
             this.position = position;
         }
     }
-
     public enum ArmExtendPos {
         ZERO(0),
         FULL(780);
-
         private final int position;
         public int getPosition() {
             return this.position;
         }
         ArmExtendPos(int position) {this.position = position;}
     }
-
     public enum ArmLimits {
         SLIDELOWER(0),
         SLIDEUPPER(900),
         ROTATELOWER(0),
         ROTATEUPPER(3050);
-
         private final int position;
         public int getPosition() {
             return this.position;
@@ -59,14 +52,11 @@ public class Crumblz extends RobotPart {
             this.position = position;
         }
     }
-
     public enum ElbowPositions {
         INTAKEPOS(0.1),//0.15
         OUTTAKEFRONTSIDEPOS(0.1),
         OUTTAKEBACKSIDEPOS(0.8),
         FOLDPOS(0.8);
-
-
         private final double position;
         public double getPosition() {
             return this.position;
@@ -75,7 +65,6 @@ public class Crumblz extends RobotPart {
             this.position = position;
         }
     }
-
     public enum WristPositions {
         INTAKEPOS(0.63),//0.39 is servo to armExtend, 0.63 is servo away
         ONE(0.35),
@@ -84,7 +73,6 @@ public class Crumblz extends RobotPart {
         FOUR(0.91),
         FIVE(0.208),
         SIX(0.97);
-
         private final double position;
         public double getPosition() {
             return this.position;
@@ -93,24 +81,19 @@ public class Crumblz extends RobotPart {
             this.position = position;
         }
     }
-
     public enum ClawPositions {
         RELEASELEFT(0.69),
         GRABLEFT(0.47),
         RELEASERIGHT(0.38),
         GRABRIGHT(0.58);
-
         private final double position;
-
         public double getPosition() {
             return this.position;
         }
-
         ClawPositions(double position) {
             this.position = position;
         }
     }
-
     public Crumblz(LinearOpMode opmode) {
         myOpMode = opmode;
         telemetry = myOpMode.telemetry;
@@ -151,8 +134,7 @@ public class Crumblz extends RobotPart {
         clawLeft.setPosition(positionLeft.getPosition());
         clawRight.setPosition(positionRight.getPosition());
     }
-
-    public void updateWrist(double x, double y) {
+public void updateWrist(double x, double y) {
         double theta;
         double r = Math.sqrt(x * x + y * y);
         WristPositions outtakePos;
