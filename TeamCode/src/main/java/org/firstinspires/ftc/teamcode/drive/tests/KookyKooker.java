@@ -91,8 +91,8 @@ public class KookyKooker extends LinearOpMode {
 
             arm.updateElbow();
             arm.updateClaw(leftPos,rightPos);
-            arm.updateSlide(false,armExtendPower,extendPos,telemetry);
-            arm.updateRotate(false, armRotatePower, rotatePos, holdSlides, telemetry);
+            arm.updateSlide(false,armExtendPower,extendPos);
+            arm.updateRotate(false, armRotatePower, rotatePos, holdSlides);
             if (arm.armRotate.getCurrentPosition() < 2000){
                 drivetrain.RobotCentric(-1);
             } else {

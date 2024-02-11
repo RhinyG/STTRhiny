@@ -89,8 +89,8 @@ public class SecretTechniqueNoJutsu extends LinearOpMode {
                 arm.armExtend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             }
             arm.updateClaw(leftPos,rightPos);
-            arm.secretRotate(armRotatePower,telemetry);
-            arm.secretSlide(armExtendPower, telemetry);
+            arm.secretRotate(armRotatePower);
+            arm.secretSlide(armExtendPower);
             telemetry.update();
         }
     }

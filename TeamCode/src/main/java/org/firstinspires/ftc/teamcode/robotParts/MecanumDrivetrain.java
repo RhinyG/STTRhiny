@@ -89,7 +89,7 @@ public class MecanumDrivetrain {
      * @param telemetry - Gives telemetry from the opmode for the method to use. Not having this parameter would result in an NPE.
      *                  This can alternatively be done with myOpMode.telemetry.addData but that's longer so we don't.
      */
-    public void driveY(double position, double speed, Telemetry telemetry) {//TODO: make work like newAutonMethods
+    public void driveY(double position, double speed, Telemetry telemetry) {
         calibrateEncoders();
         double Kp = 0.03;
         double turn;

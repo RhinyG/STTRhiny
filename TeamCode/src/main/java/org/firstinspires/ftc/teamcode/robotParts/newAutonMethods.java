@@ -86,6 +86,7 @@ public class newAutonMethods {
         imu.initialize(new IMU.Parameters(orientationOnRobot));
         resetYaw();
     }
+    //TODO: DOCUMENTATION!!!
     public void driveDean(double x,double y, double max_speed, Telemetry telemetry, double stopTime) {
         calibrateEncoders();
         beginTime = System.currentTimeMillis();

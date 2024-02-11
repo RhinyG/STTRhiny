@@ -68,8 +68,6 @@ public class LM2RobotCentric extends LinearOpMode {
             double wristY = -gamepad2.left_stick_y;
 //TODO idk of deze dpad up nuttig is voor teleop plus igor wil dpad up voor de chain movement
 
-//            boolean clawGrabOne = gamepad2.dpad_up;
-//            boolean clawMoveChain = gamepad2.dpad_up;
 
 
             boolean clawGrabTwo = gamepad2.right_bumper;
@@ -82,18 +80,15 @@ public class LM2RobotCentric extends LinearOpMode {
             boolean hookFold = gamepad1.a;
             boolean hookRelease = gamepad1.b;
 
-            if(intakeMotorSpit)
-            {
+            if(intakeMotorSpit) {
                 cntPower = -0.45;
                 telemetry.addData("Keypad" , "dpad_up clicked. power = " + cntPower);
             }
-            else if(intakeMotorSuck)
-            {
+            else if(intakeMotorSuck) {
                 cntPower = 0.45;
                 telemetry.addData("Keypad" , "dpad_down clicked. power = " + cntPower);
             }
-            else
-            {
+            else {
                 cntPower = 0.0;
                 telemetry.addData("Keypad" , "Nothing pressed. power = " + cntPower);
 
