@@ -24,12 +24,16 @@ public class OpenCVTeamPropDetection {
     double leftAvgFin;
     double rightAvgFin;
 
-    public OpenCVTeamPropDetection(LinearOpMode opMode) {myOpMode = opMode;}
-    Telemetry telemetry = myOpMode.telemetry;
-    HardwareMap hardwareMap = myOpMode.hardwareMap;
+    public OpenCVTeamPropDetection(LinearOpMode opMode) {
+        myOpMode = opMode;
+        telemetry = myOpMode.telemetry;
+        map = myOpMode.hardwareMap;
+    }
+    Telemetry telemetry;
+    HardwareMap map;
     public void findScoringPosition(boolean IsTrussRight) {
-        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        WebcamName webcamName = map.get(WebcamName.class, "Webcam 1");
+        int cameraMonitorViewId = map.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", map.appContext.getPackageName());
         webcam1 = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
 
         webcam1.setPipeline(new brightnessPipeline(IsTrussRight));

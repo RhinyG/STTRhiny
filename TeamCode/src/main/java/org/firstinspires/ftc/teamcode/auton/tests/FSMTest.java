@@ -13,7 +13,7 @@ public class FSMTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        drive.init(hardwareMap);
+        drive.init();
         waitForStart();
         if (opModeIsActive()){
             //TODO: see if this switch case works. Otherwise, use commented out one.

@@ -58,10 +58,15 @@ public class FSMMecanumDrivetrain {
     double dHeading;
     double direction;
 
-    public FSMMecanumDrivetrain(LinearOpMode opmode) {myOpMode = opmode;}
-    Telemetry telemetry = myOpMode.telemetry;
+    public FSMMecanumDrivetrain(LinearOpMode opmode) {
+        myOpMode = opmode;
+        telemetry = myOpMode.telemetry;
+        map = myOpMode.hardwareMap;
+    }
+    Telemetry telemetry;
+    HardwareMap map;
 
-    public void init(HardwareMap map) {
+    public void init() {
         imu = map.get(IMU.class, "imu");
 
         FrontL = map.get(DcMotor.class, "left_front");

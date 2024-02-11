@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Crumblz extends RobotPart {
 
-    private LinearOpMode myOpMode;
+    private final LinearOpMode myOpMode;
     public Servo clawLeft;
     public Servo clawRight;
     public Servo wrist;
@@ -113,14 +113,14 @@ public class Crumblz extends RobotPart {
         }
     }
 
-    public Crumblz(LinearOpMode opmode) {myOpMode = opmode;}
-    Telemetry telemetry = myOpMode.telemetry;
-
-    /**
-     * Init
-     * @param map otherwise NPE
-     */
-    public void init(HardwareMap map) {
+    public Crumblz(LinearOpMode opmode) {
+        myOpMode = opmode;
+        telemetry = myOpMode.telemetry;
+        map = myOpMode.hardwareMap;
+    }
+    Telemetry telemetry;
+    HardwareMap map;
+    public void init() {
         elbow = map.get(Servo.class,"elbow");
         wrist = map.get(Servo.class, "wrist");
         clawLeft = map.get(Servo.class, "clawLeft");
@@ -243,11 +243,7 @@ public class Crumblz extends RobotPart {
             int position = armExtend.getCurrentPosition();
             boolean limitReached;
 
-            if ((position <= ArmLimits.SLIDELOWER.getPosition() && power <= 0)|| (position >= ArmLimits.SLIDEUPPER.getPosition() && power >= 0)) {
-                limitReached = true;
-            } else {
-                limitReached = false;
-            }
+            limitReached = (position <= ArmLimits.SLIDELOWER.getPosition() && power <= 0) || (position >= ArmLimits.SLIDEUPPER.getPosition() && power >= 0);
 
             if (!limitReached) {
                 armExtend.setPower(power);
@@ -302,11 +298,7 @@ public class Crumblz extends RobotPart {
             int position = armRotate.getCurrentPosition();
             boolean limitReached;
 
-            if ((position <= ArmLimits.ROTATELOWER.getPosition() && power <= 0)|| (position >= ArmLimits.ROTATEUPPER.getPosition() && power >= 0)) {
-                limitReached = true;
-            } else {
-                limitReached = false;
-            }
+            limitReached = (position <= ArmLimits.ROTATELOWER.getPosition() && power <= 0) || (position >= ArmLimits.ROTATEUPPER.getPosition() && power >= 0);
 
             if (!limitReached) {
                 if (slideHeight > 700) {
