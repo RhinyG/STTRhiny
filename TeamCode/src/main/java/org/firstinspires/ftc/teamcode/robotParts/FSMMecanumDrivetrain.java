@@ -16,8 +16,8 @@ public class FSMMecanumDrivetrain {
     public int state = 0;
     public int driveState = 0;
     public int rotateState = 0;
-    private LinearOpMode myOpMode;
-    private ElapsedTime runtime = new ElapsedTime();
+    private final LinearOpMode myOpMode;
+    private final ElapsedTime runtime = new ElapsedTime();
 
     public DcMotor FrontL;
     public DcMotor FrontR;
@@ -27,14 +27,12 @@ public class FSMMecanumDrivetrain {
     double current_target_heading = 0;
     public IMU imu;
     double WHEEL_RADIUS = 48;//mm
-    double ODO_RADIUS = 17.5;//mm?
     double GEAR_RATIO = 1/13.7;
     double TICKS_PER_ROTATION = 8192;
     double OURTICKS_PER_CM;
     double threshold = 250;
     double rotateThreshold = 0.5;
     double odoMultiplier = (69.5/38.6);
-    double CM_PER_TICK = (odoMultiplier * 2*Math.PI * GEAR_RATIO * WHEEL_RADIUS)/(TICKS_PER_ROTATION); //about 1/690
 
     double beginTime;
     double TimeElapsed;

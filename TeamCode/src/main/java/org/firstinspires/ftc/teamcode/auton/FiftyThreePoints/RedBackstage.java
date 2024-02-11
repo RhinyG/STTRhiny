@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.auton.FiftyThreePoints;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.robotParts.Outdated.OpenCVTrussIsLeft;
 import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 import org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation;
 
+@Disabled
 @Autonomous(name = "RedBackstage")
 public class RedBackstage extends LinearOpMode {
     newAutonMethods methods = new newAutonMethods(this);

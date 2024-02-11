@@ -36,8 +36,6 @@ public class Crumblz extends RobotPart {
 
     public enum ArmExtendPos {
         ZERO(0),
-        ONETHIRD(260),
-        TWOTHIRDS(520),
         FULL(780);
 
         private final int position;
@@ -207,23 +205,23 @@ public class Crumblz extends RobotPart {
 
     public double slidesGoToHeight(int position, double power) {
         double margin = 50.0;
-        double currentPosLeft = armExtend.getCurrentPosition();
-        double distance = Math.abs(currentPosLeft - position);
-        if (currentPosLeft < position) {
+        double currentPos = armExtend.getCurrentPosition();
+        double distance = Math.abs(currentPos - position);
+        if (currentPos < position) {
             if (distance > margin) {
                 armExtend.setPower(power);
             } else {
                 armExtend.setPower(power * (distance/margin) * 0.4);
             }
             telemetry.addLine("up");
-        } else if (currentPosLeft > position) {
+        } else if (currentPos > position) {
             if (distance > margin) {
                 armExtend.setPower(-power);
             } else {
                 armExtend.setPower(-power * (distance/margin) * 0.4);
             }
             telemetry.addLine("down");
-        } else if (position == 0 && currentPosLeft <= 0) {
+        } else if (position == 0 && currentPos <= 0) {
             setPower(0);
         } else {
             setPower(0.01);
@@ -258,23 +256,23 @@ public class Crumblz extends RobotPart {
     }
     public double rotateToPos(int position, double power) {
         double margin = 60.0;
-        double currentPosLeft = armRotate.getCurrentPosition();
-        double distance = Math.abs(currentPosLeft - position);
-        if (currentPosLeft < position) {
+        double currentPos = armRotate.getCurrentPosition();
+        double distance = Math.abs(currentPos - position);
+        if (currentPos < position) {
             if (distance > margin) {
                 armRotate.setPower(power);
             } else {
                 armRotate.setPower(power * (distance/margin) * 0.4);
             }
             telemetry.addLine("up");
-        } else if (currentPosLeft > position) {
+        } else if (currentPos > position) {
             if (distance > margin) {
                 armRotate.setPower(-power);
             } else {
                 armRotate.setPower(-power * (distance/margin) * 0.4);
             }
             telemetry.addLine("down");
-        } else if (position == 0 && currentPosLeft <= 0) {
+        } else if (position == 0 && currentPos <= 0) {
             setPower(0);
         } else {
             setPower(0.01);

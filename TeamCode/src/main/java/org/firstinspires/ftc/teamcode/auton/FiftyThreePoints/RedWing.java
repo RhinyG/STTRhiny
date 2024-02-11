@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.auton.FiftyThreePoints;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.teamcode.robotParts.Outdated.OpenCVTrussIsRight;
 import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 import org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation;
 
+@Disabled
 @Autonomous(name = "RedWing")
 public class RedWing extends LinearOpMode {
     newAutonMethods methods = new newAutonMethods(this);
