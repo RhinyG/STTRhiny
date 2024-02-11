@@ -240,6 +240,7 @@ public class FSMMecanumDrivetrain {
                 break;
         }
     }
+    //TODO: documentation
     public void updateDrive(){
         dHeading = getCurrentHeading() - heading;
         OdoY_Pos = FrontL.getCurrentPosition();
@@ -249,6 +250,7 @@ public class FSMMecanumDrivetrain {
         dPosX = tickX - OdoX_Pos;
         dPos = Math.abs(dPosX) + Math.abs(dPosY);
     }
+    //TODO: documentation
     public void FSMRotate(double target_heading, double speed) {
         target_heading *= -1;
         switch (rotateState) {

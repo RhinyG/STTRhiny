@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
-import org.firstinspires.ftc.teamcode.robotParts.OpenCVTrussIsRight;
+import org.firstinspires.ftc.teamcode.robotParts.Outdated.OpenCVTrussIsRight;
 import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 import org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation;
 
