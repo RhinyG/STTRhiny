@@ -12,12 +12,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-
-import java.sql.Time;
-import java.util.Arrays;
 
 public class newAutonMethods {
+    public int state = 0;
+    public int driveState = 0;
+    public int rotateState = 0;
+
     private LinearOpMode myOpMode;
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -38,6 +38,7 @@ public class newAutonMethods {
     double TICKS_PER_ROTATION = 8192;
     double OURTICKS_PER_CM;
     double threshold = 250;
+    double rotateThreshold = 0.5;
     double odoMultiplier = (69.5/38.6);
     double CM_PER_TICK = (odoMultiplier * 2*Math.PI * GEAR_RATIO * WHEEL_RADIUS)/(TICKS_PER_ROTATION); //about 1/690
 
@@ -53,13 +54,16 @@ public class newAutonMethods {
     double Kp = 0.05;
     double FWD;
     double STR;
+    double ROT;
     double speed;
     double min_speed = 0.13;
     double remweg;
+    int remwegTicks = 40000;
     double a = 1;
     double b = 1;
     double heading;
     double dHeading;
+    double direction;
 
     public newAutonMethods(LinearOpMode opmode) {myOpMode = opmode;}
 
@@ -86,7 +90,7 @@ public class newAutonMethods {
         imu.initialize(new IMU.Parameters(orientationOnRobot));
         resetYaw();
     }
-    //TODO: DOCUMENTATION!!!
+    public void driveDean(double x, double y) {driveDean(x, y, 0.7, myOpMode.telemetry, 8000);}
     public void driveDean(double x,double y, double max_speed, Telemetry telemetry, double stopTime) {
         calibrateEncoders();
         beginTime = System.currentTimeMillis();
@@ -94,8 +98,8 @@ public class newAutonMethods {
         heading = current_target_heading;
         tickY = (int) (y * OURTICKS_PER_CM);
         tickX = (int) (x * OURTICKS_PER_CM);
-        remweg = max_speed * 35000;
-        updateDean(x,y);
+        remweg = max_speed * remwegTicks;
+        updateDean();
         while ((Math.abs(dPosY) > threshold || Math.abs(dPosX) > threshold || Math.abs(dHeading) > 0.5) && myOpMode.opModeIsActive() && TimeElapsed < stopTime) {
 
             if (Math.abs(dPosY) < remweg) {
@@ -145,13 +149,13 @@ public class newAutonMethods {
             FrontR.setPower(FWD - STR - turn);
             BackL.setPower(FWD - STR + turn);
             BackR.setPower(FWD + STR - turn);
-            updateDean(x,y);
+            updateDean();
         }
         Stop();
         myOpMode.sleep(100);
     }
 
-    public void updateDean(double x, double y){
+    public void updateDean(){
         dHeading = getCurrentHeading() - heading;
         OdoY_Pos = FrontL.getCurrentPosition();
         OdoX_Pos = FrontR.getCurrentPosition();
@@ -160,6 +164,267 @@ public class newAutonMethods {
         dPosX = tickX - OdoX_Pos;
         dPos = Math.abs(dPosX) + Math.abs(dPosY);
     }
+
+    //TODO: put these first versions in EN, then delete three methods if not necessary
+    public void setFSMDrive(double x, double y, double max_speed) {
+        calibrateEncoders();
+        beginTime = System.currentTimeMillis();
+        heading = current_target_heading;
+        tickY = (int) (y * OURTICKS_PER_CM);
+        tickX = (int) (x * OURTICKS_PER_CM);
+        remweg = max_speed * 35000;
+        updateDean();
+        state++;
+    }
+    public void runFSMDrive(double max_speed, double stopTime, Telemetry telemetry) {
+        if ((Math.abs(dPosY) > threshold || Math.abs(dPosX) > threshold || Math.abs(dHeading) > 0.5) && myOpMode.opModeIsActive() && TimeElapsed < stopTime) {
+
+            if (Math.abs(dPosY) < remweg) {
+                a = dPosY / remweg;
+            } else {
+                a = 1;
+            }
+            if (Math.abs(dPosX) < remweg) {
+                b = dPosX / remweg;
+            } else {
+                b = 1;
+            }
+
+            FWD = a * max_speed;
+            speed = min_speed + a * (max_speed - min_speed);
+            STR = b * max_speed;
+            if ((dPosY < 0 && FWD > 0) || (dPosY > 0 && FWD < 0)) {
+                FWD = -FWD;
+            }
+            if ((dPosX < 0 && STR > 0) || (dPosX > 0 && STR < 0)) {
+                STR = -STR;
+            }
+            ROT = Kp * Math.abs(speed) * dHeading;
+
+            telemetry.addData("tickY", tickY);
+            telemetry.addData("PosY", OdoY_Pos / OURTICKS_PER_CM);
+            telemetry.addData("dPosY", dPosY);
+            telemetry.addData("tickX", tickX);
+            telemetry.addData("PosX", OdoX_Pos / OURTICKS_PER_CM);
+            telemetry.addData("dPosX", dPosX);
+            telemetry.addData("speed", speed);
+            telemetry.addData("a", a);
+            telemetry.addData("dPos", dPos);
+            telemetry.addData("CurrentHeading", getCurrentHeading());
+            telemetry.addData("TargetHeading", heading);
+            telemetry.addData("STR", STR);
+            telemetry.addData("FWD", FWD);
+            telemetry.addData("turn", ROT);
+            telemetry.addData("time", runtime.milliseconds());
+            telemetry.addData("FL power", FrontL.getPower());
+            telemetry.addData("FR power", FrontR.getPower());
+            telemetry.addData("BL power", BackL.getPower());
+            telemetry.addData("BR power", BackR.getPower());
+
+            FrontL.setPower(FWD + STR + ROT);
+            FrontR.setPower(FWD - STR - ROT);
+            BackL.setPower(FWD - STR + ROT);
+            BackR.setPower(FWD + STR - ROT);
+            updateDean();
+        } else {
+            state++;
+        }
+    }
+    public void endFSMDrive() {
+        Stop();
+        myOpMode.sleep(100);
+        state++;
+    }
+
+    //TODO: documentation
+    public void FSMDrive(double x, double y, double max_speed, double stopTime, Telemetry telemetry) {
+        switch (driveState) {
+            case 0:
+                calibrateEncoders();
+                beginTime = System.currentTimeMillis();
+                heading = current_target_heading;
+                tickY = (int) (y * OURTICKS_PER_CM);
+                tickX = (int) (x * OURTICKS_PER_CM);
+                remweg = max_speed * 35000;
+                updateDrive();
+                driveState++;
+                break;
+            case 1:
+                if ((Math.abs(dPosY) > threshold || Math.abs(dPosX) > threshold || Math.abs(dHeading) > 0.5) && myOpMode.opModeIsActive() && TimeElapsed < stopTime) {
+
+                    if (Math.abs(dPosY) < remweg) {
+                        a = dPosY / remweg;
+                    } else {
+                        a = 1;
+                    }
+                    if (Math.abs(dPosX) < remweg) {
+                        b = dPosX / remweg;
+                    } else {
+                        b = 1;
+                    }
+
+                    FWD = a * max_speed;
+                    speed = min_speed + a * (max_speed - min_speed);
+                    STR = b * max_speed;
+                    if ((dPosY < 0 && FWD > 0) || (dPosY > 0 && FWD < 0)) {
+                        FWD = -FWD;
+                    }
+                    if ((dPosX < 0 && STR > 0) || (dPosX > 0 && STR < 0)) {
+                        STR = -STR;
+                    }
+                    ROT = Kp * Math.abs(speed) * dHeading;
+
+                    telemetry.addData("tickY", tickY);
+                    telemetry.addData("PosY", OdoY_Pos / OURTICKS_PER_CM);
+                    telemetry.addData("dPosY", dPosY);
+                    telemetry.addData("tickX", tickX);
+                    telemetry.addData("PosX", OdoX_Pos / OURTICKS_PER_CM);
+                    telemetry.addData("dPosX", dPosX);
+                    telemetry.addData("speed", speed);
+                    telemetry.addData("a", a);
+                    telemetry.addData("dPos", dPos);
+                    telemetry.addData("CurrentHeading", getCurrentHeading());
+                    telemetry.addData("TargetHeading", heading);
+                    telemetry.addData("STR", STR);
+                    telemetry.addData("FWD", FWD);
+                    telemetry.addData("turn", ROT);
+                    telemetry.addData("time", runtime.milliseconds());
+                    telemetry.addData("FL power", FrontL.getPower());
+                    telemetry.addData("FR power", FrontR.getPower());
+                    telemetry.addData("BL power", BackL.getPower());
+                    telemetry.addData("BR power", BackR.getPower());
+
+                    FrontL.setPower(FWD + STR + ROT);
+                    FrontR.setPower(FWD - STR - ROT);
+                    BackL.setPower(FWD - STR + ROT);
+                    BackR.setPower(FWD + STR - ROT);
+                    updateDrive();
+                } else {
+                    driveState++;
+                }
+                break;
+            case 2:
+                Stop();
+                break;
+        }
+    }
+    //TODO: documentation
+    public void updateDrive(){
+        dHeading = getCurrentHeading() - heading;
+        OdoY_Pos = FrontL.getCurrentPosition();
+        OdoX_Pos = FrontR.getCurrentPosition();
+        TimeElapsed = System.currentTimeMillis() - beginTime;
+        dPosY = tickY - OdoY_Pos;
+        dPosX = tickX - OdoX_Pos;
+        dPos = Math.abs(dPosX) + Math.abs(dPosY);
+    }
+    //TODO: documentation
+    public void FSMRotate(double target_heading, double speed, Telemetry telemetry) {
+        target_heading *= -1;
+        switch (rotateState) {
+            case 0:
+                dHeading = target_heading - getCurrentHeading();
+                current_target_heading = target_heading;
+                rotateThreshold = 0.5;
+                telemetry.addData("curHeading", getCurrentHeading());
+                telemetry.addData("dHeading",dHeading);
+                rotateState++;
+                break;
+            case 1:
+                if (!(Math.abs(dHeading) < rotateThreshold) && myOpMode.opModeIsActive()) {
+                    direction = checkDirection(dHeading);
+
+                    if(dHeading < 10 * rotateThreshold) {
+                        speed = 0.2;
+                    }
+
+                    FrontL.setPower(-speed * direction);
+                    FrontR.setPower(speed * direction);
+                    BackL.setPower((-speed * direction));
+                    BackR.setPower(speed * direction);
+
+                    dHeading = target_heading - getCurrentHeading();
+                    telemetry.addData("curHeading", getCurrentHeading());
+                    telemetry.addData("dHeading",dHeading);
+                } else {
+                    rotateState++;
+                }
+                break;
+            case 2:
+                calibrateEncoders();
+                Stop();
+                break;
+        }
+    }
+
+    public void IMUBackBoardCorrectionAuton(String alliance,double offsetYaw,double offsetZ, Telemetry telemetry) {
+        calibrateEncoders();
+        double corOffsetZ = (1.27 * offsetZ + 0.0471)*100;
+        double offsetX = Math.atan(Math.toRadians(offsetYaw)) * corOffsetZ;
+        telemetry.addData("offsetX", offsetX);
+        telemetry.addData("corOffsetZ", offsetZ);
+        driveDean(offsetX,-corOffsetZ);
+//        double STR;
+//        double FWD = 0;
+//        double marginYaw = 6.0;
+//        remweg = 0.3 * remwegTicks;
+//        tickX = (int) (offsetX * OURTICKS_PER_CM);
+//        tickY = (int) (corOffsetZ * OURTICKS_PER_CM);
+//
+//        dHeading = getCurrentHeading() - heading;
+//        OdoY_Pos = FrontL.getCurrentPosition();
+//        OdoX_Pos = FrontR.getCurrentPosition();
+//        dPosX = tickX - OdoX_Pos;
+//        dPosY = tickY -OdoY_Pos;
+//        dPos = Math.abs(dPosX) + Math.abs(dPosY);
+//        telemetry.addData("dPos", dPos);
+//        telemetry.update();
+//
+//        while (!(dPos > 250) && myOpMode.opModeIsActive()) {
+//            STR =  2 * (corOffsetZ * Math.sin(offsetYaw) + offsetX * Math.cos(offsetYaw));
+//            FWD = -2*corOffsetZ;
+//
+//            if ((dPosX < 0 && STR > 0) || (dPosX > 0 && STR < 0)) {
+//                 STR = -STR;
+//            }
+//
+//            if ((dPosY < 0 && FWD > 0) || (dPosY > 0 && FWD < 0)) {
+//                FWD = -FWD;
+//            }
+//
+//
+//            STR = 0;
+//
+//            FrontL.setPower(FWD + STR);
+//            FrontR.setPower(FWD - STR);
+//            BackL.setPower(FWD - STR);
+//            BackR.setPower(FWD + STR);
+//            dHeading = getCurrentHeading() - heading;
+//            OdoX_Pos = FrontR.getCurrentPosition();
+//            dPosY = tickY -OdoY_Pos;
+//            dPos = Math.abs(dPosX) + Math.abs(dPosY);
+//            telemetry.addData("FWD", FWD);
+//            telemetry.addData("STR", STR);
+//            telemetry.addData("OffsetX", offsetX);
+//            telemetry.addData("OffsetZ", corOffsetZ);
+//            telemetry.addData("tickX", tickX);
+//            telemetry.addData("PosX", OdoX_Pos/OURTICKS_PER_CM);
+//            telemetry.addData("PosY", OdoY_Pos/OURTICKS_PER_CM);
+//            telemetry.addData("dPosX", dPos);
+//            telemetry.addData("IMU",getCurrentHeading());
+//            telemetry.addData("AvgYawToBackBoard",offsetYaw);
+//            telemetry.addData("AvgPoseZToBackBoard",offsetZ);
+//            telemetry.addData("FL power", FrontL.getPower());
+//            telemetry.addData("FR power", FrontR.getPower());
+//            telemetry.addData("BL power", BackL.getPower());
+//            telemetry.addData("BR power", BackR.getPower());
+//            telemetry.update();
+//        }
+//        Stop();
+//        myOpMode.sleep(100);
+    }
+
+
 
     public void driveY (double position){
         driveY(position,0.3, myOpMode.telemetry, 10000);
@@ -214,7 +479,7 @@ public class newAutonMethods {
         speed = speed * -1;
         calibrateEncoders();
         double Kp = 0.03;
-        double turn= 0;
+        double turn;
         double heading = current_target_heading;
         double tick = (int) (position * OURTICKS_PER_CM);
         double dPos = tick - OdoX_Pos;

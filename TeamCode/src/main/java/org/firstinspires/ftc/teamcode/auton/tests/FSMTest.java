@@ -3,61 +3,44 @@ package org.firstinspires.ftc.teamcode.auton.tests;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.robotParts.FSMMecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.robotParts.Crumblz;
+import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 
 @Autonomous(name = "FSM Test", group = "Test")
 public class FSMTest extends LinearOpMode {
-    FSMMecanumDrivetrain drive = new FSMMecanumDrivetrain(this);
+    newAutonMethods drive = new newAutonMethods(this);
     Crumblz arm = new Crumblz(this);
 
     @Override
     public void runOpMode() {
-        drive.init();
+        drive.init(hardwareMap);
+        arm.init(hardwareMap);
         waitForStart();
-        if (opModeIsActive()){
-            //TODO: see if this switch case works. Otherwise, use commented out one.
-            switch (drive.state) {
-                case 0:
-                    drive.driveState = 0;
-                    drive.FSMDrive(0,50,0.5,4000);
-                    break;
-                case 1:
-                    //TODO: see if this works
-                    //TODO: better way to provide feedback to the other switch
-                    if (System.currentTimeMillis() > 5000) {
-                        drive.rotateState = 0;
-                        drive.FSMRotate(90, 0.4);
-                    }
-                    break;
-                case 2:
-                    drive.driveState = 0;
-                    drive.FSMDrive(50,0,0.5,4000);
-                    break;
-            }
-//            switch (drive.state) {
-//                case 0:
-//                    drive.setFSMDrive(0,100,0.5);
-//                    break;
-//                case 1:
-//                    drive.runFSMDrive(0.5,8000);
-//                    break;
-//                case 2:
-//                    drive.endFSMDrive();
-//                    break;
-//            }
-            //TODO: Transfer armMethods to FSM methods
+        while (opModeIsActive()){
+            telemetry.addData("Global Drive state",drive.state);
+            telemetry.addData("driveState",drive.driveState);
+            telemetry.addData("rotateState",drive.rotateState);
+            telemetry.addData("arm state",arm.state);
             switch (arm.state) {
                 case 0:
-                    if (drive.state >= 1) {
-                        telemetry.addLine("OMG this shit works");
-                        arm.state++;
-                    }
+                    arm.elbow.setPosition(Crumblz.ElbowPositions.INTAKEPOS.getPosition());
+                    arm.clawRight.setPosition(Crumblz.ClawPositions.OPENRIGHT.getPosition());
+                    arm.armRotate.setTargetPosition(370);
+                    arm.state++;
                     break;
                 case 1:
-                    telemetry.addLine("OMG that shit has worked");
+                    arm.FSMArm(370);
+                    break;
+                case 2:
+                    arm.armExtend.setTargetPosition(850);
+                    arm.state++;
+                    break;
+                case 3:
+                    arm.FSMSlide(850);
+                case 4:
+                    arm.elbow.setPosition(Crumblz.ElbowPositions.STACKFIVEPOS.getPosition());
+                    arm.clawRight.setPosition(Crumblz.ClawPositions.GRABRIGHT.getPosition());
             }
-            arm.updateElbow();
             telemetry.update();
         }
     }

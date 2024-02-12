@@ -7,8 +7,8 @@ import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.OUT
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.OUTTAKEFRONT;
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.GRABLEFT;
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.GRABRIGHT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.RELEASELEFT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.RELEASERIGHT;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.OPENLEFT;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.OPENRIGHT;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -30,8 +30,8 @@ public class KookyBotz extends LinearOpMode {
 
     Crumblz.ArmExtendPos extendPos = ZERO;
     Crumblz.ArmRotatePos rotatePos = INTAKEGROUND;
-    Crumblz.ClawPositions leftPos = RELEASELEFT;
-    Crumblz.ClawPositions rightPos = RELEASERIGHT;
+    Crumblz.ClawPositions leftPos = OPENLEFT;
+    Crumblz.ClawPositions rightPos = OPENRIGHT;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -102,13 +102,13 @@ public class KookyBotz extends LinearOpMode {
             }
 
             if (leftOpen) {
-                leftPos = RELEASELEFT;
+                leftPos = OPENLEFT;
             }
             if (leftClose) {
                 leftPos = GRABLEFT;
             }
             if (rightOpen) {
-                rightPos = RELEASERIGHT;
+                rightPos = OPENRIGHT;
             }
             if (rightClose) {
                 rightPos = GRABRIGHT;
@@ -116,8 +116,8 @@ public class KookyBotz extends LinearOpMode {
 
             arm.updateElbow();
             arm.updateClaw(leftPos,rightPos);
-            arm.updateSlide(extendButtonMode,armExtendPower,extendPos);
-            arm.updateRotate(rotateButtonMode, armRotatePower, rotatePos, holdSlides);
+            arm.updateSlide(extendButtonMode,armExtendPower,extendPos, telemetry);
+            arm.updateRotate(rotateButtonMode, armRotatePower, rotatePos, holdSlides, telemetry);
             if (arm.armRotate.getCurrentPosition() < 2000){
                 drivetrain.RobotCentric(-1);
             } else {

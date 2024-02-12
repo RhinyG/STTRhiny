@@ -6,12 +6,15 @@ import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.INT
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.OUTTAKEBACK;
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.GRABLEFT;
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.GRABRIGHT;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.OPENLEFT;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.OPENRIGHT;
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.RELEASELEFT;
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.RELEASERIGHT;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.robotParts.Crumblz;
 import org.firstinspires.ftc.teamcode.robotParts.MecanumDrivetrain;
@@ -22,6 +25,8 @@ public class KookyKooker extends LinearOpMode {
     MecanumDrivetrain drivetrain = new MecanumDrivetrain(this);
     Crumblz arm = new Crumblz(this);
 
+    Servo plane;
+
     boolean extendButtonMode = false;
     boolean rotateButtonMode = false;
     int holdSlides = 0;
@@ -30,8 +35,8 @@ public class KookyKooker extends LinearOpMode {
     Crumblz.ArmExtendPos extendPos = ZERO;
     Crumblz.ArmRotatePos rotatePos = INTAKEGROUND;
 
-    Crumblz.ClawPositions leftPos = RELEASELEFT;
-    Crumblz.ClawPositions rightPos = RELEASERIGHT;
+    Crumblz.ClawPositions leftPos = OPENLEFT;
+    Crumblz.ClawPositions rightPos = OPENRIGHT;
     double leftTime = 0;
     double rightTime = 0;
 
@@ -40,6 +45,8 @@ public class KookyKooker extends LinearOpMode {
 
         drivetrain.init(hardwareMap);
         arm.init(hardwareMap);
+
+        plane = hardwareMap.servo.get("plane");
 
         waitForStart();
 
@@ -56,6 +63,15 @@ public class KookyKooker extends LinearOpMode {
             boolean RotateIntakeButton = gamepad1.a;
             boolean RotateOuttakeButton = gamepad1.b;
 
+            boolean planeLaunch = gamepad1.dpad_up;
+            boolean planeReset = gamepad1.dpad_down;
+
+            if(planeLaunch){
+                plane.setPosition(0.55);
+            } else if (planeReset) {
+                plane.setPosition(0);
+            }
+
             if (RotateIntakeButton) {
                 rotateButtonMode = true;
                 holdSlides = arm.armExtend.getCurrentPosition();
@@ -67,22 +83,28 @@ public class KookyKooker extends LinearOpMode {
             }
 
             if ((leftTime + 500) < System.currentTimeMillis()){
-                if (leftToggle && leftPos == RELEASELEFT) {
+                if (leftToggle && leftPos == OPENLEFT) {
                     leftPos = GRABLEFT;
                     leftTime = System.currentTimeMillis();
-                } else if (leftToggle && leftPos == GRABLEFT) {
-                    leftPos = RELEASELEFT;
+                } else if (leftToggle && (leftPos == GRABLEFT || leftPos == RELEASERIGHT)) {
+                    leftPos = OPENLEFT;
                     leftTime = System.currentTimeMillis();
                 }
             }
+            if(gamepad1.dpad_right){
+                leftPos = RELEASELEFT;
+            }
             if ((rightTime + 500) < System.currentTimeMillis()) {
-                if (rightToggle && rightPos == RELEASERIGHT) {
+                if (rightToggle && rightPos == OPENRIGHT) {
                     rightPos = GRABRIGHT;
                     rightTime = System.currentTimeMillis();
-                } else if (rightToggle && rightPos == GRABRIGHT) {
-                    rightPos = RELEASERIGHT;
+                } else if (rightToggle && (rightPos == GRABRIGHT || rightPos == RELEASERIGHT)) {
+                    rightPos = OPENRIGHT;
                     rightTime = System.currentTimeMillis();
                 }
+            }
+            if(gamepad1.dpad_left){
+                rightPos = RELEASERIGHT;
             }
             if(gamepad1.y){
                 arm.armRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -91,8 +113,8 @@ public class KookyKooker extends LinearOpMode {
 
             arm.updateElbow();
             arm.updateClaw(leftPos,rightPos);
-            arm.updateSlide(false,armExtendPower,extendPos);
-            arm.updateRotate(false, armRotatePower, rotatePos, holdSlides);
+            arm.updateSlide(extendButtonMode,armExtendPower,extendPos, telemetry);
+            arm.updateRotate(rotateButtonMode, armRotatePower, rotatePos, holdSlides, telemetry);
             if (arm.armRotate.getCurrentPosition() < 2000){
                 drivetrain.RobotCentric(-1);
             } else {

@@ -270,6 +270,33 @@ public class MecanumDrivetrain {
         BackL.setPower(BackLPower/maxPower);
         BackR.setPower(BackRPower/maxPower);
     }
+
+    public void RobotCentricABC(int heading) {
+        double FWD = heading * myOpMode.gamepad1.left_stick_y;
+        double STR = heading * myOpMode.gamepad1.left_stick_x;
+        double ROT = 0.8 * -myOpMode.gamepad1.right_stick_x;
+        double speed = 1.0;
+        double maxPower = 1.0;
+
+        if(myOpMode.gamepad1.right_stick_button) {
+            ROT = -0.05*Math.abs(speed)*getCurrentHeadingDegrees();
+        }
+        double FrontLPower = ((FWD - STR - ROT) * speed);
+        double FrontRPower = ((FWD + STR + ROT) * speed);
+        double BackLPower = ((FWD + STR - ROT) * speed);
+        double BackRPower = ((FWD - STR + ROT) * speed);
+
+        maxPower = Math.max(maxPower, Math.abs(FrontLPower));
+        maxPower = Math.max(maxPower, Math.abs(FrontRPower));
+        maxPower = Math.max(maxPower, Math.abs(BackLPower));
+        maxPower = Math.max(maxPower, Math.abs(BackRPower));
+
+        FrontL.setPower(FrontLPower/maxPower);
+        FrontR.setPower(FrontRPower/maxPower);
+        BackL.setPower(BackLPower/maxPower);
+        BackR.setPower(BackRPower/maxPower);
+    }
+
 //TODO: documentation
     public void IMUBackBoardCorrection(String alliance,double offsetYaw,double offsetZ, Telemetry telemetry) {
         double STR;

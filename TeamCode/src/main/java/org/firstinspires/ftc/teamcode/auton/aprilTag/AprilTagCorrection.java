@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.auton.aprilTag;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -17,9 +19,9 @@ import org.firstinspires.ftc.teamcode.robotParts.MecanumDrivetrain;
 
 import java.util.ArrayList;
 
-@TeleOp
+@Autonomous(name = "our abcs", group = "Test")
 public class AprilTagCorrection extends LinearOpMode {
-    MecanumDrivetrain methods = new MecanumDrivetrain(this);
+    newAutonMethods auton = new newAutonMethods(this);
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -33,10 +35,11 @@ public class AprilTagCorrection extends LinearOpMode {
     double AvgYawToBackBoard;
     double AvgPoseXToBackBoard;
     double AvgPoseZToBackBoard;
+    int Yawsgotten;
 
     @Override
     public void runOpMode() {
-        methods.init(hardwareMap);
+        auton.init(hardwareMap);
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
@@ -44,7 +47,7 @@ public class AprilTagCorrection extends LinearOpMode {
         camera.setPipeline(aprilTagDetectionPipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
-            public void onOpened() {camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);}
+            public void onOpened() {camera.startStreaming(1280,720, OpenCvCameraRotation.UPRIGHT);}
             @Override
             public void onError(int errorCode) {}
         });
@@ -53,22 +56,26 @@ public class AprilTagCorrection extends LinearOpMode {
 
         waitForStart();
 
-        while (isStarted() && !isStopRequested()) {
+        while (opModeIsActive()) {
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
             if(currentDetections.size() != 0) {
                 AvgYawToBackBoard = 0;
+                Yawsgotten = 0;
                 AvgPoseZToBackBoard = 0;
                 AvgPoseXToBackBoard = 0;
 
                 for(AprilTagDetection tag : currentDetections) {
                     Orientation rot = Orientation.getOrientation(tag.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
 
-                    AvgYawToBackBoard += rot.firstAngle;
+                    if(rot.secondAngle < 0){
+                        AvgYawToBackBoard += rot.firstAngle;
+                        Yawsgotten ++;
+                    }
                     AvgPoseZToBackBoard += tag.pose.z;
                     AvgPoseXToBackBoard += tag.pose.x;
                 }
-                AvgYawToBackBoard /= currentDetections.size();
+                AvgYawToBackBoard /= Yawsgotten;
                 AvgPoseZToBackBoard /= currentDetections.size();
                 AvgPoseXToBackBoard /= currentDetections.size();
 
@@ -77,27 +84,20 @@ public class AprilTagCorrection extends LinearOpMode {
                 telemetry.addData("AvgPoseZToBackBoard",AvgPoseZToBackBoard);
                 telemetry.addData("CorrectedZ",127*AvgPoseZToBackBoard+4.71);
                 telemetry.addData("CorrectedX",Math.atan(Math.toRadians(AvgYawToBackBoard))*(127*AvgPoseZToBackBoard+4.71));
+                telemetry.update();
             }
 
-            if (gamepad1.right_bumper && gamepad1.left_bumper) {
-                methods.imu.resetYaw();
-            }
+
 
             //TODO: Test this shit
+//            if (gamepad1.x) {
+//                methods.IMUBackBoardCorrection("Red",AvgYawToBackBoard,AvgPoseZToBackBoard,telemetry);
+//                telemetry.addLine("Correcting");
+//            }
+            auton.IMUBackBoardCorrectionAuton("Blue",AvgYawToBackBoard,AvgPoseZToBackBoard,telemetry);
 
-            if (gamepad1.x) {
-                methods.IMUBackBoardCorrection("Red",AvgYawToBackBoard,AvgPoseZToBackBoard,telemetry);
-                telemetry.addLine("Correcting");
-            }
 
-            if (gamepad1.y) {
-                methods.Stop();
-            }
-
-            telemetry.addData("IMU",methods.getCurrentHeadingDegrees());
-            telemetry.update();
-
-            sleep(20);
+            sleep(30000);
         }
     }
 }

@@ -6,8 +6,8 @@ import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.INT
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.OUTTAKEBACK;
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.GRABLEFT;
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.GRABRIGHT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.RELEASELEFT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.RELEASERIGHT;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.OPENLEFT;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.OPENRIGHT;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -29,8 +29,8 @@ public class SecretTechniqueNoJutsu extends LinearOpMode {
         arm.init(hardwareMap);
         waitForStart();
 
-        Crumblz.ClawPositions leftPos = RELEASELEFT;
-        Crumblz.ClawPositions rightPos = RELEASERIGHT;
+        Crumblz.ClawPositions leftPos = OPENLEFT;
+        Crumblz.ClawPositions rightPos = OPENRIGHT;
 
         if (isStopRequested()) return;
 
@@ -63,13 +63,13 @@ public class SecretTechniqueNoJutsu extends LinearOpMode {
 
 
             if (leftOpen) {
-                leftPos = RELEASELEFT;
+                leftPos = OPENLEFT;
             }
             if (leftClose) {
                 leftPos = GRABLEFT;
             }
             if (rightOpen) {
-                rightPos = RELEASERIGHT;
+                rightPos = OPENRIGHT;
             }
             if (rightClose) {
                 rightPos = GRABRIGHT;
