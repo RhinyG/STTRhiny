@@ -63,9 +63,9 @@ public class Crumblz extends RobotPart {
     }
 
     public enum ElbowPositions {
-        INTAKEPOS(0.09),//0.15
-        STACKFIVEPOS(0.05),
-        OUTTAKEFRONTSIDEPOS(0.1),
+        INTAKEPOS(0.075),//0.15
+        STACKFIVEPOS(0.03),
+        OUTTAKEFRONTSIDEPOS(0.075), //.1
         OUTTAKEBACKSIDEPOS(0.76),
         FOLDPOS(0.8);
 
@@ -100,10 +100,10 @@ public class Crumblz extends RobotPart {
     public enum ClawPositions {
         OPENLEFT(0.69),
         RELEASELEFT(0.50),
-        GRABLEFT(0.42),
+        GRABLEFT(0.32),
         OPENRIGHT(0.38),
         RELEASERIGHT(0.52),
-        GRABRIGHT(0.61);
+        GRABRIGHT(0.7);
 
         private final double position;
 
@@ -196,14 +196,18 @@ public class Crumblz extends RobotPart {
     //servo pos = (0.707-0.64)/(790-48) * armRotate.getCurrentPosition + b
     // b = 0.707 - (0.707-0.64)/(790-48) * 790 = 0.635
     //servo pos = (0.707-0.64)/(790-48) * armRotate.getCurrentPosition + 0.635
-    public void updateElbow() {
+    public void updateElbow(boolean fold) {
         double position;
-        if (armRotate.getCurrentPosition() < 300) {
-            position = ElbowPositions.INTAKEPOS.getPosition();
-        } else if (armRotate.getCurrentPosition() < 1600) {
-            position = ElbowPositions.OUTTAKEFRONTSIDEPOS.getPosition();
+        if (fold) {
+            position = ElbowPositions.FOLDPOS.getPosition();
         } else {
-            position = ElbowPositions.OUTTAKEBACKSIDEPOS.getPosition();
+            if (armRotate.getCurrentPosition() < 300) {
+                position = ElbowPositions.INTAKEPOS.getPosition();
+            } else if (armRotate.getCurrentPosition() < 2200) {
+                position = ElbowPositions.OUTTAKEFRONTSIDEPOS.getPosition();
+            } else {
+                position = ElbowPositions.OUTTAKEBACKSIDEPOS.getPosition();
+            }
         }
         elbow.setPosition(position);
     }
@@ -237,7 +241,7 @@ public class Crumblz extends RobotPart {
     public void updateSlide(boolean buttonMode, double power, Crumblz.ArmExtendPos height, Telemetry telemetry) {
         double distance = 0;
         if (buttonMode) {
-            distance = slidesGoToHeight(height.getPosition(), 0.7, telemetry);
+            distance = slidesGoToHeight(height.getPosition(), 1.0, telemetry);
             telemetry.addData("slide", armExtend.getCurrentPosition());
             telemetry.addData("slide goal", height.getPosition());
             telemetry.addLine(String.valueOf(height));
@@ -368,33 +372,42 @@ public class Crumblz extends RobotPart {
         }
         armExtend.setPower(0.3);
     }
-    public void FSMArm(int var){
-        if (Math.abs(armRotate.getCurrentPosition() - var) > 50) {
+    public void FSMArm(int var, double speed){
+        if (Math.abs(armRotate.getCurrentPosition() - var) > 100) {
             if (armRotate.getCurrentPosition() > var) {
-                armRotate.setPower(-0.8);
+                armRotate.setPower(-speed);
             } else {
-                armRotate.setPower(0.8);
+                armRotate.setPower(speed);
             }
-        } else {
-            armRotate.setPower(0);
-            state++;
+        } else if (Math.abs(armExtend.getCurrentPosition() - var) > 50) {
+            if (armRotate.getCurrentPosition() > var) {
+                armRotate.setPower(-0.01);
+            } else {
+                armRotate.setPower(0.01);
+            }
         }
     }
-    public void FSMSlide(int var){
-        if (Math.abs(armExtend.getCurrentPosition() - var) > 10) {
+    public void FSMSlide(int var, double speed){
+        if (Math.abs(armExtend.getCurrentPosition() - var) > 125) {
             if (armExtend.getCurrentPosition() > var) {
-                armExtend.setPower(-0.7);
+                armExtend.setPower(-speed);
             } else {
-                armExtend.setPower(0.7);
+                armExtend.setPower(speed);
             }
-        } else {
+        } else if (Math.abs(armExtend.getCurrentPosition() - var) > 10) {
+            if (armExtend.getCurrentPosition() > var) {
+                armExtend.setPower(-0.3);
+            } else {
+                armExtend.setPower(0.3);
+            }
+        }
+        else {
             //TODO: find a proper way to stop this shit
             if (armRotate.getCurrentPosition() > 800) {
                 armExtend.setPower(0.01);
             } else {
                 armExtend.setPower(0);
             }
-            state++;
         }
     }
 }

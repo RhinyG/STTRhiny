@@ -27,6 +27,8 @@ public class KookyKooker extends LinearOpMode {
 
     Servo plane;
 
+    DcMotor hook;
+
     boolean extendButtonMode = false;
     boolean rotateButtonMode = false;
     int holdSlides = 0;
@@ -48,6 +50,8 @@ public class KookyKooker extends LinearOpMode {
 
         plane = hardwareMap.servo.get("plane");
 
+        hook = hardwareMap.dcMotor.get("hook");
+
         waitForStart();
 
         if (isStopRequested()) return;
@@ -55,7 +59,7 @@ public class KookyKooker extends LinearOpMode {
         while (opModeIsActive()) {
             double armRotatePower = gamepad1.right_trigger-gamepad1.left_trigger;
 
-            double armExtendPower = 0.7*(-gamepad1.right_stick_y);
+            double armExtendPower = -gamepad1.right_stick_y;
 
             boolean leftToggle = gamepad1.right_bumper;
             boolean rightToggle = gamepad1.left_bumper;
@@ -65,6 +69,11 @@ public class KookyKooker extends LinearOpMode {
 
             boolean planeLaunch = gamepad1.dpad_up;
             boolean planeReset = gamepad1.dpad_down;
+
+            double hookPower = gamepad2.right_trigger - gamepad2.left_trigger;
+            boolean fold = gamepad2.right_bumper;
+
+            hook.setPower(hookPower);
 
             if(planeLaunch){
                 plane.setPosition(0.55);
@@ -81,6 +90,7 @@ public class KookyKooker extends LinearOpMode {
                 holdSlides = arm.armExtend.getCurrentPosition();
                 rotatePos = OUTTAKEBACK;
             }
+            if(Math.abs(armRotatePower) > 0.1) {rotateButtonMode = false;}
 
             if ((leftTime + 500) < System.currentTimeMillis()){
                 if (leftToggle && leftPos == OPENLEFT) {
@@ -111,15 +121,20 @@ public class KookyKooker extends LinearOpMode {
                 arm.armRotate.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
 
-            arm.updateElbow();
+            arm.updateElbow(fold);
             arm.updateClaw(leftPos,rightPos);
             arm.updateSlide(extendButtonMode,armExtendPower,extendPos, telemetry);
             arm.updateRotate(rotateButtonMode, armRotatePower, rotatePos, holdSlides, telemetry);
-            if (arm.armRotate.getCurrentPosition() < 2000){
-                drivetrain.RobotCentric(-1);
+            if (arm.armRotate.getCurrentPosition() < 2000 && arm.armExtend.getCurrentPosition() < 500){
+                drivetrain.RobotCentric(-1, false);
+            } else if (arm.armRotate.getCurrentPosition() < 2000){
+                drivetrain.RobotCentric(-1, true);
+            } else if (arm.armExtend.getCurrentPosition() < 500) {
+                drivetrain.RobotCentric(1, false);
             } else {
-                drivetrain.RobotCentric(1);
+                drivetrain.RobotCentric(1, true);
             }
+            telemetry.addData("rotatePower",armRotatePower);
             telemetry.update();
         }
     }

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.auton.tests;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.checkerframework.checker.units.qual.C;
 import org.firstinspires.ftc.teamcode.robotParts.Crumblz;
 import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 
@@ -10,6 +11,12 @@ import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 public class FSMTest extends LinearOpMode {
     newAutonMethods drive = new newAutonMethods(this);
     Crumblz arm = new Crumblz(this);
+
+    double armTimer;
+    int rotateGoal;
+    double rotateSpeed = 1.0;
+    int slideGoal;
+    double slideSpeed = 0.7;
 
     @Override
     public void runOpMode() {
@@ -21,26 +28,47 @@ public class FSMTest extends LinearOpMode {
             telemetry.addData("driveState",drive.driveState);
             telemetry.addData("rotateState",drive.rotateState);
             telemetry.addData("arm state",arm.state);
+            switch (drive.state) {
+                case 0:
+                    if (arm.state >= 2) {
+                        drive.FSMDrive(0,10,0.5,1000,telemetry);
+                    }
+                    if (drive.driveState == 2) {
+                        drive.state++;
+                        drive.driveState = 0;
+                    }
+                    break;
+                case 1:
+                    if (arm.state >= 3) {
+                        drive.FSMDrive(0,-10,0.5,1000,telemetry);
+                    }
+            }
             switch (arm.state) {
                 case 0:
                     arm.elbow.setPosition(Crumblz.ElbowPositions.INTAKEPOS.getPosition());
-                    arm.clawRight.setPosition(Crumblz.ClawPositions.OPENRIGHT.getPosition());
-                    arm.armRotate.setTargetPosition(370);
+                    arm.clawLeft.setPosition(Crumblz.ClawPositions.OPENLEFT.getPosition());
+                    arm.elbow.setPosition(Crumblz.ElbowPositions.INTAKEPOS.getPosition());
+                    rotateGoal = 290;
+                    arm.armRotate.setTargetPosition(rotateGoal);
+                    slideGoal = 50;
+                    arm.armExtend.setTargetPosition(slideGoal);
                     arm.state++;
                     break;
                 case 1:
-                    arm.FSMArm(370);
+                    if (Math.abs(arm.armRotate.getCurrentPosition() - rotateGoal) < 20) {
+                        arm.elbow.setPosition(Crumblz.ElbowPositions.STACKFIVEPOS.getPosition());
+                        armTimer = System.currentTimeMillis();
+                        arm.state++;
+                    }
                     break;
                 case 2:
-                    arm.armExtend.setTargetPosition(850);
-                    arm.state++;
-                    break;
-                case 3:
-                    arm.FSMSlide(850);
-                case 4:
-                    arm.elbow.setPosition(Crumblz.ElbowPositions.STACKFIVEPOS.getPosition());
-                    arm.clawRight.setPosition(Crumblz.ClawPositions.GRABRIGHT.getPosition());
+                    if (drive.state >= 1) {
+                        arm.clawLeft.setPosition(Crumblz.ClawPositions.GRABLEFT.getPosition());
+                        arm.state++;
+                    }
             }
+            arm.FSMArm(rotateGoal,rotateSpeed);
+            arm.FSMSlide(slideGoal,slideSpeed);
             telemetry.update();
         }
     }

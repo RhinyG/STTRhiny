@@ -75,11 +75,11 @@ public class SecretTechniqueNoJutsu extends LinearOpMode {
                 rightPos = GRABRIGHT;
             }
 
-            drivetrain.RobotCentric(1);
+            drivetrain.RobotCentric(1, false);
             if(gamepad2.a){
                 arm.elbow.setPosition(0.8);
             } else {
-                arm.updateElbow();
+                arm.updateElbow(false);
             }
             if(gamepad2.right_stick_button){
                 arm.armRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

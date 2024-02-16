@@ -114,14 +114,14 @@ public class KookyBotz extends LinearOpMode {
                 rightPos = GRABRIGHT;
             }
 
-            arm.updateElbow();
+            arm.updateElbow(false);
             arm.updateClaw(leftPos,rightPos);
             arm.updateSlide(extendButtonMode,armExtendPower,extendPos, telemetry);
             arm.updateRotate(rotateButtonMode, armRotatePower, rotatePos, holdSlides, telemetry);
             if (arm.armRotate.getCurrentPosition() < 2000){
-                drivetrain.RobotCentric(-1);
+                drivetrain.RobotCentric(-1,false);
             } else {
-                drivetrain.RobotCentric(1);
+                drivetrain.RobotCentric(1, false);
             }
             telemetry.update();
         }

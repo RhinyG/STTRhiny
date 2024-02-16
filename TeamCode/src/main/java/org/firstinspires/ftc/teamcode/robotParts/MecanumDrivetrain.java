@@ -247,13 +247,14 @@ public class MecanumDrivetrain {
      * STR = strafe
      * FWD = forward
      */
-    public void RobotCentric(int heading) {
+    public void RobotCentric(int heading, boolean slowMode) {
         double FWD = heading * myOpMode.gamepad1.left_stick_y;
         double STR = heading * myOpMode.gamepad1.left_stick_x;
         double ROT = 0.8 * -myOpMode.gamepad1.right_stick_x;
         double speed = 1.0;
         double maxPower = 1.0;
 
+        if(slowMode){speed = 0.5;}
         if(myOpMode.gamepad1.right_stick_button){speed = 0.5;}
         double FrontLPower = ((FWD - STR - ROT) * speed);
         double FrontRPower = ((FWD + STR + ROT) * speed);

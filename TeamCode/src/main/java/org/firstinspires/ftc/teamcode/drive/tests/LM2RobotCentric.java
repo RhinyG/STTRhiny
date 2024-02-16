@@ -170,7 +170,7 @@ public class LM2RobotCentric extends LinearOpMode {
 
             contServo.setPower(cntPower);
 
-            drivetrain.RobotCentric(1);
+            drivetrain.RobotCentric(1, false);
 
             telemetry.addData("Slide Position", outtake.slides.getCurrentPosition());
             telemetry.addData("Slide Power", slidePower);
