@@ -19,10 +19,11 @@ public class Crumblz extends RobotPart {
     public DcMotorEx armRotate;
     public int state;
 //TODO: explain enumerators
+//TODO: enumerators in separate files
     public enum ArmRotatePos {
-        INTAKEGROUND(0),
-        OUTTAKEFRONT(1300),
-        OUTTAKEBACK(3050);
+        intakeGround(0),
+        outtakeFront(1300),
+        outtakeBack(3050);
 
         private final int position;
         public int getPosition() {
@@ -45,10 +46,10 @@ public class Crumblz extends RobotPart {
     }
 
     public enum ArmLimits {
-        SLIDELOWER(0),
-        SLIDEUPPER(900),
-        ROTATELOWER(0),
-        ROTATEUPPER(3050);
+        slideLower(0),
+        slideUpper(900),
+        rotateLower(0),
+        rotateUpper(3050);
 
         private final int position;
         public int getPosition() {
@@ -60,12 +61,11 @@ public class Crumblz extends RobotPart {
     }
 
     public enum ElbowPositions {
-        INTAKEPOS(0.075),//0.15
-        STACKFIVEPOS(0.095),
-        OUTTAKEFRONTSIDEPOS(0.075), //.1
-        OUTTAKEBACKSIDEPOS(0.76),
-        FOLDPOS(0.8);
-
+        intakePos(0.085),//0.15
+        stackFivePos(0.095),
+        outtakeFrontSidePos(0.075), //.1
+        outtakeBackSidePos(0.76),
+        foldPos(0.8);
 
         private final double position;
         public double getPosition() {
@@ -77,12 +77,12 @@ public class Crumblz extends RobotPart {
     }
 
     public enum ClawPositions {
-        OPENLEFT(0.69),
-        RELEASELEFT(0.50),
-        GRABLEFT(0.32),
-        OPENRIGHT(0.38),
-        RELEASERIGHT(0.52),
-        GRABRIGHT(0.7);
+        openLeft(0.69),
+        releaseLeft(0.50),
+        grabLeft(0.35),
+        openRight(0.38),
+        releaseRight(0.52),
+        grabRight(0.7);
 
         private final double position;
         public double getPosition() {
@@ -112,9 +112,9 @@ public class Crumblz extends RobotPart {
         clawLeft = map.get(Servo.class, "clawLeft");
         clawRight = map.get(Servo.class, "clawRight");
 
-        elbow.setPosition(ElbowPositions.FOLDPOS.getPosition());
-        clawLeft.setPosition(ClawPositions.GRABLEFT.getPosition());
-        clawRight.setPosition(ClawPositions.GRABRIGHT.getPosition());
+        elbow.setPosition(ElbowPositions.foldPos.getPosition());
+        clawLeft.setPosition(ClawPositions.grabLeft.getPosition());
+        clawRight.setPosition(ClawPositions.grabRight.getPosition());
 
         armExtend = map.get(DcMotorEx.class, "armExtend");
         armRotate = map.get(DcMotorEx.class, "armRotate");
@@ -137,18 +137,14 @@ public class Crumblz extends RobotPart {
         clawRight.setPosition(positionRight.getPosition());
     }
     //TODO: documentation
-    public void updateElbow(boolean fold) {
+    public void updateElbow() {
         double position;
-        if (fold) {
-            position = ElbowPositions.FOLDPOS.getPosition();
+        if (armRotate.getCurrentPosition() < 300) {
+            position = ElbowPositions.intakePos.getPosition();
+        } else if (armRotate.getCurrentPosition() < 2200) {
+            position = ElbowPositions.outtakeFrontSidePos.getPosition();
         } else {
-            if (armRotate.getCurrentPosition() < 300) {
-                position = ElbowPositions.INTAKEPOS.getPosition();
-            } else if (armRotate.getCurrentPosition() < 2200) {
-                position = ElbowPositions.OUTTAKEFRONTSIDEPOS.getPosition();
-            } else {
-                position = ElbowPositions.OUTTAKEBACKSIDEPOS.getPosition();
-            }
+            position = ElbowPositions.outtakeBackSidePos.getPosition();
         }
         elbow.setPosition(position);
     }
@@ -193,11 +189,7 @@ public class Crumblz extends RobotPart {
             int position = armExtend.getCurrentPosition();
             boolean limitReached;
 
-            if ((position <= ArmLimits.SLIDELOWER.getPosition() && power <= 0)|| (position >= ArmLimits.SLIDEUPPER.getPosition() && power >= 0)) {
-                limitReached = true;
-            } else {
-                limitReached = false;
-            }
+            limitReached = (position <= ArmLimits.slideLower.getPosition() && power <= 0) || (position >= ArmLimits.slideUpper.getPosition() && power >= 0);
 
             if (!limitReached) {
                 armExtend.setPower(power);
@@ -255,11 +247,7 @@ public class Crumblz extends RobotPart {
             int position = armRotate.getCurrentPosition();
             boolean limitReached;
 
-            if ((position <= ArmLimits.ROTATELOWER.getPosition() && power <= 0)|| (position >= ArmLimits.ROTATEUPPER.getPosition() && power >= 0)) {
-                limitReached = true;
-            } else {
-                limitReached = false;
-            }
+            limitReached = (position <= ArmLimits.rotateLower.getPosition() && power <= 0) || (position >= ArmLimits.rotateUpper.getPosition() && power >= 0);
 
             if (!limitReached) {
                 if (slideHeight > 700) {
@@ -367,5 +355,5 @@ public class Crumblz extends RobotPart {
             }
         }
     }
-    //TODO: FSM PIDF-controller
+    //TODO: FSM PIDF-controller method
 }

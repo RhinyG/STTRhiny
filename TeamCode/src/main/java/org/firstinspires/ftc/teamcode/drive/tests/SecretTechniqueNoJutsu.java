@@ -1,13 +1,9 @@
 package org.firstinspires.ftc.teamcode.drive.tests;
 
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmExtendPos.FULL;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmExtendPos.ZERO;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.INTAKEGROUND;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.OUTTAKEBACK;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.GRABLEFT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.GRABRIGHT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.OPENLEFT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.OPENRIGHT;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.grabLeft;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.grabRight;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.openLeft;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.openRight;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -29,8 +25,8 @@ public class SecretTechniqueNoJutsu extends LinearOpMode {
         arm.init(hardwareMap);
         waitForStart();
 
-        Crumblz.ClawPositions leftPos = OPENLEFT;
-        Crumblz.ClawPositions rightPos = OPENRIGHT;
+        Crumblz.ClawPositions leftPos = openLeft;
+        Crumblz.ClawPositions rightPos = openRight;
 
         if (isStopRequested()) return;
 
@@ -63,23 +59,23 @@ public class SecretTechniqueNoJutsu extends LinearOpMode {
 
 
             if (leftOpen) {
-                leftPos = OPENLEFT;
+                leftPos = openLeft;
             }
             if (leftClose) {
-                leftPos = GRABLEFT;
+                leftPos = grabLeft;
             }
             if (rightOpen) {
-                rightPos = OPENRIGHT;
+                rightPos = openRight;
             }
             if (rightClose) {
-                rightPos = GRABRIGHT;
+                rightPos = grabRight;
             }
 
             drivetrain.RobotCentric(1, false);
             if(gamepad2.a){
                 arm.elbow.setPosition(0.8);
             } else {
-                arm.updateElbow(false);
+                arm.updateElbow();
             }
             if(gamepad2.right_stick_button){
                 arm.armRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

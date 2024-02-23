@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.robotParts.Crumblz;
-import org.firstinspires.ftc.teamcode.robotParts.OpenCVTeamPropDetection;
 import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 
 //TODO: add camera
@@ -75,7 +74,7 @@ public class FiftyFSM extends LinearOpMode {
                     break;
                 case 2:
                     if (drive.state >= 2) {
-                        arm.clawLeft.setPosition(Crumblz.ClawPositions.RELEASELEFT.getPosition());
+                        arm.clawLeft.setPosition(Crumblz.ClawPositions.releaseLeft.getPosition());
                         armTimer = System.currentTimeMillis();
                         arm.state++;
                     }
@@ -86,7 +85,7 @@ public class FiftyFSM extends LinearOpMode {
                         slideGoal = 0;
                         arm.armExtend.setTargetPosition(slideGoal);
                         arm.armRotate.setTargetPosition(rotateGoal);
-                        arm.elbow.setPosition(Crumblz.ElbowPositions.INTAKEPOS.getPosition());
+                        arm.elbow.setPosition(Crumblz.ElbowPositions.intakePos.getPosition());
                         arm.state++;
                     }
                     break;
@@ -99,7 +98,7 @@ public class FiftyFSM extends LinearOpMode {
                     break;
                 case 5:
                     if(Math.abs(slideGoal - arm.armExtend.getCurrentPosition()) < 10) {
-                        arm.clawRight.setPosition(Crumblz.ClawPositions.RELEASERIGHT.getPosition());
+                        arm.clawRight.setPosition(Crumblz.ClawPositions.releaseRight.getPosition());
                         slideGoal = 0;
                         arm.armExtend.setTargetPosition(slideGoal);
                         arm.state++;

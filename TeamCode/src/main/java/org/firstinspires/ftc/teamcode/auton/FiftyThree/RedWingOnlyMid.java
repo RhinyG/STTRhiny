@@ -8,8 +8,8 @@ import org.firstinspires.ftc.teamcode.robotParts.Crumblz;
 import org.firstinspires.ftc.teamcode.robotParts.OpenCVTeamPropDetection;
 import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 
-@Autonomous(name = "BB 2+0", group = "A")
-public class BlueBackstage extends LinearOpMode {
+@Autonomous(name = "RW Mid 2+0", group = "A")
+public class RedWingOnlyMid extends LinearOpMode {
     newAutonMethods drive = new newAutonMethods(this);
     Crumblz arm = new Crumblz(this);
     OpenCVTeamPropDetection camera = new OpenCVTeamPropDetection(this);
@@ -29,7 +29,7 @@ public class BlueBackstage extends LinearOpMode {
     public void runOpMode() {
         drive.init(hardwareMap);
         arm.init(hardwareMap);
-        camera.findScoringPosition(OpenCVTeamPropDetection.robotPositions.BlueBackstage,hardwareMap);
+        camera.findScoringPosition(OpenCVTeamPropDetection.robotPositions.RedWing,hardwareMap);
         PIDController controller = new PIDController(p, i, d);
 
         waitForStart();
@@ -42,103 +42,122 @@ public class BlueBackstage extends LinearOpMode {
             telemetry.addData("Global Drive state",drive.state);
             telemetry.addData("driveState",drive.driveState);
             telemetry.addData("arm state",arm.state);
+
             switch (drive.state) {
                 case 0:
                     drive.driveState = 0;
                     drive.state++;
                     break;
                 case 1:
-                    if (finalPos == 2) {
-                        drive.drive(-93, -85, 0.7, 3000);
-                    } else if (finalPos == 1) {
-                        drive.drive(-79,-85,0.7,3000);
-                    } else if (finalPos == 0) {
-                        drive.drive(-55,-85,0.7,3000);
-                    }
+                    drive.drive(66,14,0.7,3000);
                     if (drive.driveState == 2) {
                         drive.state++;
                         drive.driveState = 0;
                     }
                     break;
                 case 2:
-                    if (System.currentTimeMillis() > 100 + armTimer) {
-                        if (finalPos == 2) {
-                            drive.drive(10,40,0.4,2500);
-                        } else if (finalPos == 1) {
-                            drive.drive(-21,13,0.4,2500);
-                        } else if (finalPos == 0) {
-                            drive.drive(-26,35,0.4,2500);
-                        }
-                    }
+                    drive.rotateToHeading(90,0.3,telemetry);
                     if (drive.driveState == 2) {
                         drive.state++;
                         drive.driveState = 0;
+                        drive.Stop();
                     }
                     break;
                 case 3:
-                    if (arm.state > 5) {
-                        if (finalPos == 2) {
-                            drive.drive(75,-36,0.8,3800);
-                        } else if (finalPos == 1) {
-                            drive.drive(87,-15,0.8,3800);
-                        } else if (finalPos == 0) {
-                            drive.drive(75,-36,0.8,3800);
-                        }
+                    if (System.currentTimeMillis() > 100 + armTimer) {
+                        drive.rotateToHeading(0, 0.3, telemetry);
                     }
                     if (drive.driveState == 2) {
                         drive.state++;
                         drive.driveState = 0;
+                        drive.Stop();
                     }
                     break;
+                case 4:
+                    if (arm.state > 4) {
+                        drive.drive(3, -200,0.7,4500);
+                    }
+                    if (drive.driveState == 2) {
+                        drive.state++;
+                        drive.driveState = 0;
+                        drive.Stop();
+                    }
+                    break;
+                case 5:
+                    drive.drive(-1,-53,0.3,2500);
+                    if (drive.driveState == 2) {
+                        drive.state++;
+                        drive.driveState = 0;
+                        drive.Stop();
+                    }
+                    break;
+                case 6:
+                    if (arm.state > 7) {
+                        drive.drive(57,5,0.7,3000);
+                    }
             }
-
             switch (arm.state) {
                 case 0:
-                    rotateGoal = 2800;
-                    arm.state++;
+                    if (drive.state > 1) {
+                        arm.elbow.setPosition(Crumblz.ElbowPositions.intakePos.getPosition());
+                        rotateGoal = 320;
+                        slideGoal = 150;
+                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.state++;
+                    }
                     break;
                 case 1:
-                    if (Math.abs(arm.armRotate.getCurrentPosition()-rotateGoal) < 1000) {
+                    if (drive.state > 2) {
+                        arm.clawRight.setPosition(Crumblz.ClawPositions.openRight.getPosition());
+                        armTimer = System.currentTimeMillis();
+                        arm.state++;
+                    }
+                    break;
+                case 2:
+                    if (System.currentTimeMillis() > 100 + armTimer) {
+                        arm.elbow.setPosition(Crumblz.ElbowPositions.stackFivePos.getPosition());
+                        slideGoal = 0;
+                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.state++;
+                    }
+                    break;
+                case 3:
+                    if((Math.abs(arm.armExtend.getCurrentPosition() - slideGoal) < 20) && drive.state > 3){
+                        rotateGoal = 300;
+                        arm.state++;
+                    }
+                    break;
+                case 4:
+                    arm.clawRight.setPosition((Crumblz.ClawPositions.grabRight.getPosition()));
+                    slideGoal = 0;
+                    arm.armExtend.setTargetPosition(slideGoal);
+                    arm.state++;
+                case 5:
+                    if (drive.state > 4) {
+                        arm.elbow.setPosition(Crumblz.ElbowPositions.outtakeBackSidePos.getPosition());
+                        rotateGoal = 2800;
                         slideGoal = 360;
                         arm.armExtend.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;
-                case 2:
-                    if (drive.state >= 2) {
-                        arm.clawRight.setPosition(Crumblz.ClawPositions.releaseRight.getPosition());
+                case 6:
+                    if (drive.state > 5) {
+                        arm.clawRight.setPosition(Crumblz.ClawPositions.openRight.getPosition());
+                        arm.clawLeft.setPosition(Crumblz.ClawPositions.openLeft.getPosition());
                         armTimer = System.currentTimeMillis();
                         arm.state++;
                     }
                     break;
-                case 3:
+                case 7:
                     if (System.currentTimeMillis() > 100 + armTimer) {
-                        rotateGoal = 320;
-                        slideGoal = 0;
-                        arm.armExtend.setTargetPosition(slideGoal);
-                        arm.elbow.setPosition(Crumblz.ElbowPositions.intakePos.getPosition());
-                        arm.state++;
-                    }
-                    break;
-                case 4:
-                    if(Math.abs(arm.armRotate.getCurrentPosition() - rotateGoal) < 100) {
-                        if (finalPos != 0) {
-                            slideGoal = 850;
-                            arm.armExtend.setTargetPosition(slideGoal);
-                        }
-                        arm.state++;
-                    }
-                    break;
-                case 5:
-                    if(Math.abs(slideGoal - arm.armExtend.getCurrentPosition()) < 10) {
-                        arm.clawLeft.setPosition(Crumblz.ClawPositions.releaseLeft.getPosition());
                         rotateGoal = 0;
                         slideGoal = 0;
                         arm.armExtend.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;
-            }
+                }
 
             controller.setPID(p,i,d);
             int armPos = arm.armRotate.getCurrentPosition();

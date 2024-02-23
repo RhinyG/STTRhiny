@@ -2,17 +2,15 @@ package org.firstinspires.ftc.teamcode.drive.tests;
 
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmExtendPos.FULL;
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmExtendPos.ZERO;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.INTAKEGROUND;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.OUTTAKEBACK;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.OUTTAKEFRONT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.GRABLEFT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.GRABRIGHT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.OPENLEFT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.OPENRIGHT;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.intakeGround;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.outtakeBack;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.grabLeft;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.grabRight;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.openLeft;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.openRight;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.robotParts.MecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.robotParts.Crumblz;
@@ -29,9 +27,9 @@ public class KookyBotz extends LinearOpMode {
     boolean holdSlideButton = false;
 
     Crumblz.ArmExtendPos extendPos = ZERO;
-    Crumblz.ArmRotatePos rotatePos = INTAKEGROUND;
-    Crumblz.ClawPositions leftPos = OPENLEFT;
-    Crumblz.ClawPositions rightPos = OPENRIGHT;
+    Crumblz.ArmRotatePos rotatePos = intakeGround;
+    Crumblz.ClawPositions leftPos = openLeft;
+    Crumblz.ClawPositions rightPos = openRight;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -62,11 +60,11 @@ public class KookyBotz extends LinearOpMode {
             if (RotateIntakeButton) {
                 rotateButtonMode = true;
                 holdSlides = arm.armExtend.getCurrentPosition();
-                rotatePos = INTAKEGROUND;
+                rotatePos = intakeGround;
             } else if (RotateOuttakeButton) {
                 rotateButtonMode = true;
                 holdSlides = arm.armExtend.getCurrentPosition();
-                rotatePos = OUTTAKEBACK;
+                rotatePos = outtakeBack;
             }
 
             if (Math.abs(armRotatePower) > 0.1) {
@@ -102,19 +100,19 @@ public class KookyBotz extends LinearOpMode {
             }
 
             if (leftOpen) {
-                leftPos = OPENLEFT;
+                leftPos = openLeft;
             }
             if (leftClose) {
-                leftPos = GRABLEFT;
+                leftPos = grabLeft;
             }
             if (rightOpen) {
-                rightPos = OPENRIGHT;
+                rightPos = openRight;
             }
             if (rightClose) {
-                rightPos = GRABRIGHT;
+                rightPos = grabRight;
             }
 
-            arm.updateElbow(false);
+            arm.updateElbow();
             arm.updateClaw(leftPos,rightPos);
             arm.updateSlide(extendButtonMode,armExtendPower,extendPos, telemetry);
             arm.updateRotate(rotateButtonMode, armRotatePower, rotatePos, holdSlides, telemetry);

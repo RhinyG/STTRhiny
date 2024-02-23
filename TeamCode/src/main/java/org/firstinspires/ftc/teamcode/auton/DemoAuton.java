@@ -96,7 +96,7 @@ public class DemoAuton extends LinearOpMode {
                 case 2:
                     //TODO: explain
                     if (drive.state >= 2) {
-                        arm.clawLeft.setPosition(Crumblz.ClawPositions.RELEASELEFT.getPosition());
+                        arm.clawLeft.setPosition(Crumblz.ClawPositions.releaseLeft.getPosition());
                         armTimer = System.currentTimeMillis();
                         arm.state++;
                     }

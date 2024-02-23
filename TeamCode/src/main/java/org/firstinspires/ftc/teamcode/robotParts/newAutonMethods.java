@@ -17,52 +17,30 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class newAutonMethods {
     //TODO: explain variables
-    public int state = 0;
-    public int driveState = 0;
     private final LinearOpMode myOpMode;
     private final ElapsedTime runtime = new ElapsedTime();
 
     //TODO: see what happens if you change this to DcMotorEx
-    public DcMotor FrontL;
-    public DcMotor FrontR;
-    public DcMotor BackL;
-    public DcMotor BackR;
-
-    double current_target_heading = 0;
+    public DcMotor FrontL,FrontR,BackL,BackR;
     public IMU imu;
-    double WHEEL_RADIUS = 48;//mm
-    double GEAR_RATIO = 1/13.7;
-    double TICKS_PER_ROTATION = 8192;
-    double OURTICKS_PER_CM;
-    double threshold = 250;
-    double rotateThreshold = 0.5;
-    double odoMultiplier = (69.5/38.6);
-    double beginTime;
-    double TimeElapsed;
-    double OdoY_Pos;
-    double OdoX_Pos;
-    double tickY;
-    double tickX;
-    double dPosY;
-    double dPosX;
-    double dPos;
-    double Kp = 0.05;
-    double FWD;
-    double STR;
-    double ROT;
-    double speed;
-    double min_speed = 0.13;
-    double remweg;
-    int remwegTicks = 40000;
-    double a = 1;
-    double b = 1;
-    double heading;
-    double dHeading;
-    double direction;
+    public int state = 0,driveState = 0;
+    int slowDownTicks = 40000;
+    double
+            current_target_heading = 0,
+            WHEEL_RADIUS = 48,//mm
+            GEAR_RATIO = 1/13.7,
+            TICKS_PER_ROTATION = 8192,
+            OURTICKS_PER_CM,
+            threshold = 250,
+            rotateThreshold = 0.5,
+            odoMultiplier = (69.5/38.6),
+            Kp = 0.05,
+            min_speed = 0.13,
+            beginTime,TimeElapsed,OdoY_Pos,OdoX_Pos,tickY,tickX,dPosY,dPosX,dPos,FWD,STR,ROT,speed, slowDown,a = 1,b = 1,heading,dHeading,direction;
 
     /**
      * This is the constructor.
-     * @param opmode is opmode from LinearOpMode file
+     * @param opmode is opmode from a LinearOpMode file
      */
     public newAutonMethods(LinearOpMode opmode) {myOpMode = opmode;}
 
@@ -113,17 +91,17 @@ public class newAutonMethods {
         heading = current_target_heading;
         tickY = (int) (y * OURTICKS_PER_CM);
         tickX = (int) (x * OURTICKS_PER_CM);
-        remweg = max_speed * remwegTicks;
+        slowDown = max_speed * slowDownTicks;
         updateTargets();
         while ((Math.abs(dPosY) > threshold || Math.abs(dPosX) > threshold || Math.abs(dHeading) > 0.5) && myOpMode.opModeIsActive() && TimeElapsed < stopTime) {
 
-            if (Math.abs(dPosY) < remweg) {
-                a = dPosY / remweg;
+            if (Math.abs(dPosY) < slowDown) {
+                a = dPosY / slowDown;
             } else {
                 a = 1;
             }
-            if (Math.abs(dPosX) < remweg) {
-                b = dPosX / remweg;
+            if (Math.abs(dPosX) < slowDown) {
+                b = dPosX / slowDown;
             } else {
                 b = 1;
             }
@@ -177,20 +155,20 @@ public class newAutonMethods {
         heading = current_target_heading;
         tickY = (int) (y * OURTICKS_PER_CM);
         tickX = (int) (x * OURTICKS_PER_CM);
-        remweg = max_speed * 35000;
+        slowDown = max_speed * 35000;
         updateTargets();
         state++;
     }
     public void runFSMDrive(double max_speed, double stopTime, Telemetry telemetry) {
         if ((Math.abs(dPosY) > threshold || Math.abs(dPosX) > threshold || Math.abs(dHeading) > 0.5) && myOpMode.opModeIsActive() && TimeElapsed < stopTime) {
 
-            if (Math.abs(dPosY) < remweg) {
-                a = dPosY / remweg;
+            if (Math.abs(dPosY) < slowDown) {
+                a = dPosY / slowDown;
             } else {
                 a = 1;
             }
-            if (Math.abs(dPosX) < remweg) {
-                b = dPosX / remweg;
+            if (Math.abs(dPosX) < slowDown) {
+                b = dPosX / slowDown;
             } else {
                 b = 1;
             }
@@ -259,20 +237,20 @@ public class newAutonMethods {
                 heading = current_target_heading;
                 tickY = (int) (y * OURTICKS_PER_CM);
                 tickX = (int) (x * OURTICKS_PER_CM);
-                remweg = max_speed * 35000;
+                slowDown = max_speed * 35000;
                 updateTargets();
                 driveState++;
                 break;
             case 1:
                 if ((Math.abs(dPosY) > threshold || Math.abs(dPosX) > threshold || Math.abs(dHeading) > 0.5) && myOpMode.opModeIsActive() && TimeElapsed < stopTime) {
 
-                    if (Math.abs(dPosY) < remweg) {
-                        a = dPosY / remweg;
+                    if (Math.abs(dPosY) < slowDown) {
+                        a = dPosY / slowDown;
                     } else {
                         a = 1;
                     }
-                    if (Math.abs(dPosX) < remweg) {
-                        b = dPosX / remweg;
+                    if (Math.abs(dPosX) < slowDown) {
+                        b = dPosX / slowDown;
                     } else {
                         b = 1;
                     }

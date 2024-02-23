@@ -1,15 +1,14 @@
 package org.firstinspires.ftc.teamcode.drive;
 
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmExtendPos.FULL;
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmExtendPos.ZERO;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.INTAKEGROUND;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.OUTTAKEBACK;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.GRABLEFT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.GRABRIGHT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.OPENLEFT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.OPENRIGHT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.RELEASELEFT;
-import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.RELEASERIGHT;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.intakeGround;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmRotatePos.outtakeBack;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.grabLeft;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.grabRight;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.openLeft;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.openRight;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.releaseLeft;
+import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.releaseRight;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -35,12 +34,13 @@ public class KookyKooker extends LinearOpMode {
     boolean holdSlideButton = false;
 
     Crumblz.ArmExtendPos extendPos = ZERO;
-    Crumblz.ArmRotatePos rotatePos = INTAKEGROUND;
+    Crumblz.ArmRotatePos rotatePos = intakeGround;
 
-    Crumblz.ClawPositions leftPos = OPENLEFT;
-    Crumblz.ClawPositions rightPos = OPENRIGHT;
+    Crumblz.ClawPositions leftPos = openLeft;
+    Crumblz.ClawPositions rightPos = openRight;
     double leftTime = 0;
     double rightTime = 0;
+    double foldTime = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -73,7 +73,7 @@ public class KookyKooker extends LinearOpMode {
             boolean planeReset = gamepad2.dpad_right;
 
             double hookPower = gamepad2.right_trigger - gamepad2.left_trigger;
-            boolean fold = gamepad2.right_bumper;
+            boolean foldToggle = false;
 
             hook.setPower(hookPower);
 
@@ -86,37 +86,37 @@ public class KookyKooker extends LinearOpMode {
             if (RotateIntakeButton) {
                 rotateButtonMode = true;
                 holdSlides = arm.armExtend.getCurrentPosition();
-                rotatePos = INTAKEGROUND;
+                rotatePos = intakeGround;
             } else if (RotateOuttakeButton) {
                 rotateButtonMode = true;
                 holdSlides = arm.armExtend.getCurrentPosition();
-                rotatePos = OUTTAKEBACK;
+                rotatePos = outtakeBack;
             }
             if(Math.abs(armRotatePower) > 0.1) {rotateButtonMode = false;}
 
             if ((leftTime + 500) < System.currentTimeMillis()){
-                if (leftToggle && leftPos == OPENLEFT) {
-                    leftPos = GRABLEFT;
+                if (leftToggle && leftPos == openLeft) {
+                    leftPos = grabLeft;
                     leftTime = System.currentTimeMillis();
-                } else if (leftToggle && (leftPos == GRABLEFT || leftPos == RELEASERIGHT)) {
-                    leftPos = OPENLEFT;
+                } else if (leftToggle && (leftPos == grabLeft || leftPos == releaseRight)) {
+                    leftPos = openLeft;
                     leftTime = System.currentTimeMillis();
                 }
             }
             if(gamepad1.dpad_right){
-                leftPos = RELEASELEFT;
+                leftPos = releaseLeft;
             }
             if ((rightTime + 500) < System.currentTimeMillis()) {
-                if (rightToggle && rightPos == OPENRIGHT) {
-                    rightPos = GRABRIGHT;
+                if (rightToggle && rightPos == openRight) {
+                    rightPos = grabRight;
                     rightTime = System.currentTimeMillis();
-                } else if (rightToggle && (rightPos == GRABRIGHT || rightPos == RELEASERIGHT)) {
-                    rightPos = OPENRIGHT;
+                } else if (rightToggle && (rightPos == grabRight || rightPos == releaseRight)) {
+                    rightPos = openRight;
                     rightTime = System.currentTimeMillis();
                 }
             }
             if(gamepad1.dpad_left){
-                rightPos = RELEASERIGHT;
+                rightPos = releaseRight;
             }
             if(gamepad1.y){
                 arm.armRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -129,7 +129,21 @@ public class KookyKooker extends LinearOpMode {
                 hookServo.setPosition(0);
             }
 
-            arm.updateElbow(fold);
+            if ((foldTime + 500) < System.currentTimeMillis() && gamepad2.right_bumper){
+                if (foldToggle) {
+                    foldToggle = false;
+                    foldTime = System.currentTimeMillis();
+                } else {
+                    foldToggle = true;
+                    foldTime = System.currentTimeMillis();
+                }
+            }
+
+            if (!foldToggle) {
+                arm.updateElbow();
+            } else {
+                arm.elbow.setPosition(Crumblz.ElbowPositions.foldPos.getPosition());
+            }
             arm.updateClaw(leftPos,rightPos);
             arm.updateSlide(extendButtonMode,armExtendPower,extendPos, telemetry);
             arm.updateRotate(rotateButtonMode, armRotatePower, rotatePos, holdSlides, telemetry);
