@@ -14,11 +14,11 @@ public class DeanAtHomeTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         drive.init(hardwareMap);
-        camera.findScoringPosition(true);
+        camera.findScoringPosition(OpenCVTeamPropDetection.robotPositions.RedBackstage, hardwareMap);
         waitForStart();
         if (opModeIsActive()){
-            drive.driveY(50);
-            drive.driveX(50);
+            drive.linearDriveY(50);
+            drive.linearDriveX(50);
         }
     }
 }

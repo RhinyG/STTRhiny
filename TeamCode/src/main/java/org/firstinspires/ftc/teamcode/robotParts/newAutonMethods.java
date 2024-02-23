@@ -1,3 +1,5 @@
+//TODO: change name of file to something better
+//TODO: see if RobotCentric and FieldCentric work here as well
 package org.firstinspires.ftc.teamcode.robotParts;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -14,34 +16,27 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class newAutonMethods {
+    //TODO: explain variables
     public int state = 0;
     public int driveState = 0;
-    public int rotateState = 0;
+    private final LinearOpMode myOpMode;
+    private final ElapsedTime runtime = new ElapsedTime();
 
-    private LinearOpMode myOpMode;
-    private ElapsedTime runtime = new ElapsedTime();
-
+    //TODO: see what happens if you change this to DcMotorEx
     public DcMotor FrontL;
     public DcMotor FrontR;
     public DcMotor BackL;
     public DcMotor BackR;
 
-    final public int robotLength_cm = 39;
-    final public int robotWidth_cm = 40;
-    final public double gravityConstant = 1.35;
-
     double current_target_heading = 0;
     public IMU imu;
     double WHEEL_RADIUS = 48;//mm
-    double ODO_RADIUS = 17.5;//mm?
     double GEAR_RATIO = 1/13.7;
     double TICKS_PER_ROTATION = 8192;
     double OURTICKS_PER_CM;
     double threshold = 250;
     double rotateThreshold = 0.5;
     double odoMultiplier = (69.5/38.6);
-    double CM_PER_TICK = (odoMultiplier * 2*Math.PI * GEAR_RATIO * WHEEL_RADIUS)/(TICKS_PER_ROTATION); //about 1/690
-
     double beginTime;
     double TimeElapsed;
     double OdoY_Pos;
@@ -65,22 +60,34 @@ public class newAutonMethods {
     double dHeading;
     double direction;
 
+    /**
+     * This is the constructor.
+     * @param opmode is opmode from LinearOpMode file
+     */
     public newAutonMethods(LinearOpMode opmode) {myOpMode = opmode;}
 
+    /**
+     * This methods initialises the mecanum drivetrain and the IMU and sets all the directions and modes to their correct settings.
+     * @param map - Gives a hardwareMap from the opmode for the method to use. Not having this parameter would result in an NPE.
+     *            This can alternatively be done with myOpMode.hardwareMap.get but that's longer so we don't.
+     *            It can also probably be done via the constructor but I haven't managed to do that yet.
+     */
     public void init(HardwareMap map) {
         imu = map.get(IMU.class, "imu");
 
+        //TODO: see what happens if you change this to DcMotorEx
         FrontL = map.get(DcMotor.class, "left_front");
         FrontR = map.get(DcMotor.class, "right_front");
         BackL = map.get(DcMotor.class, "left_back");
         BackR = map.get(DcMotor.class, "right_back");
 
+        //TODO: see what happens if you change this to DcMotorEx
         FrontL.setDirection(DcMotorSimple.Direction.REVERSE);
         FrontR.setDirection(DcMotorSimple.Direction.FORWARD);
         BackL.setDirection(DcMotorSimple.Direction.REVERSE);
         BackR.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        OURTICKS_PER_CM = odoMultiplier*(TICKS_PER_ROTATION)/(2*Math.PI * GEAR_RATIO * WHEEL_RADIUS);
+        OURTICKS_PER_CM = odoMultiplier*(TICKS_PER_ROTATION)/(2*Math.PI * GEAR_RATIO * WHEEL_RADIUS); //about 690 ticks per centimeter
 
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
         RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.UP;
@@ -90,8 +97,16 @@ public class newAutonMethods {
         imu.initialize(new IMU.Parameters(orientationOnRobot));
         resetYaw();
     }
-    public void driveDean(double x, double y) {driveDean(x, y, 0.7, myOpMode.telemetry, 8000);}
-    public void driveDean(double x,double y, double max_speed, Telemetry telemetry, double stopTime) {
+
+    /**
+     * This method is a shorthand for the regular linearDrive, with the speed, telemetry and stopTime filled in already.
+     * This makes long strings of auton with similar driveY's easier to write and read.
+     * @param x - How far you want to strafe, in centimeters
+     * @param y - How far you want to drive forward, in centimeters
+     */
+    public void linearDrive(double x, double y) {linearDrive(x, y, 0.7, myOpMode.telemetry, 8000);}
+    //TODO: documentation
+    public void linearDrive(double x, double y, double max_speed, Telemetry telemetry, double stopTime) {
         calibrateEncoders();
         beginTime = System.currentTimeMillis();
         double turn;
@@ -99,7 +114,7 @@ public class newAutonMethods {
         tickY = (int) (y * OURTICKS_PER_CM);
         tickX = (int) (x * OURTICKS_PER_CM);
         remweg = max_speed * remwegTicks;
-        updateDean();
+        updateTargets();
         while ((Math.abs(dPosY) > threshold || Math.abs(dPosX) > threshold || Math.abs(dHeading) > 0.5) && myOpMode.opModeIsActive() && TimeElapsed < stopTime) {
 
             if (Math.abs(dPosY) < remweg) {
@@ -149,20 +164,10 @@ public class newAutonMethods {
             FrontR.setPower(FWD - STR - turn);
             BackL.setPower(FWD - STR + turn);
             BackR.setPower(FWD + STR - turn);
-            updateDean();
+            updateTargets();
         }
         Stop();
         myOpMode.sleep(100);
-    }
-
-    public void updateDean(){
-        dHeading = getCurrentHeading() - heading;
-        OdoY_Pos = FrontL.getCurrentPosition();
-        OdoX_Pos = FrontR.getCurrentPosition();
-        TimeElapsed = System.currentTimeMillis() - beginTime;
-        dPosY = tickY - OdoY_Pos;
-        dPosX = tickX - OdoX_Pos;
-        dPos = Math.abs(dPosX) + Math.abs(dPosY);
     }
 
     //TODO: put these first versions in EN, then delete three methods if not necessary
@@ -173,7 +178,7 @@ public class newAutonMethods {
         tickY = (int) (y * OURTICKS_PER_CM);
         tickX = (int) (x * OURTICKS_PER_CM);
         remweg = max_speed * 35000;
-        updateDean();
+        updateTargets();
         state++;
     }
     public void runFSMDrive(double max_speed, double stopTime, Telemetry telemetry) {
@@ -225,7 +230,7 @@ public class newAutonMethods {
             FrontR.setPower(FWD - STR - ROT);
             BackL.setPower(FWD - STR + ROT);
             BackR.setPower(FWD + STR - ROT);
-            updateDean();
+            updateTargets();
         } else {
             state++;
         }
@@ -237,7 +242,16 @@ public class newAutonMethods {
     }
 
     //TODO: documentation
-    public void FSMDrive(double x, double y, double max_speed, double stopTime, Telemetry telemetry) {
+    public void drive(double x, double y){drive(x, y, 0.7, 5000, myOpMode.telemetry);}
+
+    //TODO: documentation
+    public void drive(double x, double y, double stopTime){drive(x, y, 0.7, stopTime, myOpMode.telemetry);}
+
+    //TODO: documentation
+    public void drive(double x, double y, double max_speed, double stopTime){drive(x, y, max_speed, stopTime, myOpMode.telemetry);}
+
+    //TODO: documentation
+    public void drive(double x, double y, double max_speed, double stopTime, Telemetry telemetry) {
         switch (driveState) {
             case 0:
                 calibrateEncoders();
@@ -246,7 +260,7 @@ public class newAutonMethods {
                 tickY = (int) (y * OURTICKS_PER_CM);
                 tickX = (int) (x * OURTICKS_PER_CM);
                 remweg = max_speed * 35000;
-                updateDrive();
+                updateTargets();
                 driveState++;
                 break;
             case 1:
@@ -298,7 +312,7 @@ public class newAutonMethods {
                     FrontR.setPower(FWD - STR - ROT);
                     BackL.setPower(FWD - STR + ROT);
                     BackR.setPower(FWD + STR - ROT);
-                    updateDrive();
+                    updateTargets();
                 } else {
                     driveState++;
                 }
@@ -309,7 +323,7 @@ public class newAutonMethods {
         }
     }
     //TODO: documentation
-    public void updateDrive(){
+    public void updateTargets(){
         dHeading = getCurrentHeading() - heading;
         OdoY_Pos = FrontL.getCurrentPosition();
         OdoX_Pos = FrontR.getCurrentPosition();
@@ -319,22 +333,22 @@ public class newAutonMethods {
         dPos = Math.abs(dPosX) + Math.abs(dPosY);
     }
     //TODO: documentation
-    public void FSMRotate(double target_heading, double speed, Telemetry telemetry) {
+    public void rotateToHeading(double target_heading, double speed, Telemetry telemetry) {
         target_heading *= -1;
-        switch (rotateState) {
+        switch (driveState) {
             case 0:
                 dHeading = target_heading - getCurrentHeading();
                 current_target_heading = target_heading;
                 rotateThreshold = 0.5;
                 telemetry.addData("curHeading", getCurrentHeading());
                 telemetry.addData("dHeading",dHeading);
-                rotateState++;
+                driveState++;
                 break;
             case 1:
                 if (!(Math.abs(dHeading) < rotateThreshold) && myOpMode.opModeIsActive()) {
                     direction = checkDirection(dHeading);
 
-                    if(dHeading < 10 * rotateThreshold) {
+                    if (Math.abs(dHeading) < (10 * rotateThreshold)) {
                         speed = 0.2;
                     }
 
@@ -347,7 +361,7 @@ public class newAutonMethods {
                     telemetry.addData("curHeading", getCurrentHeading());
                     telemetry.addData("dHeading",dHeading);
                 } else {
-                    rotateState++;
+                    driveState++;
                 }
                 break;
             case 2:
@@ -357,80 +371,48 @@ public class newAutonMethods {
         }
     }
 
-    public void IMUBackBoardCorrectionAuton(String alliance,double offsetYaw,double offsetZ, Telemetry telemetry) {
+    //TODO: documentation
+    public void linearAprilTagBackboardCorrection(double offsetYaw, double offsetZ, Telemetry telemetry) {
         calibrateEncoders();
         double corOffsetZ = (1.27 * offsetZ + 0.0471)*100;
         double offsetX = Math.atan(Math.toRadians(offsetYaw)) * corOffsetZ;
         telemetry.addData("offsetX", offsetX);
         telemetry.addData("corOffsetZ", offsetZ);
-        driveDean(offsetX,-corOffsetZ);
-//        double STR;
-//        double FWD = 0;
-//        double marginYaw = 6.0;
-//        remweg = 0.3 * remwegTicks;
-//        tickX = (int) (offsetX * OURTICKS_PER_CM);
-//        tickY = (int) (corOffsetZ * OURTICKS_PER_CM);
-//
-//        dHeading = getCurrentHeading() - heading;
-//        OdoY_Pos = FrontL.getCurrentPosition();
-//        OdoX_Pos = FrontR.getCurrentPosition();
-//        dPosX = tickX - OdoX_Pos;
-//        dPosY = tickY -OdoY_Pos;
-//        dPos = Math.abs(dPosX) + Math.abs(dPosY);
-//        telemetry.addData("dPos", dPos);
-//        telemetry.update();
-//
-//        while (!(dPos > 250) && myOpMode.opModeIsActive()) {
-//            STR =  2 * (corOffsetZ * Math.sin(offsetYaw) + offsetX * Math.cos(offsetYaw));
-//            FWD = -2*corOffsetZ;
-//
-//            if ((dPosX < 0 && STR > 0) || (dPosX > 0 && STR < 0)) {
-//                 STR = -STR;
-//            }
-//
-//            if ((dPosY < 0 && FWD > 0) || (dPosY > 0 && FWD < 0)) {
-//                FWD = -FWD;
-//            }
-//
-//
-//            STR = 0;
-//
-//            FrontL.setPower(FWD + STR);
-//            FrontR.setPower(FWD - STR);
-//            BackL.setPower(FWD - STR);
-//            BackR.setPower(FWD + STR);
-//            dHeading = getCurrentHeading() - heading;
-//            OdoX_Pos = FrontR.getCurrentPosition();
-//            dPosY = tickY -OdoY_Pos;
-//            dPos = Math.abs(dPosX) + Math.abs(dPosY);
-//            telemetry.addData("FWD", FWD);
-//            telemetry.addData("STR", STR);
-//            telemetry.addData("OffsetX", offsetX);
-//            telemetry.addData("OffsetZ", corOffsetZ);
-//            telemetry.addData("tickX", tickX);
-//            telemetry.addData("PosX", OdoX_Pos/OURTICKS_PER_CM);
-//            telemetry.addData("PosY", OdoY_Pos/OURTICKS_PER_CM);
-//            telemetry.addData("dPosX", dPos);
-//            telemetry.addData("IMU",getCurrentHeading());
-//            telemetry.addData("AvgYawToBackBoard",offsetYaw);
-//            telemetry.addData("AvgPoseZToBackBoard",offsetZ);
-//            telemetry.addData("FL power", FrontL.getPower());
-//            telemetry.addData("FR power", FrontR.getPower());
-//            telemetry.addData("BL power", BackL.getPower());
-//            telemetry.addData("BR power", BackR.getPower());
-//            telemetry.update();
-//        }
-//        Stop();
-//        myOpMode.sleep(100);
+        linearDrive(offsetX,-corOffsetZ);
     }
 
-
-
-    public void driveY (double position){
-        driveY(position,0.3, myOpMode.telemetry, 10000);
+    //TODO: documentation
+    //TODO: method that can do this while robotCentric
+    public void AprilTagBackboardCorrection(double offsetYaw, double offsetZ, Telemetry telemetry) {
+        calibrateEncoders();
+        double corOffsetZ = (1.27 * offsetZ + 0.0471)*100;
+        double offsetX = Math.atan(Math.toRadians(offsetYaw)) * corOffsetZ;
+        telemetry.addData("offsetX", offsetX);
+        telemetry.addData("corOffsetZ", offsetZ);
+        drive(offsetX,-corOffsetZ);
     }
-//    positive = forward
-    public void driveY(double position, double speed, Telemetry telemetry, double stopTime) {
+
+    /**
+     * This method is a shorthand for the regular driveY, with the speed and telemetry filled in already.
+     * This makes long strings of auton with similar driveY's easier to write and read.
+     * @param position - How far you want to travel, in centimeters
+     */
+    public void linearDriveY(double position){
+        linearDriveY(position,0.3, myOpMode.telemetry, 10000);
+    }
+
+    /**
+     * This method is for autonomously driving in the primary axis of motion, which, for us, means
+     * forwards or backwards. You could rename this to driveX as the X-axis is usually the primary
+     * axis for vehicles, but we chose not to. This method does not remember its coordinate system because of the calibrateEncoders, it resets to
+     * zero each time.
+     * @param position - How far you want to travel, in centimeters. A positive position means forward, a negative position means backwards.
+     * @param speed - Is how fast you want to travel. In autonomous, it is generally smart to move slowly,
+     *              because that gives you more precision. If you run into time constraints, you can try going quicker.
+     * @param telemetry - Gives telemetry from the opmode for the method to use. Not having this parameter would result in an NPE.
+     *                  This can alternatively be done with myOpMode.telemetry.addData but that's longer so we don't.
+     */
+    public void linearDriveY(double position, double speed, Telemetry telemetry, double stopTime) {
         calibrateEncoders();
         double beginTime = System.currentTimeMillis();
         double TimeElapsed = System.currentTimeMillis() - beginTime;
@@ -471,11 +453,28 @@ public class newAutonMethods {
         Stop();
         myOpMode.sleep(100);
     }
-    public void driveX(double position){
-        driveX(position,0.3, myOpMode.telemetry);
+
+    /**
+     * This method is a shorthand for the regular driveX, with the speed and telemetry filled in already.
+     * This makes long strings of auton with similar driveX's easier to write and read.
+     * @param position - How far you want to travel, in centimeters
+     */
+    public void linearDriveX(double position){
+        linearDriveX(position,0.3, myOpMode.telemetry);
     }
-    //positive = right
-    public void driveX(double position, double speed, Telemetry telemetry) {
+
+    /**
+     * This method is for autonomously driving in the secondary axis of motion, which, for us, means
+     * to the left or right. You could rename this to driveY as the Y-axis is usually the secondary
+     * axis for vehicles, but we chose not to. This method does not remember its coordinate system because of the calibrateEncoders, it resets to
+     * zero each time.
+     * @param position - How far you want to travel, in centimeters. A positive position means to the right, a negative position means to the left.
+     * @param speed - Is how fast you want to travel. In autonomous, it is generally smart to move slowly,
+     *              because that gives you more precision. If you run into time constraints, you can try going quicker.
+     * @param telemetry - Gives telemetry from the opmode for the method to use. Not having this parameter would result in an NPE.
+     *                  This can alternatively be done with myOpMode.telemetry.addData but that's longer so we don't.
+     */
+    public void linearDriveX(double position, double speed, Telemetry telemetry) {
         speed = speed * -1;
         calibrateEncoders();
         double Kp = 0.03;
@@ -511,11 +510,27 @@ public class newAutonMethods {
         myOpMode.sleep(100);
     }
 
-    public void rotateToHeading(double target_heading){
-        rotateToHeading(target_heading,0.4, myOpMode.telemetry);
+    /**
+     * This method is a shorthand for the regular rotateToHeading, with the speed and telemetry filled in already.
+     * This makes long strings of auton with similar rotateToHeading's easier to write and read.
+     * @param target_heading - To which angle you want to turn, in degrees. This means that with two successive
+     *                       rotateToHeading(90)'s, the second rotateToHeading is useless, as you are at that heading already.
+     */
+    public void linearRotateToHeading(double target_heading){
+        linearRotateToHeading(target_heading,0.4, myOpMode.telemetry);
     }
-    //positive = clockwise
-    public void rotateToHeading(double target_heading, double speed, Telemetry telemetry) {
+    /**
+     * This method is for autonomously driving turning around the Z-axis or yaw. It might make sense to reverse target_heading,
+     * so that positive is counterclockwise, because that is how degrees usually work. We preferred clockwise as it made more intuitive sense.
+     * @param target_heading - To which angle you want to turn, in degrees. This means that with two successive
+     *                       rotateToHeading(90)'s, the second rotateToHeading is useless, as you are at that heading already.
+     *                       You could change this by making the parameter the dHeading (delta Heading). A positive target_heading means clockwise,
+     *                       a negative heading means counterclockwise. It's interval is therefore [-180,180]
+     * @param speed - Is how fast you want to travel. In autonomous, it is generally smart to move slowly,
+     *              because that gives you more precision. If you run into time constraints, you can try going quicker.
+     * @param telemetry - Gives telemetry from the opmode for the method to use. Not having this parameter would result in an NPE.
+     *                  This can alternatively be done with myOpMode.telemetry.addData but that's longer so we don't.
+     */    public void linearRotateToHeading(double target_heading, double speed, Telemetry telemetry) {
         target_heading *= -1;
         double current_heading = getCurrentHeading();
         double dHeading = target_heading - current_heading;
@@ -546,44 +561,23 @@ public class newAutonMethods {
         current_target_heading = target_heading;
     }
 
+    /**
+     * This method checks if the parameter is positive or negative, which is used to check if the
+     * rotateToHeading needs to rotate clockwise or counterclockwise.
+     * @param val - Interval can be anything.
+     * @return - Returns -1 if a negative number is inputted and 1 if a positive number is inputted.
+     */
     int checkDirection(double val){
         if (val < 0)
             return -1;
         else return 1;
     }
 
-    public void FieldCentric(double speed, HardwareMap map) {
-        double theta = getCurrentHeading()*(Math.PI/180);
-        double forward = (myOpMode.gamepad1.left_stick_x * Math.sin(theta) + myOpMode.gamepad1.left_stick_y * Math.cos(theta));
-        double strafe = (myOpMode.gamepad1.left_stick_x * Math.cos(theta) - myOpMode.gamepad1.left_stick_y * Math.sin(theta));
-        double rotate = myOpMode.gamepad1.right_stick_x;
-
-        FrontL.setPower((-forward + strafe + rotate) * speed);
-        FrontR.setPower((-forward - strafe - rotate) * speed);
-        BackL.setPower((-forward - strafe + rotate) * speed);
-        BackR.setPower((-forward + strafe - rotate) * speed);
-
-        if (myOpMode.gamepad1.right_trigger > 0 && myOpMode.gamepad1.left_trigger > 0) {
-            resetYaw();
-        }
-        myOpMode.telemetry.addData("wtf",-forward-strafe+rotate);
-        myOpMode.telemetry.addData("Forward",forward);
-        myOpMode.telemetry.addData("Strafe",strafe);
-        myOpMode.telemetry.addData("Rotate",rotate);
-        myOpMode.telemetry.addData("Currentheading",getCurrentHeading());
-    }
-    public void RobotCentric(double speed) {
-        double FWD = myOpMode.gamepad1.left_stick_y;
-        double STR = myOpMode.gamepad1.left_stick_x;
-        double ROT = myOpMode.gamepad1.right_stick_x;
-        speed = speed * -1;
-
-        FrontL.setPower((FWD + STR + ROT) * (speed));
-        FrontR.setPower((FWD - STR + ROT) * (speed));
-        BackL.setPower((FWD - STR - ROT) * (speed));
-        BackR.setPower((FWD + STR - ROT) * (speed));
-    }
-
+    /**
+     * This method is used at the end of other methods to ensure all motors are at zero power. The alternative,
+     * stopping with commands, might result in never stopping or a large distance at the end of each method,
+     * during which the robot slowly slows to a halt.
+     */
     public void Stop(){
         FrontL.setPower(0);
         FrontR.setPower(0);
@@ -596,15 +590,29 @@ public class newAutonMethods {
         BackR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
+    /**
+     * This method uses the 2023 universal IMU code (works for both BHI260AP and BNO055 chips) and
+     * the Control Hub's or Expansion Hub's IMU chip to figure out the robots heading. This value
+     * does not reset when switching from Autonomous to Tele-Op opmodes. We use this method for autonomous
+     * because we have more intuition with degrees.
+     * @return - Returns the robots current heading, in degrees.
+     */
     public double getCurrentHeading() {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         return (orientation.getYaw(AngleUnit.DEGREES));
     }
 
+    /**
+     * ResetYaw is one of the new IMU methods, and it resets the yaw of the robot. When implemented correctly,
+     * yaw is the only rotate axis you want to change.
+     */
     public void resetYaw() {
         imu.resetYaw();
     }
 
+    /**
+     * This method resets the encoders to a new zero position, so the next method starts from position zero again.
+     */
     public void calibrateEncoders() {
         FrontL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         FrontR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

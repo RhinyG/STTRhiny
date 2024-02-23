@@ -198,7 +198,8 @@ public class MecanumDrivetrain {
      * @param speed - Is how fast you want to travel. In autonomous, it is generally smart to move slowly,
      *              because that gives you more precision. If you run into time constraints, you can try going quicker.
      * @param telemetry - Gives telemetry from the opmode for the method to use. Not having this parameter would result in an NPE.
-     *                  This can alternatively be done with myOpMode.telemetry.addData but that's longer so we don't.     */
+     *                  This can alternatively be done with myOpMode.telemetry.addData but that's longer so we don't.
+     */
     public void rotateToHeading(double target_heading, double speed, Telemetry telemetry) {
         double current_heading = -getCurrentHeadingDegrees();
         double dHeading = target_heading - current_heading;
@@ -298,7 +299,7 @@ public class MecanumDrivetrain {
         BackR.setPower(BackRPower/maxPower);
     }
 
-//TODO: documentation
+//TODO: delete if other method works
     public void IMUBackBoardCorrection(String alliance,double offsetYaw,double offsetZ, Telemetry telemetry) {
         double STR;
         double FWD = 0;
@@ -441,6 +442,7 @@ public class MecanumDrivetrain {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         return (orientation.getYaw(AngleUnit.RADIANS));
     }
+
     /**
      * This method resets the encoders to a new zero position, so the next method starts from position zero again.
      */

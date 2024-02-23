@@ -17,29 +17,41 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 public class OpenCVTeamPropDetection {
+    public enum robotPositions {
+        BlueBackstage,
+        BlueWing,
+        RedBackstage, //.1
+        RedWing
+    }
     LinearOpMode myOpMode;
-    OpenCvWebcam webcam1 = null;
+    OpenCvWebcam webcam = null;
 
     public int pos = 1; //Left 0, Middle 1, Right 2
     double leftAvgFin;
     double rightAvgFin;
     public OpenCVTeamPropDetection(LinearOpMode opMode) {
         myOpMode = opMode;
-        telemetry = myOpMode.telemetry;
-        map = myOpMode.hardwareMap;
+        telemetry = opMode.telemetry;
+        map = opMode.hardwareMap;
     }
     Telemetry telemetry;
     HardwareMap map;
-    public void findScoringPosition(boolean IsTrussRight) {
-        WebcamName webcamName = map.get(WebcamName.class, "Webcam 1");
-        int cameraMonitorViewId = map.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", map.appContext.getPackageName());
-        webcam1 = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
 
-        webcam1.setPipeline(new brightnessPipeline(IsTrussRight));
-        webcam1.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+    public void findScoringPosition(robotPositions robotPos, HardwareMap map) {
+        WebcamName webcamName;
+        if (robotPos == robotPositions.RedWing || robotPos == robotPositions.RedBackstage) {
+             webcamName = map.get(WebcamName.class, "Webcam Right");
+        } else {
+            webcamName = map.get(WebcamName.class, "Webcam Left");
+        }
+        int cameraMonitorViewId = map.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", map.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+
+        webcam.setPipeline(new brightnessPipeline(robotPos));
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                webcam1.startStreaming(1280,720, OpenCvCameraRotation.UPRIGHT);
+                webcam.startStreaming(1280,720, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -48,15 +60,21 @@ public class OpenCVTeamPropDetection {
             }
         });
     }
+    public void stopStreaming(){
+        webcam.stopStreaming();
+    }
     class brightnessPipeline extends OpenCvPipeline {
-        boolean TrussIsRight;
-        brightnessPipeline(boolean IsTrussRight){TrussIsRight = IsTrussRight;}
-        //TODO: I changed the name of this to HSV, from YCbCr. This might break shit?
+        robotPositions robotPos;
+        brightnessPipeline(robotPositions robotPosition){robotPos = robotPosition;}
         Mat HSV = new Mat();
-        Rect trussLeftMidRect = new Rect(300,255, 180, 199);
-        Rect trussLeftRightRect = new Rect(820, 260, 230, 240);
-        Rect trussRightMidRect = new Rect(650,370, 180, 199);
-        Rect trussRightLeftRect = new Rect(0, 380, 220, 260);
+        Rect pos0LeftRect = new Rect(190,330, 200, 220);
+        Rect pos0RightRect = new Rect(690, 220, 180, 220);
+        Rect pos1LeftRect = new Rect(390,270, 190, 210);
+        Rect pos1RightRect = new Rect(960, 220, 200, 225);
+        Rect pos2LeftRect = new Rect(390,310, 180, 199);
+        Rect pos2RightRect = new Rect(820, 430, 220, 240);
+        Rect pos3LeftRect = new Rect(80,340, 200, 230);
+        Rect pos3RightRect = new Rect(660, 360, 190, 210);
         Mat outPut = new Mat();
         Scalar redColor = new Scalar(255.0, 0.0, 0.0);
         Scalar greenColor = new Scalar(0.0, 255.0, 0.0);
@@ -66,20 +84,28 @@ public class OpenCVTeamPropDetection {
             input.copyTo(outPut);
             Mat leftCrop;
             Mat rightCrop;
-            if (TrussIsRight) {
-                Imgproc.rectangle(outPut, trussRightLeftRect, redColor, 2);
-                Imgproc.rectangle(outPut, trussRightMidRect, redColor, 2);
-                leftCrop = HSV.submat(trussRightLeftRect);
-                rightCrop = HSV.submat(trussRightMidRect);
-            } else {
-                Imgproc.rectangle(outPut, trussLeftMidRect, redColor, 2);
-                Imgproc.rectangle(outPut, trussLeftRightRect, redColor, 2);
-                leftCrop = HSV.submat(trussLeftMidRect);
-                rightCrop = HSV.submat(trussLeftRightRect);
+
+            Rect leftRect = pos0LeftRect;
+            Rect rightRect = pos0RightRect;
+
+            if (robotPos == robotPositions.RedWing) {
+                leftRect = pos3LeftRect;
+                rightRect = pos3RightRect;
+            } else if (robotPos == robotPositions.RedBackstage) {
+                leftRect = pos2LeftRect;
+                rightRect = pos2RightRect;
+            } else if (robotPos == robotPositions.BlueWing) {
+                leftRect = pos1LeftRect;
+                rightRect = pos1RightRect;
             }
 
+            Imgproc.rectangle(outPut, leftRect, redColor, 2);
+            Imgproc.rectangle(outPut, rightRect, redColor, 2);
+            leftCrop = HSV.submat(leftRect);
+            rightCrop = HSV.submat(rightRect);
+
             // For HSV: measures intensity so always use coi = 1. No clue what the other values do/measure/are.
-            //For YCbCr: Blue = 1, Red = 2
+            // For YCbCr: Blue = 1, Red = 2
             Core.extractChannel(leftCrop, leftCrop, 1);
             Core.extractChannel(rightCrop, rightCrop, 1);
 
@@ -92,24 +118,24 @@ public class OpenCVTeamPropDetection {
             telemetry.addData("valueLeft", leftAvgFin);
             telemetry.addData("valueRight", rightAvgFin);
 
-            if (TrussIsRight) {
+            if (robotPos == robotPositions.RedWing || robotPos == robotPositions.BlueBackstage) {
                 if (Math.abs(leftAvgFin - rightAvgFin) < 20) {
                     pos = 2;
                 } else if (rightAvgFin > leftAvgFin) {
-                    Imgproc.rectangle(outPut, trussRightMidRect, greenColor, 2);
+                    Imgproc.rectangle(outPut, leftRect, greenColor, 2);
                     pos = 1;
                 } else if (leftAvgFin > rightAvgFin) {
-                    Imgproc.rectangle(outPut, trussRightLeftRect, greenColor, 2);
+                    Imgproc.rectangle(outPut, rightRect, greenColor, 2);
                     pos = 0;
                 }
             } else {
                 if (Math.abs(leftAvgFin - rightAvgFin) < 20) {
                     pos = 0;
                 } else if (rightAvgFin > leftAvgFin) {
-                    Imgproc.rectangle(outPut, trussLeftRightRect, greenColor, 2);
+                    Imgproc.rectangle(outPut, rightRect, greenColor, 2);
                     pos = 2;
                 } else {
-                    Imgproc.rectangle(outPut, trussLeftMidRect, greenColor, 2);
+                    Imgproc.rectangle(outPut, leftRect, greenColor, 2);
                     pos = 1;
                 }
             }

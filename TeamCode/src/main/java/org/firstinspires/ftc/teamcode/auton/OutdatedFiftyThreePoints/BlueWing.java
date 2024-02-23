@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auton.FiftyThreePoints;
+package org.firstinspires.ftc.teamcode.auton.OutdatedFiftyThreePoints;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -26,11 +26,11 @@ public class BlueWing extends LinearOpMode {
             int finalPos = camera.pos;
             telemetry.addData("localPos", camera.pos);
             if (finalPos == 0) {
-                methods.driveY(-90);
-                methods.rotateToHeading(90);
-                methods.driveX(-10);
-                methods.driveY(-20);
-                methods.driveY(25);
+                methods.linearDriveY(-90);
+                methods.linearRotateToHeading(90);
+                methods.linearDriveX(-10);
+                methods.linearDriveY(-20);
+                methods.linearDriveY(25);
 //                methods.driveY(40);
 //                methods.driveX(-60);
 ////                methods.driveY(-230);
@@ -41,8 +41,8 @@ public class BlueWing extends LinearOpMode {
 //                methods.driveX(50);
 //                methods.driveY(-30);
             } else if (finalPos == 1) {
-                methods.driveY(-110);
-                methods.driveY(20);
+                methods.linearDriveY(-110);
+                methods.linearDriveY(20);
 //                methods.driveX(-90);
 //                methods.driveY(-100);
 //                methods.rotateToHeading(90);
@@ -54,9 +54,9 @@ public class BlueWing extends LinearOpMode {
 //                methods.driveX(80);
 //                methods.driveY(-30);
             } else if (finalPos == 2){
-                methods.driveX(-16);
-                methods.driveY(-90);
-                methods.driveY(30);
+                methods.linearDriveX(-16);
+                methods.linearDriveY(-90);
+                methods.linearDriveY(30);
 //                methods.driveX(50);
 //                methods.driveY(-115);
 //                methods.rotateToHeading(90);

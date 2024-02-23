@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.drive.tests;
+package org.firstinspires.ftc.teamcode.drive;
 
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmExtendPos.FULL;
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ArmExtendPos.ZERO;
@@ -26,8 +26,8 @@ public class KookyKooker extends LinearOpMode {
     Crumblz arm = new Crumblz(this);
 
     Servo plane;
-
     DcMotor hook;
+    Servo hookServo;
 
     boolean extendButtonMode = false;
     boolean rotateButtonMode = false;
@@ -51,6 +51,8 @@ public class KookyKooker extends LinearOpMode {
         plane = hardwareMap.servo.get("plane");
 
         hook = hardwareMap.dcMotor.get("hook");
+        hookServo = hardwareMap.servo.get("hookServo");
+        hookServo.setPosition(0);
 
         waitForStart();
 
@@ -67,8 +69,8 @@ public class KookyKooker extends LinearOpMode {
             boolean RotateIntakeButton = gamepad1.a;
             boolean RotateOuttakeButton = gamepad1.b;
 
-            boolean planeLaunch = gamepad1.dpad_up;
-            boolean planeReset = gamepad1.dpad_down;
+            boolean planeLaunch = gamepad2.dpad_left;
+            boolean planeReset = gamepad2.dpad_right;
 
             double hookPower = gamepad2.right_trigger - gamepad2.left_trigger;
             boolean fold = gamepad2.right_bumper;
@@ -119,6 +121,12 @@ public class KookyKooker extends LinearOpMode {
             if(gamepad1.y){
                 arm.armRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 arm.armRotate.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+
+            if (gamepad2.dpad_up) {
+                hookServo.setPosition(0.35);
+            } else if (gamepad2.dpad_down) {
+                hookServo.setPosition(0);
             }
 
             arm.updateElbow(fold);

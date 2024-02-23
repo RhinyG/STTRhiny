@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auton.FiftyThreePoints;
+package org.firstinspires.ftc.teamcode.auton.OutdatedFiftyThreePoints;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -28,38 +28,38 @@ public class RedBackstage extends LinearOpMode {
             int finalPos = camera.pos;
             telemetry.addData("localPos", camera.pos);
             if (finalPos == 0) {
-                methods.driveY(-90);
-                methods.rotateToHeading(90);
-                methods.driveX(-20);
-                methods.driveY(-25);
-                methods.driveY(40);
-                methods.driveX(35);
-                methods.rotateToHeading(-90);
-                methods.driveY(-140, 0.2, telemetry, 7000);
+                methods.linearDriveY(-90);
+                methods.linearRotateToHeading(90);
+                methods.linearDriveX(-20);
+                methods.linearDriveY(-25);
+                methods.linearDriveY(40);
+                methods.linearDriveX(35);
+                methods.linearRotateToHeading(-90);
+                methods.linearDriveY(-140, 0.2, telemetry, 7000);
                 slides.dropYellowPixel();
-                methods.driveY(20);
-                methods.driveX(-90);
+                methods.linearDriveY(20);
+                methods.linearDriveX(-90);
             } else if (finalPos == 1) {
-                methods.driveY(-110);
-                methods.driveY(30);
-                methods.rotateToHeading(-90);
-                methods.driveY(-155, 0.2, telemetry, 6000);
-                methods.driveY(-10, 0.2, telemetry, 2500);
+                methods.linearDriveY(-110);
+                methods.linearDriveY(30);
+                methods.linearRotateToHeading(-90);
+                methods.linearDriveY(-155, 0.2, telemetry, 6000);
+                methods.linearDriveY(-10, 0.2, telemetry, 2500);
                 slides.dropYellowPixel();
-                methods.driveY(20);
-                methods.driveX(-80);
-                methods.driveY(-30);
+                methods.linearDriveY(20);
+                methods.linearDriveX(-80);
+                methods.linearDriveY(-30);
             } else if (finalPos == 2){
-                methods.driveX(-12);
-                methods.driveY(-90);
-                methods.driveY(30);
-                methods.rotateToHeading(-90);
-                methods.driveY(-115, 0.2, telemetry, 7000);
-                methods.driveX(10);
-                methods.driveY(-4, 0.2, telemetry, 2000);
+                methods.linearDriveX(-12);
+                methods.linearDriveY(-90);
+                methods.linearDriveY(30);
+                methods.linearRotateToHeading(-90);
+                methods.linearDriveY(-115, 0.2, telemetry, 7000);
+                methods.linearDriveX(10);
+                methods.linearDriveY(-4, 0.2, telemetry, 2000);
                 slides.dropYellowPixel();
-                methods.driveX(-60);
-                methods.driveY(-30);
+                methods.linearDriveX(-60);
+                methods.linearDriveY(-30);
             }
             slides.autonGoToHeight(PixelManipulation.ArmHeight.INTAKE, 0, telemetry);
             sleep(30000);

@@ -66,9 +66,6 @@ public class LM2RobotCentric extends LinearOpMode {
 
             double wristX = gamepad2.left_stick_x;
             double wristY = -gamepad2.left_stick_y;
-//TODO idk of deze dpad up nuttig is voor teleop plus igor wil dpad up voor de chain movement
-
-
 
             boolean clawGrabTwo = gamepad2.right_bumper;
             boolean clawRelease = gamepad2.left_bumper;

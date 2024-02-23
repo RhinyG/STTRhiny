@@ -1,6 +1,4 @@
 package org.firstinspires.ftc.teamcode.auton.tests;
-//TODO: import acmerobotics to access FTC dashboard
-
 //import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;

@@ -10,16 +10,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Crumblz extends RobotPart {
-
+//TODO: explain variables
     private final LinearOpMode myOpMode;
     public Servo clawLeft;
     public Servo clawRight;
-    public Servo wrist;
     public Servo elbow;
     public DcMotorEx armExtend;
     public DcMotorEx armRotate;
     public int state;
-
+//TODO: explain enumerators
     public enum ArmRotatePos {
         INTAKEGROUND(0),
         OUTTAKEFRONT(1300),
@@ -36,8 +35,6 @@ public class Crumblz extends RobotPart {
 
     public enum ArmExtendPos {
         ZERO(0),
-        ONETHIRD(260),
-        TWOTHIRDS(520),
         FULL(780);
 
         private final int position;
@@ -64,7 +61,7 @@ public class Crumblz extends RobotPart {
 
     public enum ElbowPositions {
         INTAKEPOS(0.075),//0.15
-        STACKFIVEPOS(0.03),
+        STACKFIVEPOS(0.095),
         OUTTAKEFRONTSIDEPOS(0.075), //.1
         OUTTAKEBACKSIDEPOS(0.76),
         FOLDPOS(0.8);
@@ -79,24 +76,6 @@ public class Crumblz extends RobotPart {
         }
     }
 
-    public enum WristPositions {
-        INTAKEPOS(0.65),//0.39 is servo to armExtend, 0.63 is servo away
-        ONE(0.35),
-        TWO(0.52),
-        THREE(0.72),
-        FOUR(0.91),
-        FIVE(0.208),
-        SIX(0.97);
-
-        private final double position;
-        public double getPosition() {
-            return this.position;
-        }
-        WristPositions(double position) {
-            this.position = position;
-        }
-    }
-
     public enum ClawPositions {
         OPENLEFT(0.69),
         RELEASELEFT(0.50),
@@ -106,30 +85,33 @@ public class Crumblz extends RobotPart {
         GRABRIGHT(0.7);
 
         private final double position;
-
         public double getPosition() {
             return this.position;
         }
-
         ClawPositions(double position) {
             this.position = position;
         }
     }
 
+    /**
+     * This is the constructor.
+     * @param opmode is opmode from LinearOpMode file
+     */
     public Crumblz(LinearOpMode opmode) {
         myOpMode = opmode;
     }
+
     /**
-     * Init
-     * @param map otherwise NPE
+     * This methods initialises the pixel manipulation mechanisms and sets all the directions and modes to their correct settings.
+     * @param map - Gives a hardwareMap from the opmode for the method to use. Not having this parameter would result in an NPE.
+     *            This can alternatively be done with myOpMode.hardwareMap.get but that's longer so we don't.
+     *            It can also probably be done via the constructor but I haven't managed to do that yet.
      */
     public void init(HardwareMap map) {
         elbow = map.get(Servo.class,"elbow");
-        wrist = map.get(Servo.class, "wrist");
         clawLeft = map.get(Servo.class, "clawLeft");
         clawRight = map.get(Servo.class, "clawRight");
 
-        wrist.setPosition(WristPositions.INTAKEPOS.getPosition());
         elbow.setPosition(ElbowPositions.FOLDPOS.getPosition());
         clawLeft.setPosition(ClawPositions.GRABLEFT.getPosition());
         clawRight.setPosition(ClawPositions.GRABRIGHT.getPosition());
@@ -149,53 +131,12 @@ public class Crumblz extends RobotPart {
         resetEncoders();
     }
 
-    /**
-     * This updates the claws to a (new) position
-     */
+   //TODO: documentation
     public void updateClaw(ClawPositions positionLeft, ClawPositions positionRight) {
         clawLeft.setPosition(positionLeft.getPosition());
         clawRight.setPosition(positionRight.getPosition());
     }
-
-    public void updateWrist(double x, double y) {
-        double theta;
-        double r = Math.sqrt(x * x + y * y);
-        WristPositions outtakePos;
-
-        if (x >= 0 && y >= 0) {
-            theta = Math.atan(y / x);
-        } else if (x<0) {
-            theta = Math.atan(y / x) + Math.PI;
-        } else {
-            theta = Math.atan(y / x) + 2 * Math.PI;
-        }
-
-        if(r > 0.5){
-            if (theta < 2.0/6.0*Math.PI) {
-                outtakePos = WristPositions.ONE;
-            } else if (theta < 4.0/6.0*Math.PI) {
-                outtakePos = WristPositions.TWO;
-            } else if (theta < /*6.0/6.0**/Math.PI) {
-                outtakePos = WristPositions.THREE;
-            } else if (theta < 8.0/6.0*Math.PI) {
-                outtakePos = WristPositions.FOUR;
-            } else if (theta < 10.0/6.0*Math.PI) {
-                outtakePos = WristPositions.FIVE;
-            } else {
-                outtakePos = WristPositions.SIX;
-            }
-            telemetry.addData("wristPos",outtakePos);
-
-        } else if (myOpMode.gamepad2.left_stick_button) {
-            outtakePos = WristPositions.INTAKEPOS;
-            telemetry.addData("Going for neutral",outtakePos);
-        }
-    }
-
-    //0.64 rotate 48, 0.707 rotate 790
-    //servo pos = (0.707-0.64)/(790-48) * armRotate.getCurrentPosition + b
-    // b = 0.707 - (0.707-0.64)/(790-48) * 790 = 0.635
-    //servo pos = (0.707-0.64)/(790-48) * armRotate.getCurrentPosition + 0.635
+    //TODO: documentation
     public void updateElbow(boolean fold) {
         double position;
         if (fold) {
@@ -212,6 +153,7 @@ public class Crumblz extends RobotPart {
         elbow.setPosition(position);
     }
 
+    //TODO: documentation
     public double slidesGoToHeight(int position, double power, Telemetry telemetry) {
         double margin = 50.0;
         double currentPosLeft = armExtend.getCurrentPosition();
@@ -238,6 +180,7 @@ public class Crumblz extends RobotPart {
         return distance;
     }
 
+    //TODO: documentation
     public void updateSlide(boolean buttonMode, double power, Crumblz.ArmExtendPos height, Telemetry telemetry) {
         double distance = 0;
         if (buttonMode) {
@@ -267,6 +210,8 @@ public class Crumblz extends RobotPart {
             telemetry.addData("distance to goal", distance);
         }
     }
+
+    //TODO: documentation
     public double rotateToPos(int position, double power, Telemetry telemetry) {
         double margin = 60.0;
         double currentPosLeft = armRotate.getCurrentPosition();
@@ -293,6 +238,7 @@ public class Crumblz extends RobotPart {
         return distance;
     }
 
+    //TODO: documentation
     public void updateRotate(boolean buttonMode, double power, Crumblz.ArmRotatePos height, int holdSlides, Telemetry telemetry) {
         double distance = 0;
         double slideHeight = armExtend.getCurrentPosition();
@@ -330,6 +276,7 @@ public class Crumblz extends RobotPart {
         }
     }
 
+    //TODO: documentation
     public void secretRotate(double power) {
         int position = armRotate.getCurrentPosition();
         armRotate.setPower(power);
@@ -337,6 +284,8 @@ public class Crumblz extends RobotPart {
         telemetry.addData("rotate", position);
         telemetry.addData("rotate power", armRotate.getPower());
     }
+
+    //TODO: documentation
     public void secretSlide(double power) {
         int position = armExtend.getCurrentPosition();
         armExtend.setPower(power);
@@ -344,6 +293,8 @@ public class Crumblz extends RobotPart {
         telemetry.addData("slide", position);
         telemetry.addData("slide power", armExtend.getPower());
     }
+
+    //TODO: documentation
     public void autonArm(int var){
         armRotate.setTargetPosition(var);
         armRotate.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -358,6 +309,8 @@ public class Crumblz extends RobotPart {
         }
         armRotate.setPower(0);
     }
+
+    //TODO: documentation
     public void autonSlide(int var){
         armExtend.setTargetPosition(var);
         armExtend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -372,6 +325,8 @@ public class Crumblz extends RobotPart {
         }
         armExtend.setPower(0.3);
     }
+
+    //TODO: documentation
     public void FSMArm(int var, double speed){
         if (Math.abs(armRotate.getCurrentPosition() - var) > 100) {
             if (armRotate.getCurrentPosition() > var) {
@@ -387,8 +342,10 @@ public class Crumblz extends RobotPart {
             }
         }
     }
+
+    //TODO: documentation
     public void FSMSlide(int var, double speed){
-        if (Math.abs(armExtend.getCurrentPosition() - var) > 125) {
+        if (Math.abs(armExtend.getCurrentPosition() - var) > 175) {
             if (armExtend.getCurrentPosition() > var) {
                 armExtend.setPower(-speed);
             } else {
@@ -410,4 +367,5 @@ public class Crumblz extends RobotPart {
             }
         }
     }
+    //TODO: FSM PIDF-controller
 }

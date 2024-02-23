@@ -1,32 +1,42 @@
 package org.firstinspires.ftc.teamcode.auton.tests;
 
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.arcrobotics.ftclib.controller.PIDController;
 
 import org.firstinspires.ftc.teamcode.robotParts.Crumblz;
+import org.firstinspires.ftc.teamcode.robotParts.OpenCVTeamPropDetection;
 import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
-@Autonomous(name = "FSM Test", group = "Test")
-public class FSMTest extends LinearOpMode {
+
+@Autonomous(name = "RB 2+2", group = "B")
+public class SixtyRed extends LinearOpMode {
     newAutonMethods drive = new newAutonMethods(this);
     Crumblz arm = new Crumblz(this);
+//    OpenCVTeamPropDetection camera = new OpenCVTeamPropDetection(this);
 
-    public static double p = 0.008, i = 0, d = 0;
-    public static double f = 0.08;
-    public static int rotateGoal;
-
-    double armTimer;
-    int slideGoal;
-    double slideSpeed = 0.7;
-
+    double
+            p = 0.008,
+            i = 0,
+            d = 0,
+            f = 0.08,
+            armTimer,
+            slideSpeed = 0.7;
+    int
+            rotateGoal,
+            slideGoal;
     @Override
     public void runOpMode() {
         drive.init(hardwareMap);
         arm.init(hardwareMap);
+//        camera.findScoringPosition(OpenCVTeamPropDetection.robotPositions.RedBackstage,hardwareMap);
         PIDController controller = new PIDController(p, i, d);
 
-        //44.5
         waitForStart();
+
+//        camera.stopStreaming();
+
+        int finalPos = 0;
+
         while (opModeIsActive()){
             telemetry.addData("Global Drive state",drive.state);
             telemetry.addData("driveState",drive.driveState);
@@ -37,7 +47,13 @@ public class FSMTest extends LinearOpMode {
                     drive.state++;
                     break;
                 case 1:
-                    drive.drive(89,-85,0.7,3000);
+                    if (finalPos == 0) {
+                        drive.drive(96, -85, 0.7, 3000);
+                    } else if (finalPos == 1) {
+                        drive.drive(79,-85,0.7,3000);
+                    } else if (finalPos == 2) {
+                        drive.drive(55,-85,0.7,3000);
+                    }
                     if (drive.driveState == 2) {
                         drive.state++;
                         drive.driveState = 0;
@@ -45,7 +61,13 @@ public class FSMTest extends LinearOpMode {
                     break;
                 case 2:
                     if (System.currentTimeMillis() > 100 + armTimer) {
-                        drive.drive(-10,42,0.4,2500);
+                        if (finalPos == 0) {
+                            drive.drive(-13,40,0.4,2500);
+                        } else if (finalPos == 1) {
+                            drive.drive(21,13,0.4,2500);
+                        } else if (finalPos == 2) {
+                            drive.drive(26,35,0.4,2500);
+                        }
                     }
                     if (drive.driveState == 2) {
                         drive.state++;
@@ -54,7 +76,7 @@ public class FSMTest extends LinearOpMode {
                     break;
                 case 3:
                     if (arm.state > 5) {
-                        drive.drive(54,20,0.8,3500);
+                        drive.drive(54,-10,0.7,2500);
                     }
                     if (drive.driveState == 2) {
                         drive.state++;
@@ -62,45 +84,29 @@ public class FSMTest extends LinearOpMode {
                     }
                     break;
                 case 4:
-                    drive.drive(0,130,0.7,5000);
+                    drive.drive(18,196,0.7,5000);
                     if (drive.driveState == 2) {
                         drive.state++;
                         drive.driveState = 0;
                     }
                     break;
                 case 5:
-                    drive.drive(-5,15,0.5,2000);
-                    if (drive.driveState == 2) {
-                        drive.state++;
-                        drive.driveState = 0;
-                    }
-                    break;
-                case 6:
-                    if (System.currentTimeMillis() > 100 + armTimer) {
-                        drive.drive(0,-200,6000);
-                    }
-                    if (drive.driveState == 2) {
-                        drive.state++;
-                        drive.driveState = 0;
-                    }
-                    break;
-                case 7:
-                    drive.drive(-70,-45,2500);
+                    drive.drive(0,15,0.3,5000);
                     if (drive.driveState == 2) {
                         drive.state++;
                         drive.driveState = 0;
                     }
                     break;
             }
+
             switch (arm.state) {
                 case 0:
-                    rotateGoal = 2900;
+                    rotateGoal = 2800;
                     arm.state++;
                     break;
                 case 1:
-                case 11:
                     if (Math.abs(arm.armRotate.getCurrentPosition()-rotateGoal) < 1000) {
-                        slideGoal = 500;
+                        slideGoal = 360;
                         arm.armExtend.setTargetPosition(slideGoal);
                         arm.state++;
                     }
@@ -113,7 +119,6 @@ public class FSMTest extends LinearOpMode {
                     }
                     break;
                 case 3:
-                case 13:
                     if (System.currentTimeMillis() > 100 + armTimer) {
                         rotateGoal = 320;
                         slideGoal = 0;
@@ -124,89 +129,38 @@ public class FSMTest extends LinearOpMode {
                     break;
                 case 4:
                     if(Math.abs(arm.armRotate.getCurrentPosition() - rotateGoal) < 100) {
-                        slideGoal = 850;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        if (finalPos != 2) {
+                            slideGoal = 850;
+                            arm.armExtend.setTargetPosition(slideGoal);
+                        }
                         arm.state++;
                     }
                     break;
                 case 5:
                     if(Math.abs(slideGoal - arm.armExtend.getCurrentPosition()) < 10) {
                         arm.clawRight.setPosition(Crumblz.ClawPositions.RELEASERIGHT.getPosition());
-                        rotateGoal = 320;
+                        rotateGoal = 600;
                         slideGoal = 0;
                         arm.armExtend.setTargetPosition(slideGoal);
                         arm.state++;
-                        armTimer = System.currentTimeMillis();
                     }
                     break;
                 case 6:
                     if (drive.state > 3) {
                         slideGoal = 500;
                         arm.armExtend.setTargetPosition(slideGoal);
+                        rotateGoal = 300;
                         arm.clawLeft.setPosition(Crumblz.ClawPositions.OPENLEFT.getPosition());
-                        arm.state++;
-                    }
-                    break;
-                case 7:
-                    if (Math.abs(arm.armRotate.getCurrentPosition() - rotateGoal) < 20 && Math.abs(arm.armExtend.getCurrentPosition() - slideGoal) < 20) {
                         arm.elbow.setPosition(Crumblz.ElbowPositions.STACKFIVEPOS.getPosition());
-                        arm.state++;
                     }
-                    break;
-                case 8:
+                case 7:
                     if (drive.state > 5) {
                         arm.clawLeft.setPosition(Crumblz.ClawPositions.GRABLEFT.getPosition());
                         arm.state++;
                         armTimer = System.currentTimeMillis();
                     }
                     break;
-                case 9:
-                    if (System.currentTimeMillis() > 100 + armTimer) {
-                        slideGoal = 200;
-                        arm.armExtend.setTargetPosition(slideGoal);
-                        arm.state++;
-                    }
-                    break;
-                case 10:
-                    if (drive.state > 6) {
-                        rotateGoal = 2900;
-                        arm.state++;
-                    }
-                    break;
-                case 12:
-                    if (drive.state >= 7) {
-                        arm.clawLeft.setPosition(Crumblz.ClawPositions.RELEASELEFT.getPosition());
-                        armTimer = System.currentTimeMillis();
-                        arm.state++;
-                    }
-                    break;
             }
-//            switch (arm.state) {
-//                case 0:
-//                    arm.elbow.setPosition(Crumblz.ElbowPositions.INTAKEPOS.getPosition());
-//                    arm.clawLeft.setPosition(Crumblz.ClawPositions.OPENLEFT.getPosition());
-//                    rotateGoal = 310;
-//                    slideGoal = 500;
-//                    arm.armExtend.setTargetPosition(slideGoal);
-//                    arm.state++;
-//                    break;
-//                case 1:
-//                    if (Math.abs(arm.armRotate.getCurrentPosition() - rotateGoal) < 20 && Math.abs(arm.armExtend.getCurrentPosition() - slideGoal) < 20) {
-//                        arm.elbow.setPosition(Crumblz.ElbowPositions.STACKFIVEPOS.getPosition());
-//                        armTimer = System.currentTimeMillis();
-//                        arm.state++;
-//                    }
-//                    break;
-//                case 2:
-//                    arm.clawLeft.setPosition(Crumblz.ClawPositions.GRABLEFT.getPosition());
-//                    arm.state++;
-//                    armTimer = System.currentTimeMillis();
-//                case 3:
-//                    if(armTimer + 500 < System.currentTimeMillis()) {
-//                        rotateGoal = 700;
-//                        slideGoal = 100;
-//                    }
-//            }
 
             controller.setPID(p,i,d);
             int armPos = arm.armRotate.getCurrentPosition();

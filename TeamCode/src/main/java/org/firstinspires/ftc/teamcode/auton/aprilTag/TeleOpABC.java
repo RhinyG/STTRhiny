@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.auton.aprilTag;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -14,11 +14,12 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
+
 import java.util.ArrayList;
 
-@Autonomous(name = "linearABC", group = "Test")
-public class AprilTagCorrection extends LinearOpMode {
-    newAutonMethods auton = new newAutonMethods(this);
+@TeleOp(group = "Test")
+public class TeleOpABC extends LinearOpMode {
+    newAutonMethods drive = new newAutonMethods(this);
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -36,7 +37,7 @@ public class AprilTagCorrection extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        auton.init(hardwareMap);
+        drive.init(hardwareMap);
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
@@ -84,13 +85,10 @@ public class AprilTagCorrection extends LinearOpMode {
                 telemetry.update();
             }
 
-
-
             //TODO: Test this shit
-            auton.linearAprilTagBackboardCorrection(AvgYawToBackBoard,AvgPoseZToBackBoard,telemetry);
-
-
-            sleep(30000);
+            if (gamepad1.right_stick_button) {
+                drive.AprilTagBackboardCorrection(AvgYawToBackBoard, AvgPoseZToBackBoard, telemetry);
+            }
         }
     }
 }
