@@ -74,6 +74,12 @@ public class newAutonMethods {
 
         imu.initialize(new IMU.Parameters(orientationOnRobot));
         resetYaw();
+        resetYaw();
+        resetYaw();
+        resetYaw();
+        resetYaw();
+        myOpMode.telemetry.addData("heading",getCurrentHeading());
+        myOpMode.telemetry.update();
     }
 
     /**

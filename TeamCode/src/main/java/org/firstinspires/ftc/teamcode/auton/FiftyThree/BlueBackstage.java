@@ -49,11 +49,11 @@ public class BlueBackstage extends LinearOpMode {
                     break;
                 case 1:
                     if (finalPos == 2) {
-                        drive.drive(-93, -85, 0.7, 3000);
+                        drive.drive(-91, -93, 0.7, 3000);
                     } else if (finalPos == 1) {
-                        drive.drive(-79,-85,0.7,3000);
+                        drive.drive(-77,-92,0.7,3000);
                     } else if (finalPos == 0) {
-                        drive.drive(-55,-85,0.7,3000);
+                        drive.drive(-68,-90,0.7,3000);
                     }
                     if (drive.driveState == 2) {
                         drive.state++;
@@ -63,11 +63,11 @@ public class BlueBackstage extends LinearOpMode {
                 case 2:
                     if (System.currentTimeMillis() > 100 + armTimer) {
                         if (finalPos == 2) {
-                            drive.drive(10,40,0.4,2500);
+                            drive.drive(10,47,0.4,2500);
                         } else if (finalPos == 1) {
-                            drive.drive(-21,13,0.4,2500);
+                            drive.drive(-21,22,0.4,2500);
                         } else if (finalPos == 0) {
-                            drive.drive(-26,35,0.4,2500);
+                            drive.drive(-17,47,0.4,2500);
                         }
                     }
                     if (drive.driveState == 2) {
@@ -78,11 +78,11 @@ public class BlueBackstage extends LinearOpMode {
                 case 3:
                     if (arm.state > 5) {
                         if (finalPos == 2) {
-                            drive.drive(75,-36,0.8,3800);
+                            drive.drive(-55,-30,0.8,3800);
                         } else if (finalPos == 1) {
-                            drive.drive(87,-15,0.8,3800);
+                            drive.drive(-55,-9,0.8,3800);
                         } else if (finalPos == 0) {
-                            drive.drive(75,-36,0.8,3800);
+                            drive.drive(-55,-30,0.8,3800);
                         }
                     }
                     if (drive.driveState == 2) {

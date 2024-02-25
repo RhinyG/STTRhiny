@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.robotParts.OpenCVTeamPropDetection;
 import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 
 @Autonomous(name = "RW 2+0 again", group = "A")
-public class RedBackstageAgain extends LinearOpMode {
+public class RedWingAgain extends LinearOpMode {
     newAutonMethods drive = new newAutonMethods(this);
     Crumblz arm = new Crumblz(this);
     OpenCVTeamPropDetection camera = new OpenCVTeamPropDetection(this);
@@ -65,7 +65,7 @@ public class RedBackstageAgain extends LinearOpMode {
                     } else if (finalPos == 1) {
                         drive.rotateToHeading(90, 0.3, telemetry);
                     } else {
-                        drive.drive(5,-84,0.4,2500);
+                        drive.rotateToHeading(180,0.3,telemetry);
                     }
                     if (drive.driveState == 2) {
                         drive.state++;
@@ -76,11 +76,13 @@ public class RedBackstageAgain extends LinearOpMode {
                 case 3:
                     if (System.currentTimeMillis() > 100 + armTimer) {
                         if (finalPos == 0) {
-                            drive.drive(60,0,0.4,2000);
+//                            drive.drive(60,0,0.4,2000);
+                            drive.state++;
                         } else if (finalPos == 1) {
                             drive.rotateToHeading(0, 0.3, telemetry);
                         } else {
-                            drive.drive(63,5,0.4,2500);
+//                            drive.drive(63,5,0.4,2500);
+                            drive.state++;
                         }
                     }
                     if (drive.driveState == 2) {
@@ -92,11 +94,13 @@ public class RedBackstageAgain extends LinearOpMode {
                 case 4:
                     if (arm.state > 4) {
                         if (finalPos == 0) {
-                            drive.drive(0,-205,0.3,7000);
+//                            drive.drive(0,-205,0.3,7000);
+                            drive.state++;
                         } else if (finalPos == 1) {
                             drive.drive(7, -200,0.3,7000);
                         } else {
-                            drive.drive(0,-121,0.3,7000);
+//                            drive.drive(0,-121,0.3,7000);
+                            drive.state++;
                         }
                     }
                     if (drive.driveState == 2) {
@@ -106,11 +110,13 @@ public class RedBackstageAgain extends LinearOpMode {
                     break;
                 case 5:
                     if (finalPos == 0) {
-                        drive.drive(-32, -53, 0.3, 2500);
+//                        drive.drive(-32, -53, 0.3, 2500);
+                        drive.state++;
                     } else if (finalPos == 1) {
                         drive.drive(-1, -53, 0.3, 2500);
                     } else {
-                        drive.drive(-88, -53, 0.3, 2500);
+//                        drive.drive(-88, -53, 0.3, 2500);
+                        drive.state++;
                     }
                     if (drive.driveState == 2) {
                         drive.state++;
@@ -120,11 +126,13 @@ public class RedBackstageAgain extends LinearOpMode {
                 case 6:
                     if (arm.state > 7) {
                         if (finalPos == 0) {
-                            drive.drive(33,5,0.7,3000);
+//                            drive.drive(33,5,0.7,3000);
+                            drive.state++;
                         } else if (finalPos == 1) {
                             drive.drive(57,5,0.7,3000);
                         } else {
-                            drive.drive(81,5,0.7,3000);
+//                            drive.drive(81,5,0.7,3000);
+                            drive.state++;
                         }
                     }
             }
@@ -148,7 +156,7 @@ public class RedBackstageAgain extends LinearOpMode {
                     break;
                 case 2:
                     if (System.currentTimeMillis() > 100 + armTimer) {
-                        if (finalPos == 2) {arm.elbow.setPosition(Crumblz.ElbowPositions.foldPos.getPosition());}
+//                        if (finalPos == 2) {arm.elbow.setPosition(Crumblz.ElbowPositions.foldPos.getPosition());}
                         arm.elbow.setPosition(Crumblz.ElbowPositions.stackFivePos.getPosition());
                         slideGoal = 0;
                         arm.armExtend.setTargetPosition(slideGoal);
@@ -157,38 +165,48 @@ public class RedBackstageAgain extends LinearOpMode {
                     break;
                 case 3:
                     if((Math.abs(arm.armExtend.getCurrentPosition() - slideGoal) < 20) && drive.state > 3){
-                        rotateGoal = 300;
+                        if (finalPos == 1) {
+                            rotateGoal = 300;
+                        }
                         arm.state++;
                     }
                     break;
                 case 4:
-                    arm.clawRight.setPosition((Crumblz.ClawPositions.grabRight.getPosition()));
-                    slideGoal = 0;
-                    arm.armExtend.setTargetPosition(slideGoal);
+                    if (finalPos == 1) {
+                        arm.clawRight.setPosition((Crumblz.ClawPositions.grabRight.getPosition()));
+                        slideGoal = 0;
+                        arm.armExtend.setTargetPosition(slideGoal);
+                    }
                     arm.state++;
                 case 5:
                     if (drive.state > 4) {
-                        arm.elbow.setPosition(Crumblz.ElbowPositions.outtakeBackSidePos.getPosition());
-                        rotateGoal = 2800;
-                        slideGoal = 360;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        if (finalPos == 1) {
+                            arm.elbow.setPosition(Crumblz.ElbowPositions.outtakeBackSidePos.getPosition());
+                            rotateGoal = 2800;
+                            slideGoal = 360;
+                            arm.armExtend.setTargetPosition(slideGoal);
+                        }
                         arm.state++;
                     }
                     break;
                 case 6:
                     if (drive.state > 5) {
-                        arm.clawRight.setPosition(Crumblz.ClawPositions.openRight.getPosition());
-                        arm.clawLeft.setPosition(Crumblz.ClawPositions.openLeft.getPosition());
-                        armTimer = System.currentTimeMillis();
+                        if (finalPos == 1) {
+                            arm.clawRight.setPosition(Crumblz.ClawPositions.openRight.getPosition());
+                            arm.clawLeft.setPosition(Crumblz.ClawPositions.openLeft.getPosition());
+                            armTimer = System.currentTimeMillis();
+                        }
                         arm.state++;
                     }
                     break;
                 case 7:
                     if (System.currentTimeMillis() > 100 + armTimer) {
-                        rotateGoal = 0;
-                        slideGoal = 0;
-                        arm.armExtend.setTargetPosition(slideGoal);
-                        arm.state++;
+                        if (finalPos == 1) {
+                            rotateGoal = 0;
+                            slideGoal = 0;
+                            arm.armExtend.setTargetPosition(slideGoal);
+                            arm.state++;
+                        }
                     }
                     break;
                 }

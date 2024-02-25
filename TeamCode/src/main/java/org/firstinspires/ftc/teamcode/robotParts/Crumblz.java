@@ -79,7 +79,7 @@ public class Crumblz extends RobotPart {
     public enum ClawPositions {
         openLeft(0.69),
         releaseLeft(0.50),
-        grabLeft(0.35),
+        grabLeft(0.33),
         openRight(0.38),
         releaseRight(0.52),
         grabRight(0.7);
