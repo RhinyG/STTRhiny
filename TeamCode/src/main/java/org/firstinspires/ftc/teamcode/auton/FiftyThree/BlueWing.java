@@ -27,8 +27,8 @@ public class BlueWing extends LinearOpMode {
             slideSpeed = 0.7;
     @Override
     public void runOpMode() {
-        drive.init(hardwareMap);
-        arm.init(hardwareMap);
+        drive.init();
+        arm.init();
         camera.findScoringPosition(OpenCVTeamPropDetection.robotPositions.BlueWing,hardwareMap);
         PIDController controller = new PIDController(p, i, d);
 
@@ -63,9 +63,9 @@ public class BlueWing extends LinearOpMode {
                     if (finalPos == 2) {
                         drive.state++;
                     } else if (finalPos == 1) {
-                        drive.rotateToHeading(-90, 0.3, telemetry);
+                        drive.rotateToHeading(-90, 0.3);
                     } else {
-                        drive.rotateToHeading(-180,0.3,telemetry);
+                        drive.rotateToHeading(-180,0.3);
                     }
                     if (drive.driveState == 2) {
                         drive.state++;
@@ -79,7 +79,7 @@ public class BlueWing extends LinearOpMode {
 //                            drive.drive(60,0,0.4,2000);
                             drive.state++;
                         } else if (finalPos == 1) {
-                            drive.rotateToHeading(0, 0.3, telemetry);
+                            drive.rotateToHeading(0, 0.3);
                         } else {
 //                            drive.drive(63,5,0.4,2500);
                             drive.state++;
@@ -142,7 +142,7 @@ public class BlueWing extends LinearOpMode {
                     if (drive.state > 1) {
                         rotateGoal = 320;
                         slideGoal = 150;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         armTimer = System.currentTimeMillis();
                         arm.state++;
                     }
@@ -159,12 +159,12 @@ public class BlueWing extends LinearOpMode {
 //                        if (finalPos == 2) {arm.elbow.setPosition(Crumblz.ElbowPositions.foldPos.getPosition());}
                         arm.elbow.setPosition(Crumblz.ElbowPositions.stackFivePos.getPosition());
                         slideGoal = 0;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;
                 case 3:
-                    if((Math.abs(arm.armExtend.getCurrentPosition() - slideGoal) < 20) && drive.state > 3){
+                    if((Math.abs(arm.armExtend1.getCurrentPosition() - slideGoal) < 20) && drive.state > 3){
                         if (finalPos == 1) {
                             rotateGoal = 300;
                         }
@@ -175,7 +175,7 @@ public class BlueWing extends LinearOpMode {
                     if (finalPos == 1) {
                         arm.clawRight.setPosition((Crumblz.ClawPositions.grabRight.getPosition()));
                         slideGoal = 0;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                     }
                     arm.state++;
                 case 5:
@@ -184,7 +184,7 @@ public class BlueWing extends LinearOpMode {
                             arm.elbow.setPosition(Crumblz.ElbowPositions.outtakeBackSidePos.getPosition());
                             rotateGoal = 2800;
                             slideGoal = 360;
-                            arm.armExtend.setTargetPosition(slideGoal);
+                            arm.armExtend1.setTargetPosition(slideGoal);
                         }
                         arm.state++;
                     }
@@ -204,7 +204,7 @@ public class BlueWing extends LinearOpMode {
                         if (finalPos == 1) {
                             rotateGoal = 0;
                             slideGoal = 0;
-                            arm.armExtend.setTargetPosition(slideGoal);
+                            arm.armExtend1.setTargetPosition(slideGoal);
                             arm.state++;
                         }
                     }

@@ -19,7 +19,8 @@ public class newAutonMethods {
     //TODO: explain variables
     private final LinearOpMode myOpMode;
     private final ElapsedTime runtime = new ElapsedTime();
-
+    Telemetry telemetry;
+    HardwareMap map;
     //TODO: see what happens if you change this to DcMotorEx
     public DcMotor FrontL,FrontR,BackL,BackR;
     public IMU imu;
@@ -30,27 +31,30 @@ public class newAutonMethods {
             WHEEL_RADIUS = 48,//mm
             GEAR_RATIO = 1/13.7,
             TICKS_PER_ROTATION = 8192,
-            OURTICKS_PER_CM,
+            odoMultiplier = (69.5/38.6),
+            ourTicksPerCM = odoMultiplier*(TICKS_PER_ROTATION)/(2*Math.PI * GEAR_RATIO * WHEEL_RADIUS), //about 690 ticks per centimeter
             threshold = 250,
             rotateThreshold = 0.5,
-            odoMultiplier = (69.5/38.6),
             Kp = 0.05,
             min_speed = 0.13,
-            beginTime,TimeElapsed,OdoY_Pos,OdoX_Pos,tickY,tickX,dPosY,dPosX,dPos,FWD,STR,ROT,speed, slowDown,a = 1,b = 1,heading,dHeading,direction;
+            a = 1,
+            b = 1,
+            beginTime,TimeElapsed,OdoY_Pos,OdoX_Pos,tickY,tickX,dPosY,dPosX,dPos,FWD,STR,ROT,speed, slowDown,heading,dHeading,direction;
 
     /**
      * This is the constructor.
      * @param opmode is opmode from a LinearOpMode file
      */
-    public newAutonMethods(LinearOpMode opmode) {myOpMode = opmode;}
+    public newAutonMethods(LinearOpMode opmode) {
+        myOpMode = opmode;
+        telemetry = opmode.telemetry;
+        map = opmode.hardwareMap;
+    }
 
     /**
      * This methods initialises the mecanum drivetrain and the IMU and sets all the directions and modes to their correct settings.
-     * @param map - Gives a hardwareMap from the opmode for the method to use. Not having this parameter would result in an NPE.
-     *            This can alternatively be done with myOpMode.hardwareMap.get but that's longer so we don't.
-     *            It can also probably be done via the constructor but I haven't managed to do that yet.
      */
-    public void init(HardwareMap map) {
+    public void init() {
         imu = map.get(IMU.class, "imu");
 
         //TODO: see what happens if you change this to DcMotorEx
@@ -65,8 +69,6 @@ public class newAutonMethods {
         BackL.setDirection(DcMotorSimple.Direction.REVERSE);
         BackR.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        OURTICKS_PER_CM = odoMultiplier*(TICKS_PER_ROTATION)/(2*Math.PI * GEAR_RATIO * WHEEL_RADIUS); //about 690 ticks per centimeter
-
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
         RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
@@ -74,12 +76,8 @@ public class newAutonMethods {
 
         imu.initialize(new IMU.Parameters(orientationOnRobot));
         resetYaw();
-        resetYaw();
-        resetYaw();
-        resetYaw();
-        resetYaw();
-        myOpMode.telemetry.addData("heading",getCurrentHeading());
-        myOpMode.telemetry.update();
+        telemetry.addData("heading",getCurrentHeading());
+        telemetry.update();
     }
 
     /**
@@ -88,15 +86,15 @@ public class newAutonMethods {
      * @param x - How far you want to strafe, in centimeters
      * @param y - How far you want to drive forward, in centimeters
      */
-    public void linearDrive(double x, double y) {linearDrive(x, y, 0.7, myOpMode.telemetry, 8000);}
+    public void linearDrive(double x, double y) {linearDrive(x, y, 0.7, 4000);}
     //TODO: documentation
-    public void linearDrive(double x, double y, double max_speed, Telemetry telemetry, double stopTime) {
+    public void linearDrive(double x, double y, double max_speed, double stopTime) {
         calibrateEncoders();
         beginTime = System.currentTimeMillis();
         double turn;
         heading = current_target_heading;
-        tickY = (int) (y * OURTICKS_PER_CM);
-        tickX = (int) (x * OURTICKS_PER_CM);
+        tickY = (int) (y * ourTicksPerCM);
+        tickX = (int) (x * ourTicksPerCM);
         slowDown = max_speed * slowDownTicks;
         updateTargets();
         while ((Math.abs(dPosY) > threshold || Math.abs(dPosX) > threshold || Math.abs(dHeading) > 0.5) && myOpMode.opModeIsActive() && TimeElapsed < stopTime) {
@@ -123,25 +121,8 @@ public class newAutonMethods {
             }
             turn = Kp*Math.abs(speed)*dHeading;
 
-            telemetry.addData("tickY", tickY);
-            telemetry.addData("PosY", OdoY_Pos/OURTICKS_PER_CM);
-            telemetry.addData("dPosY", dPosY);
-            telemetry.addData("tickX", tickX);
-            telemetry.addData("PosX", OdoX_Pos/OURTICKS_PER_CM);
-            telemetry.addData("dPosX", dPosX);
-            telemetry.addData("speed", speed);
-            telemetry.addData("a", a);
-            telemetry.addData("dPos", dPos);
-            telemetry.addData("CurrentHeading", getCurrentHeading());
-            telemetry.addData("TargetHeading", heading);
-            telemetry.addData("STR", STR);
-            telemetry.addData("FWD", FWD);
-            telemetry.addData("turn", turn);
-            telemetry.addData("time", runtime.milliseconds());
-            telemetry.addData("FL power", FrontL.getPower());
-            telemetry.addData("FR power", FrontR.getPower());
-            telemetry.addData("BL power", BackL.getPower());
-            telemetry.addData("BR power", BackR.getPower());
+            telemetry();
+
             telemetry.update();
 
             FrontL.setPower(FWD + STR + turn);
@@ -159,13 +140,13 @@ public class newAutonMethods {
         calibrateEncoders();
         beginTime = System.currentTimeMillis();
         heading = current_target_heading;
-        tickY = (int) (y * OURTICKS_PER_CM);
-        tickX = (int) (x * OURTICKS_PER_CM);
+        tickY = (int) (y * ourTicksPerCM);
+        tickX = (int) (x * ourTicksPerCM);
         slowDown = max_speed * 35000;
         updateTargets();
         state++;
     }
-    public void runFSMDrive(double max_speed, double stopTime, Telemetry telemetry) {
+    public void runFSMDrive(double max_speed, double stopTime) {
         if ((Math.abs(dPosY) > threshold || Math.abs(dPosX) > threshold || Math.abs(dHeading) > 0.5) && myOpMode.opModeIsActive() && TimeElapsed < stopTime) {
 
             if (Math.abs(dPosY) < slowDown) {
@@ -190,25 +171,7 @@ public class newAutonMethods {
             }
             ROT = Kp * Math.abs(speed) * dHeading;
 
-            telemetry.addData("tickY", tickY);
-            telemetry.addData("PosY", OdoY_Pos / OURTICKS_PER_CM);
-            telemetry.addData("dPosY", dPosY);
-            telemetry.addData("tickX", tickX);
-            telemetry.addData("PosX", OdoX_Pos / OURTICKS_PER_CM);
-            telemetry.addData("dPosX", dPosX);
-            telemetry.addData("speed", speed);
-            telemetry.addData("a", a);
-            telemetry.addData("dPos", dPos);
-            telemetry.addData("CurrentHeading", getCurrentHeading());
-            telemetry.addData("TargetHeading", heading);
-            telemetry.addData("STR", STR);
-            telemetry.addData("FWD", FWD);
-            telemetry.addData("turn", ROT);
-            telemetry.addData("time", runtime.milliseconds());
-            telemetry.addData("FL power", FrontL.getPower());
-            telemetry.addData("FR power", FrontR.getPower());
-            telemetry.addData("BL power", BackL.getPower());
-            telemetry.addData("BR power", BackR.getPower());
+            telemetry();
 
             FrontL.setPower(FWD + STR + ROT);
             FrontR.setPower(FWD - STR - ROT);
@@ -226,23 +189,23 @@ public class newAutonMethods {
     }
 
     //TODO: documentation
-    public void drive(double x, double y){drive(x, y, 0.7, 5000, myOpMode.telemetry);}
+    public void drive(double x, double y){
+        //TODO: calculation for stopTime based on max_speed and dPos
+        drive(x, y, 0.7, 5000);
+    }
 
     //TODO: documentation
-    public void drive(double x, double y, double stopTime){drive(x, y, 0.7, stopTime, myOpMode.telemetry);}
+    public void drive(double x, double y, double stopTime){drive(x, y, 0.7, stopTime);}
 
     //TODO: documentation
-    public void drive(double x, double y, double max_speed, double stopTime){drive(x, y, max_speed, stopTime, myOpMode.telemetry);}
-
-    //TODO: documentation
-    public void drive(double x, double y, double max_speed, double stopTime, Telemetry telemetry) {
+    public void drive(double x, double y, double max_speed, double stopTime) {
         switch (driveState) {
             case 0:
                 calibrateEncoders();
                 beginTime = System.currentTimeMillis();
                 heading = current_target_heading;
-                tickY = (int) (y * OURTICKS_PER_CM);
-                tickX = (int) (x * OURTICKS_PER_CM);
+                tickY = (int) (y * ourTicksPerCM);
+                tickX = (int) (x * ourTicksPerCM);
                 slowDown = max_speed * 35000;
                 updateTargets();
                 driveState++;
@@ -272,25 +235,7 @@ public class newAutonMethods {
                     }
                     ROT = Kp * Math.abs(speed) * dHeading;
 
-                    telemetry.addData("tickY", tickY);
-                    telemetry.addData("PosY", OdoY_Pos / OURTICKS_PER_CM);
-                    telemetry.addData("dPosY", dPosY);
-                    telemetry.addData("tickX", tickX);
-                    telemetry.addData("PosX", OdoX_Pos / OURTICKS_PER_CM);
-                    telemetry.addData("dPosX", dPosX);
-                    telemetry.addData("speed", speed);
-                    telemetry.addData("a", a);
-                    telemetry.addData("dPos", dPos);
-                    telemetry.addData("CurrentHeading", getCurrentHeading());
-                    telemetry.addData("TargetHeading", heading);
-                    telemetry.addData("STR", STR);
-                    telemetry.addData("FWD", FWD);
-                    telemetry.addData("turn", ROT);
-                    telemetry.addData("time", runtime.milliseconds());
-                    telemetry.addData("FL power", FrontL.getPower());
-                    telemetry.addData("FR power", FrontR.getPower());
-                    telemetry.addData("BL power", BackL.getPower());
-                    telemetry.addData("BR power", BackR.getPower());
+                    telemetry();
 
                     FrontL.setPower(FWD + STR + ROT);
                     FrontR.setPower(FWD - STR - ROT);
@@ -316,8 +261,29 @@ public class newAutonMethods {
         dPosX = tickX - OdoX_Pos;
         dPos = Math.abs(dPosX) + Math.abs(dPosY);
     }
+    public void telemetry(){
+        telemetry.addData("tickY", tickY);
+        telemetry.addData("PosY", OdoY_Pos / ourTicksPerCM);
+        telemetry.addData("dPosY", dPosY);
+        telemetry.addData("tickX", tickX);
+        telemetry.addData("PosX", OdoX_Pos / ourTicksPerCM);
+        telemetry.addData("dPosX", dPosX);
+        telemetry.addData("speed", speed);
+        telemetry.addData("a", a);
+        telemetry.addData("dPos", dPos);
+        telemetry.addData("CurrentHeading", getCurrentHeading());
+        telemetry.addData("TargetHeading", heading);
+        telemetry.addData("STR", STR);
+        telemetry.addData("FWD", FWD);
+        telemetry.addData("turn", ROT);
+        telemetry.addData("time", runtime.milliseconds());
+        telemetry.addData("FL power", FrontL.getPower());
+        telemetry.addData("FR power", FrontR.getPower());
+        telemetry.addData("BL power", BackL.getPower());
+        telemetry.addData("BR power", BackR.getPower());
+    }
     //TODO: documentation
-    public void rotateToHeading(double target_heading, double speed, Telemetry telemetry) {
+    public void rotateToHeading(double target_heading, double speed) {
         target_heading *= -1;
         switch (driveState) {
             case 0:
@@ -356,7 +322,7 @@ public class newAutonMethods {
     }
 
     //TODO: documentation
-    public void linearAprilTagBackboardCorrection(double offsetYaw, double offsetZ, Telemetry telemetry) {
+    public void linearAprilTagBackboardCorrection(double offsetYaw, double offsetZ) {
         calibrateEncoders();
         double corOffsetZ = (1.27 * offsetZ + 0.0471)*100;
         double offsetX = Math.atan(Math.toRadians(offsetYaw)) * corOffsetZ;
@@ -367,7 +333,7 @@ public class newAutonMethods {
 
     //TODO: documentation
     //TODO: method that can do this while robotCentric
-    public void AprilTagBackboardCorrection(double offsetYaw, double offsetZ, Telemetry telemetry) {
+    public void AprilTagBackboardCorrection(double offsetYaw, double offsetZ) {
         calibrateEncoders();
         double corOffsetZ = (1.27 * offsetZ + 0.0471)*100;
         double offsetX = Math.atan(Math.toRadians(offsetYaw)) * corOffsetZ;
@@ -382,7 +348,7 @@ public class newAutonMethods {
      * @param position - How far you want to travel, in centimeters
      */
     public void linearDriveY(double position){
-        linearDriveY(position,0.3, myOpMode.telemetry, 10000);
+        linearDriveY(position,0.3, 10000);
     }
 
     /**
@@ -393,17 +359,15 @@ public class newAutonMethods {
      * @param position - How far you want to travel, in centimeters. A positive position means forward, a negative position means backwards.
      * @param speed - Is how fast you want to travel. In autonomous, it is generally smart to move slowly,
      *              because that gives you more precision. If you run into time constraints, you can try going quicker.
-     * @param telemetry - Gives telemetry from the opmode for the method to use. Not having this parameter would result in an NPE.
-     *                  This can alternatively be done with myOpMode.telemetry.addData but that's longer so we don't.
      */
-    public void linearDriveY(double position, double speed, Telemetry telemetry, double stopTime) {
+    public void linearDriveY(double position, double speed, double stopTime) {
         calibrateEncoders();
         double beginTime = System.currentTimeMillis();
         double TimeElapsed = System.currentTimeMillis() - beginTime;
         double turn;
         double heading = current_target_heading;
         double OdoY_Pos = FrontL.getCurrentPosition();
-        double tick = (int) (position * OURTICKS_PER_CM);
+        double tick = (int) (position * ourTicksPerCM);
         double dPos = tick - OdoY_Pos;
         while (!(dPos > -threshold  && dPos < threshold) && myOpMode.opModeIsActive() && TimeElapsed < stopTime) {
             if ((dPos < 0 && speed > 0) || (dPos > 0 && speed < 0)) {
@@ -412,7 +376,7 @@ public class newAutonMethods {
             turn = Kp*Math.abs(speed)*(getCurrentHeading() - heading);
 
             telemetry.addData("tick", tick);
-            telemetry.addData("PosY", OdoY_Pos/OURTICKS_PER_CM);
+            telemetry.addData("PosY", OdoY_Pos/ ourTicksPerCM);
             telemetry.addData("dPos", dPos);
             telemetry.addData("speed", speed);
             telemetry.addData("CurrentHeading", getCurrentHeading());
@@ -444,7 +408,7 @@ public class newAutonMethods {
      * @param position - How far you want to travel, in centimeters
      */
     public void linearDriveX(double position){
-        linearDriveX(position,0.3, myOpMode.telemetry);
+        linearDriveX(position,0.3);
     }
 
     /**
@@ -455,16 +419,14 @@ public class newAutonMethods {
      * @param position - How far you want to travel, in centimeters. A positive position means to the right, a negative position means to the left.
      * @param speed - Is how fast you want to travel. In autonomous, it is generally smart to move slowly,
      *              because that gives you more precision. If you run into time constraints, you can try going quicker.
-     * @param telemetry - Gives telemetry from the opmode for the method to use. Not having this parameter would result in an NPE.
-     *                  This can alternatively be done with myOpMode.telemetry.addData but that's longer so we don't.
      */
-    public void linearDriveX(double position, double speed, Telemetry telemetry) {
+    public void linearDriveX(double position, double speed) {
         speed = speed * -1;
         calibrateEncoders();
         double Kp = 0.03;
         double turn;
         double heading = current_target_heading;
-        double tick = (int) (position * OURTICKS_PER_CM);
+        double tick = (int) (position * ourTicksPerCM);
         double dPos = tick - OdoX_Pos;
         while (!((Math.abs(dPos) < threshold)) && myOpMode.opModeIsActive()) {
             if ((dPos > 0 && speed > 0) || (dPos < 0 && speed < 0)) {
@@ -473,7 +435,7 @@ public class newAutonMethods {
             turn = Kp*Math.abs(speed)*(getCurrentHeading() - heading);
 
             telemetry.addData("tick", tick);
-            telemetry.addData("PosX", OdoX_Pos/OURTICKS_PER_CM);
+            telemetry.addData("PosX", OdoX_Pos/ ourTicksPerCM);
             telemetry.addData("dPos", dPos);
             telemetry.addData("speed", speed);
             telemetry.addData("FL power", FrontL.getPower());
@@ -501,7 +463,7 @@ public class newAutonMethods {
      *                       rotateToHeading(90)'s, the second rotateToHeading is useless, as you are at that heading already.
      */
     public void linearRotateToHeading(double target_heading){
-        linearRotateToHeading(target_heading,0.4, myOpMode.telemetry);
+        linearRotateToHeading(target_heading,0.4);
     }
     /**
      * This method is for autonomously driving turning around the Z-axis or yaw. It might make sense to reverse target_heading,
@@ -512,9 +474,8 @@ public class newAutonMethods {
      *                       a negative heading means counterclockwise. It's interval is therefore [-180,180]
      * @param speed - Is how fast you want to travel. In autonomous, it is generally smart to move slowly,
      *              because that gives you more precision. If you run into time constraints, you can try going quicker.
-     * @param telemetry - Gives telemetry from the opmode for the method to use. Not having this parameter would result in an NPE.
-     *                  This can alternatively be done with myOpMode.telemetry.addData but that's longer so we don't.
-     */    public void linearRotateToHeading(double target_heading, double speed, Telemetry telemetry) {
+     */
+    public void linearRotateToHeading(double target_heading, double speed) {
         target_heading *= -1;
         double current_heading = getCurrentHeading();
         double dHeading = target_heading - current_heading;

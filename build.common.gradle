@@ -51,7 +51,6 @@ android {
         noCompress "tflite"
     }
 
-    //TODO: import FTClib
     //TODO: import Acme dashboard
     defaultConfig {
         signingConfig signingConfigs.debug

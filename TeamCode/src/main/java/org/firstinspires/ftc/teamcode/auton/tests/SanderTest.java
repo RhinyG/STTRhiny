@@ -12,6 +12,7 @@ import java.util.List;
 public class SanderTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
+        //TODO: wat de shit
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         SanderDrive drive = new SanderDrive(this);
         drive.init(hardwareMap);

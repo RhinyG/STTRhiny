@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode.auton.FiftyThree;
+package org.firstinspires.ftc.teamcode.auton;
 
-import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -8,17 +7,13 @@ import org.firstinspires.ftc.teamcode.robotParts.Crumblz;
 import org.firstinspires.ftc.teamcode.robotParts.OpenCVTeamPropDetection;
 import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 
-@Autonomous(name = "RB 2+0", group = "A")
-public class RedBackstage extends LinearOpMode {
+@Autonomous(group = "A")
+public class TournamentAuton extends LinearOpMode {
     newAutonMethods drive = new newAutonMethods(this);
     Crumblz arm = new Crumblz(this);
     OpenCVTeamPropDetection camera = new OpenCVTeamPropDetection(this);
 
     double
-            p = 0.008,
-            i = 0,
-            d = 0,
-            f = 0.08,
             armTimer,
             slideSpeed = 0.7;
     int rotateGoal, slideGoal;
@@ -27,7 +22,6 @@ public class RedBackstage extends LinearOpMode {
         drive.init();
         arm.init();
         camera.findScoringPosition(OpenCVTeamPropDetection.robotPositions.RedBackstage,hardwareMap);
-        PIDController controller = new PIDController(p, i, d);
 
         waitForStart();
 
@@ -52,6 +46,7 @@ public class RedBackstage extends LinearOpMode {
                     } else if (finalPos == 2) {
                         drive.drive(55,-85,0.7,3000);
                     }
+                    //TODO: make this shit a method or part of drive.drive()
                     if (drive.driveState == 2) {
                         drive.state++;
                         drive.driveState = 0;
@@ -137,21 +132,9 @@ public class RedBackstage extends LinearOpMode {
                     break;
             }
 
-            controller.setPID(p,i,d);
-            int armPos = arm.armRotate.getCurrentPosition();
-            double pid = controller.calculate(armPos,rotateGoal);
-            if (armPos > 1500) {
-                f = 0;
-            } else {
-                f = 0.08;
-            }
-            double ticks_in_degree = 5281.1 / 180.0;
-            double ff = Math.cos(Math.toRadians(rotateGoal / ticks_in_degree)) * f;
+            //TODO: make this a method
+            arm.rotateArm();
 
-            double power = pid + ff;
-            arm.armRotate.setPower(power);
-
-            telemetry.addData("pos", armPos);
             telemetry.addData("target",rotateGoal);
             arm.FSMSlide(slideGoal,slideSpeed);
             telemetry.update();

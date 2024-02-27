@@ -37,7 +37,7 @@ public class TeleOpABC extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        drive.init(hardwareMap);
+        drive.init();
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
@@ -87,7 +87,7 @@ public class TeleOpABC extends LinearOpMode {
 
             //TODO: Test this shit
             if (gamepad1.right_stick_button) {
-                drive.AprilTagBackboardCorrection(AvgYawToBackBoard, AvgPoseZToBackBoard, telemetry);
+                drive.AprilTagBackboardCorrection(AvgYawToBackBoard, AvgPoseZToBackBoard);
             }
         }
     }

@@ -25,8 +25,8 @@ public class SixtyRed extends LinearOpMode {
             slideGoal;
     @Override
     public void runOpMode() {
-        drive.init(hardwareMap);
-        arm.init(hardwareMap);
+        drive.init();
+        arm.init();
 //        camera.findScoringPosition(OpenCVTeamPropDetection.robotPositions.RedBackstage,hardwareMap);
         PIDController controller = new PIDController(p, i, d);
 
@@ -106,7 +106,7 @@ public class SixtyRed extends LinearOpMode {
                 case 1:
                     if (Math.abs(arm.armRotate.getCurrentPosition()-rotateGoal) < 1000) {
                         slideGoal = 360;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;
@@ -121,7 +121,7 @@ public class SixtyRed extends LinearOpMode {
                     if (System.currentTimeMillis() > 100 + armTimer) {
                         rotateGoal = 320;
                         slideGoal = 0;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.elbow.setPosition(Crumblz.ElbowPositions.intakePos.getPosition());
                         arm.state++;
                     }
@@ -130,24 +130,24 @@ public class SixtyRed extends LinearOpMode {
                     if(Math.abs(arm.armRotate.getCurrentPosition() - rotateGoal) < 100) {
                         if (finalPos != 2) {
                             slideGoal = 850;
-                            arm.armExtend.setTargetPosition(slideGoal);
+                            arm.armExtend1.setTargetPosition(slideGoal);
                         }
                         arm.state++;
                     }
                     break;
                 case 5:
-                    if(Math.abs(slideGoal - arm.armExtend.getCurrentPosition()) < 10) {
+                    if(Math.abs(slideGoal - arm.armExtend1.getCurrentPosition()) < 10) {
                         arm.clawRight.setPosition(Crumblz.ClawPositions.releaseRight.getPosition());
                         rotateGoal = 600;
                         slideGoal = 0;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;
                 case 6:
                     if (drive.state > 3) {
                         slideGoal = 500;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         rotateGoal = 300;
                         arm.clawLeft.setPosition(Crumblz.ClawPositions.openLeft.getPosition());
                         arm.elbow.setPosition(Crumblz.ElbowPositions.stackFivePos.getPosition());

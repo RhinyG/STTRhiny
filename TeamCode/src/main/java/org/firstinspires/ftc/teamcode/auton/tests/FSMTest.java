@@ -21,8 +21,8 @@ public class FSMTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        drive.init(hardwareMap);
-        arm.init(hardwareMap);
+        drive.init();
+        arm.init();
         PIDController controller = new PIDController(p, i, d);
 
         //44.5
@@ -101,7 +101,7 @@ public class FSMTest extends LinearOpMode {
                 case 11:
                     if (Math.abs(arm.armRotate.getCurrentPosition()-rotateGoal) < 1000) {
                         slideGoal = 500;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;
@@ -117,7 +117,7 @@ public class FSMTest extends LinearOpMode {
                     if (System.currentTimeMillis() > 100 + armTimer) {
                         rotateGoal = 320;
                         slideGoal = 0;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.elbow.setPosition(Crumblz.ElbowPositions.intakePos.getPosition());
                         arm.state++;
                     }
@@ -125,16 +125,16 @@ public class FSMTest extends LinearOpMode {
                 case 4:
                     if(Math.abs(arm.armRotate.getCurrentPosition() - rotateGoal) < 100) {
                         slideGoal = 850;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;
                 case 5:
-                    if(Math.abs(slideGoal - arm.armExtend.getCurrentPosition()) < 10) {
+                    if(Math.abs(slideGoal - arm.armExtend1.getCurrentPosition()) < 10) {
                         arm.clawRight.setPosition(Crumblz.ClawPositions.releaseRight.getPosition());
                         rotateGoal = 320;
                         slideGoal = 0;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                         armTimer = System.currentTimeMillis();
                     }
@@ -142,13 +142,13 @@ public class FSMTest extends LinearOpMode {
                 case 6:
                     if (drive.state > 3) {
                         slideGoal = 500;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.clawLeft.setPosition(Crumblz.ClawPositions.openLeft.getPosition());
                         arm.state++;
                     }
                     break;
                 case 7:
-                    if (Math.abs(arm.armRotate.getCurrentPosition() - rotateGoal) < 20 && Math.abs(arm.armExtend.getCurrentPosition() - slideGoal) < 20) {
+                    if (Math.abs(arm.armRotate.getCurrentPosition() - rotateGoal) < 20 && Math.abs(arm.armExtend1.getCurrentPosition() - slideGoal) < 20) {
                         arm.elbow.setPosition(Crumblz.ElbowPositions.stackFivePos.getPosition());
                         arm.state++;
                     }
@@ -163,7 +163,7 @@ public class FSMTest extends LinearOpMode {
                 case 9:
                     if (System.currentTimeMillis() > 100 + armTimer) {
                         slideGoal = 200;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;

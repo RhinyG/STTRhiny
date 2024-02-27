@@ -15,7 +15,7 @@ public class BlueBackstage extends LinearOpMode {
     PixelManipulation slides = new PixelManipulation(this);
 
     public void runOpMode() {
-        methods.init(hardwareMap);
+        methods.init();
         slides.init(hardwareMap, telemetry);
         methods.calibrateEncoders();
         methods.resetYaw();
@@ -32,9 +32,9 @@ public class BlueBackstage extends LinearOpMode {
                 methods.linearDriveY(-90);
                 methods.linearDriveY(30);
                 methods.linearRotateToHeading(90);
-                methods.linearDriveY(-125, 0.2, telemetry,7000);
+                methods.linearDriveY(-125, 0.2,7000);
                 methods.linearDriveX(30);
-                methods.linearDriveY(-4, 0.2, telemetry, 3000);
+                methods.linearDriveY(-4, 0.2, 3000);
                 slides.dropYellowPixel();
                 methods.linearDriveX(60);
                 methods.linearDriveY(-30);
@@ -42,7 +42,7 @@ public class BlueBackstage extends LinearOpMode {
                 methods.linearDriveY(-116);
                 methods.linearDriveY(30);
                 methods.linearRotateToHeading(80);
-                methods.linearDriveY(-145, 0.2, telemetry, 7000);
+                methods.linearDriveY(-145, 0.2, 7000);
                 methods.linearDriveX(-20);
                 slides.dropYellowPixel();
                 methods.linearDriveY(20);
@@ -56,7 +56,7 @@ public class BlueBackstage extends LinearOpMode {
                 methods.linearDriveY(40);
                 methods.linearDriveX(-35);
                 methods.linearRotateToHeading(90);
-                methods.linearDriveY(-135, 0.2, telemetry,7000);
+                methods.linearDriveY(-135, 0.2,7000);
                 slides.dropYellowPixel();
                 methods.linearDriveY(20);
                 methods.linearDriveX(90);

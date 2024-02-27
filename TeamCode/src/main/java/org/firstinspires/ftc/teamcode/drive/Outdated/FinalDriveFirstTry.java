@@ -15,7 +15,7 @@ public class FinalDriveFirstTry {
 OuttakeTwoSlides outtake = new OuttakeTwoSlides();
 DrivetrainAlex drivetrain = new DrivetrainAlex();
 
-    @Override //wat de abdominale kanker Really Youri
+    @Override
     public void runOpMode() throws InterruptedException {
         drivetrain.init(hardwareMap);
         outtake.init(hardwareMap);

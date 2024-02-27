@@ -22,7 +22,7 @@ public class SecretTechniqueNoJutsu extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         drivetrain.init(hardwareMap);
-        arm.init(hardwareMap);
+        arm.init();
         waitForStart();
 
         Crumblz.ClawPositions leftPos = openLeft;
@@ -82,7 +82,7 @@ public class SecretTechniqueNoJutsu extends LinearOpMode {
             }
 
             if(gamepad2.left_stick_button){
-                arm.armExtend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                arm.armExtend1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             }
             arm.updateClaw(leftPos,rightPos);
             arm.secretRotate(armRotatePower);

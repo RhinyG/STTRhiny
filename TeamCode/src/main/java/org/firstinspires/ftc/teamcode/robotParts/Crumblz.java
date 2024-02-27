@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robotParts;
 
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -12,17 +13,23 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Crumblz extends RobotPart {
 //TODO: explain variables
     private final LinearOpMode myOpMode;
-    public Servo clawLeft;
-    public Servo clawRight;
-    public Servo elbow;
-    public DcMotorEx armExtend;
-    public DcMotorEx armRotate;
+    Telemetry telemetry;
+    HardwareMap map;
+    public Servo clawLeft,clawRight,elbow;
+    public DcMotorEx armExtend1, armExtend2,armRotate;
     public int state;
+    double
+            p = 0.008,
+            i = 0,
+            d = 0,
+            f = 0.08;
+    //TODO: see if other PIDs like liftPID work better.
+    PIDController controller = new PIDController(p, i, d);
+    int rotateGoal;
 //TODO: explain enumerators
 //TODO: enumerators in separate files
     public enum ArmRotatePos {
         intakeGround(0),
-        outtakeFront(1300),
         outtakeBack(3050);
 
         private final int position;
@@ -35,9 +42,7 @@ public class Crumblz extends RobotPart {
     }
 
     public enum ArmExtendPos {
-        ZERO(0),
-        FULL(780);
-
+        ZERO(0);
         private final int position;
         public int getPosition() {
             return this.position;
@@ -99,15 +104,14 @@ public class Crumblz extends RobotPart {
      */
     public Crumblz(LinearOpMode opmode) {
         myOpMode = opmode;
+        telemetry = opmode.telemetry;
+        map = opmode.hardwareMap;
     }
 
     /**
      * This methods initialises the pixel manipulation mechanisms and sets all the directions and modes to their correct settings.
-     * @param map - Gives a hardwareMap from the opmode for the method to use. Not having this parameter would result in an NPE.
-     *            This can alternatively be done with myOpMode.hardwareMap.get but that's longer so we don't.
-     *            It can also probably be done via the constructor but I haven't managed to do that yet.
      */
-    public void init(HardwareMap map) {
+    public void init() {
         elbow = map.get(Servo.class,"elbow");
         clawLeft = map.get(Servo.class, "clawLeft");
         clawRight = map.get(Servo.class, "clawRight");
@@ -116,18 +120,23 @@ public class Crumblz extends RobotPart {
         clawLeft.setPosition(ClawPositions.grabLeft.getPosition());
         clawRight.setPosition(ClawPositions.grabRight.getPosition());
 
-        armExtend = map.get(DcMotorEx.class, "armExtend");
+        armExtend1 = map.get(DcMotorEx.class, "armExtend");
+        armExtend2 = map.get(DcMotorEx.class, "armExtendo");
         armRotate = map.get(DcMotorEx.class, "armRotate");
 
-        armExtend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armExtend1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armExtend2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armRotate.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        armExtend.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armExtend1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armExtend2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armRotate.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        armExtend.setDirection(DcMotorSimple.Direction.FORWARD);
+        armExtend1.setDirection(DcMotorSimple.Direction.FORWARD);
+        armExtend2.setDirection(DcMotorSimple.Direction.FORWARD);
         armRotate.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // from ArmReza code seems do interact with RobotPart.java I don't know really
-        motors.put("slideLeft", armExtend);
+        motors.put("armExtend", armExtend1);
+
         resetEncoders();
     }
 
@@ -150,61 +159,67 @@ public class Crumblz extends RobotPart {
     }
 
     //TODO: documentation
-    public double slidesGoToHeight(int position, double power, Telemetry telemetry) {
+    public void slidesGoToHeight(int position, double power) {
         double margin = 50.0;
-        double currentPosLeft = armExtend.getCurrentPosition();
+        double currentPosLeft = armExtend1.getCurrentPosition();
         double distance = Math.abs(currentPosLeft - position);
         if (currentPosLeft < position) {
             if (distance > margin) {
-                armExtend.setPower(power);
+                armExtend1.setPower(power);
+                armExtend2.setPower(power);
             } else {
-                armExtend.setPower(power * (distance/margin) * 0.4);
+                armExtend1.setPower(power * (distance/margin) * 0.4);
+                armExtend2.setPower(power * (distance/margin) * 0.4);
             }
             telemetry.addLine("up");
         } else if (currentPosLeft > position) {
             if (distance > margin) {
-                armExtend.setPower(-power);
+                armExtend1.setPower(-power);
+                armExtend2.setPower(-power);
             } else {
-                armExtend.setPower(-power * (distance/margin) * 0.4);
+                armExtend1.setPower(-power * (distance/margin) * 0.4);
+                armExtend2.setPower(-power * (distance/margin) * 0.4);
             }
             telemetry.addLine("down");
         } else if (position == 0 && currentPosLeft <= 0) {
-            setPower(0);
+            armExtend1.setPower(0);
+            armExtend2.setPower(0);
         } else {
-            setPower(0.01);
+            armExtend1.setPower(0.01);
+            armExtend2.setPower(0.01);
         }
-        return distance;
+        telemetry.addData("distance to goal", distance);
     }
 
     //TODO: documentation
-    public void updateSlide(boolean buttonMode, double power, Crumblz.ArmExtendPos height, Telemetry telemetry) {
-        double distance = 0;
+    public void updateSlide(boolean buttonMode, double power, Crumblz.ArmExtendPos height) {
         if (buttonMode) {
-            distance = slidesGoToHeight(height.getPosition(), 1.0, telemetry);
-            telemetry.addData("slide", armExtend.getCurrentPosition());
+            slidesGoToHeight(height.getPosition(), 1.0);
+            telemetry.addData("slide", armExtend1.getCurrentPosition());
             telemetry.addData("slide goal", height.getPosition());
             telemetry.addLine(String.valueOf(height));
-            telemetry.addData("arm power", armExtend.getPower());
+            telemetry.addData("arm power", armExtend1.getPower());
         } else {
-            int position = armExtend.getCurrentPosition();
+            int position = armExtend1.getCurrentPosition();
             boolean limitReached;
 
             limitReached = (position <= ArmLimits.slideLower.getPosition() && power <= 0) || (position >= ArmLimits.slideUpper.getPosition() && power >= 0);
 
             if (!limitReached) {
-                armExtend.setPower(power);
+                armExtend1.setPower(power);
+                armExtend2.setPower(power);
             } else {
 
-                armExtend.setPower(0);
+                armExtend1.setPower(0);
+                armExtend2.setPower(0);
             }
             telemetry.addData("slide pos", position);
-            telemetry.addData("slide power", armExtend.getPower());
-            telemetry.addData("distance to goal", distance);
+            telemetry.addData("slide power", armExtend1.getPower());
         }
     }
 
     //TODO: documentation
-    public double rotateToPos(int position, double power, Telemetry telemetry) {
+    public double rotateToPos(int position, double power) {
         double margin = 60.0;
         double currentPosLeft = armRotate.getCurrentPosition();
         double distance = Math.abs(currentPosLeft - position);
@@ -231,13 +246,13 @@ public class Crumblz extends RobotPart {
     }
 
     //TODO: documentation
-    public void updateRotate(boolean buttonMode, double power, Crumblz.ArmRotatePos height, int holdSlides, Telemetry telemetry) {
+    public void updateRotate(boolean buttonMode, double power, Crumblz.ArmRotatePos height, int holdSlides) {
         double distance = 0;
-        double slideHeight = armExtend.getCurrentPosition();
+        double slideHeight = armExtend1.getCurrentPosition();
         if (buttonMode) {
-            distance = rotateToPos(height.getPosition(), 1, telemetry);
+            distance = rotateToPos(height.getPosition(), 1);
             if(distance > 100){
-                slidesGoToHeight(holdSlides,0.7, telemetry);
+                slidesGoToHeight(holdSlides,0.7);
             }
             telemetry.addData("rotate", armRotate.getCurrentPosition());
             telemetry.addData("rotate goal", height.getPosition());
@@ -275,11 +290,11 @@ public class Crumblz extends RobotPart {
 
     //TODO: documentation
     public void secretSlide(double power) {
-        int position = armExtend.getCurrentPosition();
-        armExtend.setPower(power);
-        armExtend.setPower(0);
+        int position = armExtend1.getCurrentPosition();
+        armExtend1.setPower(power);
+        armExtend2.setPower(power);
         telemetry.addData("slide", position);
-        telemetry.addData("slide power", armExtend.getPower());
+        telemetry.addData("slide power", armExtend1.getPower());
     }
 
     //TODO: documentation
@@ -300,18 +315,22 @@ public class Crumblz extends RobotPart {
 
     //TODO: documentation
     public void autonSlide(int var){
-        armExtend.setTargetPosition(var);
-        armExtend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armExtend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        if(armExtend.getCurrentPosition() > var) {
-            armExtend.setPower(-0.5);
+        armExtend1.setTargetPosition(var);
+        armExtend2.setTargetPosition(var);
+        armExtend1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armExtend2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armExtend1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armExtend2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        if(armExtend1.getCurrentPosition() > var) {
+            armExtend1.setPower(-0.5);
+            armExtend2.setPower(-0.5);
         } else {
-            armExtend.setPower(0.5);
+            armExtend1.setPower(0.5);
+            armExtend2.setPower(0.5);
         }
-        while (myOpMode.opModeIsActive() && armExtend.isBusy()) {
+        while (myOpMode.opModeIsActive() && (armExtend1.isBusy() || armExtend2.isBusy())) {
             myOpMode.idle();
         }
-        armExtend.setPower(0.3);
     }
 
     //TODO: documentation
@@ -322,7 +341,7 @@ public class Crumblz extends RobotPart {
             } else {
                 armRotate.setPower(speed);
             }
-        } else if (Math.abs(armExtend.getCurrentPosition() - var) > 50) {
+        } else if (Math.abs(armExtend1.getCurrentPosition() - var) > 50) {
             if (armRotate.getCurrentPosition() > var) {
                 armRotate.setPower(-0.01);
             } else {
@@ -332,28 +351,50 @@ public class Crumblz extends RobotPart {
     }
 
     //TODO: documentation
+    //TODO: PID
     public void FSMSlide(int var, double speed){
-        if (Math.abs(armExtend.getCurrentPosition() - var) > 175) {
-            if (armExtend.getCurrentPosition() > var) {
-                armExtend.setPower(-speed);
+        if (Math.abs(armExtend1.getCurrentPosition() - var) > 175) {
+            if (armExtend1.getCurrentPosition() > var) {
+                armExtend1.setPower(-speed);
+                armExtend2.setPower(-speed);
             } else {
-                armExtend.setPower(speed);
+                armExtend1.setPower(speed);
+                armExtend2.setPower(speed);
             }
-        } else if (Math.abs(armExtend.getCurrentPosition() - var) > 10) {
-            if (armExtend.getCurrentPosition() > var) {
-                armExtend.setPower(-0.3);
+        } else if (Math.abs(armExtend1.getCurrentPosition() - var) > 10) {
+            if (armExtend1.getCurrentPosition() > var) {
+                armExtend1.setPower(-0.3);
+                armExtend2.setPower(-0.3);
             } else {
-                armExtend.setPower(0.3);
+                armExtend1.setPower(0.3);
+                armExtend2.setPower(0.3);
             }
         }
         else {
-            //TODO: find a proper way to stop this shit
             if (armRotate.getCurrentPosition() > 800) {
-                armExtend.setPower(0.01);
+                armExtend1.setPower(0.01);
+                armExtend2.setPower(0.01);
             } else {
-                armExtend.setPower(0);
+                armExtend1.setPower(0);
+                armExtend2.setPower(0.01);
             }
         }
     }
-    //TODO: FSM PIDF-controller method
+    public void rotateArm(){
+        controller.setPID(p,i,d);
+        int armPos = armRotate.getCurrentPosition();
+        double pid = controller.calculate(armPos,rotateGoal);
+        if (armPos > 1500) {
+            f = 0;
+        } else {
+            f = 0.08;
+        }
+        double ticks_in_degree = 5281.1 / 180.0;
+        double ff = Math.cos(Math.toRadians(rotateGoal / ticks_in_degree)) * f;
+
+        double power = pid + ff;
+        armRotate.setPower(power);
+
+        telemetry.addData("pos", armPos);
+    }
 }

@@ -21,15 +21,15 @@ public class FiftyFSM extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        drive.init(hardwareMap);
-        arm.init(hardwareMap);
+        drive.init();
+        arm.init();
         waitForStart();
         while (opModeIsActive()){
             telemetry.addData("Global Drive state",drive.state);
             telemetry.addData("driveState",drive.driveState);
             telemetry.addData("arm state",arm.state);
             telemetry.addData("slideGoal",slideGoal);
-            telemetry.addData("slidePos",arm.armExtend.getCurrentPosition());
+            telemetry.addData("slidePos",arm.armExtend1.getCurrentPosition());
             switch (drive.state) {
                 case 0:
                     drive.driveState = 0;
@@ -68,7 +68,7 @@ public class FiftyFSM extends LinearOpMode {
                 case 1:
                     if (Math.abs(arm.armRotate.getCurrentPosition()-rotateGoal) < 1000) {
                         slideGoal = 500;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;
@@ -83,7 +83,7 @@ public class FiftyFSM extends LinearOpMode {
                     if (System.currentTimeMillis() > 100 + armTimer) {
                         rotateGoal = 0;
                         slideGoal = 0;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.armRotate.setTargetPosition(rotateGoal);
                         arm.elbow.setPosition(Crumblz.ElbowPositions.intakePos.getPosition());
                         arm.state++;
@@ -92,15 +92,15 @@ public class FiftyFSM extends LinearOpMode {
                 case 4:
                     if(Math.abs(arm.armRotate.getCurrentPosition() - rotateGoal) < 100) {
                         slideGoal = 850;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;
                 case 5:
-                    if(Math.abs(slideGoal - arm.armExtend.getCurrentPosition()) < 10) {
+                    if(Math.abs(slideGoal - arm.armExtend1.getCurrentPosition()) < 10) {
                         arm.clawRight.setPosition(Crumblz.ClawPositions.releaseRight.getPosition());
                         slideGoal = 0;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                     }
             }

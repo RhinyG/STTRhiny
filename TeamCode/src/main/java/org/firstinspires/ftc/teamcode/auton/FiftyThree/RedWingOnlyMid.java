@@ -27,8 +27,8 @@ public class RedWingOnlyMid extends LinearOpMode {
             slideSpeed = 0.7;
     @Override
     public void runOpMode() {
-        drive.init(hardwareMap);
-        arm.init(hardwareMap);
+        drive.init();
+        arm.init();
         camera.findScoringPosition(OpenCVTeamPropDetection.robotPositions.RedWing,hardwareMap);
         PIDController controller = new PIDController(p, i, d);
 
@@ -56,7 +56,7 @@ public class RedWingOnlyMid extends LinearOpMode {
                     }
                     break;
                 case 2:
-                    drive.rotateToHeading(90,0.3,telemetry);
+                    drive.rotateToHeading(90,0.3);
                     if (drive.driveState == 2) {
                         drive.state++;
                         drive.driveState = 0;
@@ -65,7 +65,7 @@ public class RedWingOnlyMid extends LinearOpMode {
                     break;
                 case 3:
                     if (System.currentTimeMillis() > 100 + armTimer) {
-                        drive.rotateToHeading(0, 0.3, telemetry);
+                        drive.rotateToHeading(0, 0.3);
                     }
                     if (drive.driveState == 2) {
                         drive.state++;
@@ -102,7 +102,7 @@ public class RedWingOnlyMid extends LinearOpMode {
                         arm.elbow.setPosition(Crumblz.ElbowPositions.intakePos.getPosition());
                         rotateGoal = 320;
                         slideGoal = 150;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;
@@ -117,12 +117,12 @@ public class RedWingOnlyMid extends LinearOpMode {
                     if (System.currentTimeMillis() > 100 + armTimer) {
                         arm.elbow.setPosition(Crumblz.ElbowPositions.stackFivePos.getPosition());
                         slideGoal = 0;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;
                 case 3:
-                    if((Math.abs(arm.armExtend.getCurrentPosition() - slideGoal) < 20) && drive.state > 3){
+                    if((Math.abs(arm.armExtend1.getCurrentPosition() - slideGoal) < 20) && drive.state > 3){
                         rotateGoal = 300;
                         arm.state++;
                     }
@@ -130,14 +130,14 @@ public class RedWingOnlyMid extends LinearOpMode {
                 case 4:
                     arm.clawRight.setPosition((Crumblz.ClawPositions.grabRight.getPosition()));
                     slideGoal = 0;
-                    arm.armExtend.setTargetPosition(slideGoal);
+                    arm.armExtend1.setTargetPosition(slideGoal);
                     arm.state++;
                 case 5:
                     if (drive.state > 4) {
                         arm.elbow.setPosition(Crumblz.ElbowPositions.outtakeBackSidePos.getPosition());
                         rotateGoal = 2800;
                         slideGoal = 360;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;
@@ -153,7 +153,7 @@ public class RedWingOnlyMid extends LinearOpMode {
                     if (System.currentTimeMillis() > 100 + armTimer) {
                         rotateGoal = 0;
                         slideGoal = 0;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;

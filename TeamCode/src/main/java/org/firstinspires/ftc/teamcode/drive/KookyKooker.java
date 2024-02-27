@@ -24,29 +24,21 @@ public class KookyKooker extends LinearOpMode {
     MecanumDrivetrain drivetrain = new MecanumDrivetrain(this);
     Crumblz arm = new Crumblz(this);
 
-    Servo plane;
+    Servo plane, hookServo;
     DcMotor hook;
-    Servo hookServo;
 
-    boolean extendButtonMode = false;
-    boolean rotateButtonMode = false;
+    boolean extendButtonMode = false,rotateButtonMode = false, foldToggle = false;
     int holdSlides = 0;
-    boolean holdSlideButton = false;
-
     Crumblz.ArmExtendPos extendPos = ZERO;
     Crumblz.ArmRotatePos rotatePos = intakeGround;
 
-    Crumblz.ClawPositions leftPos = openLeft;
-    Crumblz.ClawPositions rightPos = openRight;
-    double leftTime = 0;
-    double rightTime = 0;
-    double foldTime = 0;
-
+    Crumblz.ClawPositions leftPos = openLeft, rightPos = openRight;
+    double leftTime = 0, rightTime = 0, foldTime = 0;
     @Override
     public void runOpMode() throws InterruptedException {
 
         drivetrain.init(hardwareMap);
-        arm.init(hardwareMap);
+        arm.init();
 
         plane = hardwareMap.servo.get("plane");
 
@@ -73,7 +65,6 @@ public class KookyKooker extends LinearOpMode {
             boolean planeReset = gamepad2.dpad_right;
 
             double hookPower = gamepad2.right_trigger - gamepad2.left_trigger;
-            boolean foldToggle = false;
 
             hook.setPower(hookPower);
 
@@ -85,11 +76,11 @@ public class KookyKooker extends LinearOpMode {
 
             if (RotateIntakeButton) {
                 rotateButtonMode = true;
-                holdSlides = arm.armExtend.getCurrentPosition();
+                holdSlides = arm.armExtend1.getCurrentPosition();
                 rotatePos = intakeGround;
             } else if (RotateOuttakeButton) {
                 rotateButtonMode = true;
-                holdSlides = arm.armExtend.getCurrentPosition();
+                holdSlides = arm.armExtend1.getCurrentPosition();
                 rotatePos = outtakeBack;
             }
             if(Math.abs(armRotatePower) > 0.1) {rotateButtonMode = false;}
@@ -130,13 +121,8 @@ public class KookyKooker extends LinearOpMode {
             }
 
             if ((foldTime + 500) < System.currentTimeMillis() && gamepad2.right_bumper){
-                if (foldToggle) {
-                    foldToggle = false;
-                    foldTime = System.currentTimeMillis();
-                } else {
-                    foldToggle = true;
-                    foldTime = System.currentTimeMillis();
-                }
+                foldTime = System.currentTimeMillis();
+                foldToggle = !foldToggle;
             }
 
             if (!foldToggle) {
@@ -145,16 +131,13 @@ public class KookyKooker extends LinearOpMode {
                 arm.elbow.setPosition(Crumblz.ElbowPositions.foldPos.getPosition());
             }
             arm.updateClaw(leftPos,rightPos);
-            arm.updateSlide(extendButtonMode,armExtendPower,extendPos, telemetry);
-            arm.updateRotate(rotateButtonMode, armRotatePower, rotatePos, holdSlides, telemetry);
-            if (arm.armRotate.getCurrentPosition() < 2000 && arm.armExtend.getCurrentPosition() < 500){
-                drivetrain.RobotCentric(-1, false);
-            } else if (arm.armRotate.getCurrentPosition() < 2000){
-                drivetrain.RobotCentric(-1, true);
-            } else if (arm.armExtend.getCurrentPosition() < 500) {
-                drivetrain.RobotCentric(1, false);
+            arm.updateSlide(extendButtonMode,armExtendPower,extendPos);
+            arm.updateRotate(rotateButtonMode, armRotatePower, rotatePos, holdSlides);
+            //TODO: slowmode based on voltage sensor
+            if (arm.armRotate.getCurrentPosition() < 2000){
+                drivetrain.RobotCentric(-1, arm.armExtend1.getCurrentPosition() >= 500);
             } else {
-                drivetrain.RobotCentric(1, true);
+                drivetrain.RobotCentric(1, arm.armExtend1.getCurrentPosition() >= 500);
             }
             telemetry.addData("rotatePower",armRotatePower);
             telemetry.update();

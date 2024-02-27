@@ -25,8 +25,8 @@ public class DemoAuton extends LinearOpMode {
     @Override
     public void runOpMode() {
         //TODO: explain init
-        drive.init(hardwareMap);
-        arm.init(hardwareMap);
+        drive.init();
+        arm.init();
 
         //TODO: explain
         waitForStart();
@@ -39,7 +39,7 @@ public class DemoAuton extends LinearOpMode {
             telemetry.addData("driveState",drive.driveState);
             telemetry.addData("arm state",arm.state);
             telemetry.addData("slideGoal",slideGoal);
-            telemetry.addData("slidePos",arm.armExtend.getCurrentPosition());
+            telemetry.addData("slidePos",arm.armExtend1.getCurrentPosition());
 
             //TODO: explain
             switch (drive.state) {
@@ -89,7 +89,7 @@ public class DemoAuton extends LinearOpMode {
                     //TODO: explain
                     if (Math.abs(arm.armRotate.getCurrentPosition()-rotateGoal) < 1000) {
                         slideGoal = 500;
-                        arm.armExtend.setTargetPosition(slideGoal);
+                        arm.armExtend1.setTargetPosition(slideGoal);
                         arm.state++;
                     }
                     break;

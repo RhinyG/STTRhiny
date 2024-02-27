@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 @Autonomous(name = "linearABC", group = "Test")
 public class AprilTagCorrection extends LinearOpMode {
-    newAutonMethods auton = new newAutonMethods(this);
+    newAutonMethods drive = new newAutonMethods(this);
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -36,7 +36,7 @@ public class AprilTagCorrection extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        auton.init(hardwareMap);
+        drive.init();
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam Right"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
@@ -87,7 +87,7 @@ public class AprilTagCorrection extends LinearOpMode {
 
 
             //TODO: Test this shit
-            auton.linearAprilTagBackboardCorrection(AvgYawToBackBoard,AvgPoseZToBackBoard,telemetry);
+            drive.linearAprilTagBackboardCorrection(AvgYawToBackBoard,AvgPoseZToBackBoard);
 
 
             sleep(30000);
