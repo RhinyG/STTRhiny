@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode.drive.tests;
 
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+@Config
 @TeleOp
 public class PIDF_test extends OpMode {
     private PIDController controller;

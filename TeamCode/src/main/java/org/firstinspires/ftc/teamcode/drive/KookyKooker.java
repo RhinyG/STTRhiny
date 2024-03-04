@@ -10,14 +10,23 @@ import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.op
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.releaseLeft;
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.releaseRight;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.robotParts.Crumblz;
 import org.firstinspires.ftc.teamcode.robotParts.MecanumDrivetrain;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvWebcam;
 
+@Config
 @TeleOp(name = "LET THE KOOKYKOOKER KOOK")
 public class KookyKooker extends LinearOpMode {
 
@@ -34,23 +43,36 @@ public class KookyKooker extends LinearOpMode {
 
     Crumblz.ClawPositions leftPos = openLeft, rightPos = openRight;
     double leftTime = 0, rightTime = 0, foldTime = 0;
+    OpenCvWebcam webcam = null;
     @Override
     public void runOpMode() throws InterruptedException {
 
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drivetrain.init(hardwareMap);
         arm.init();
+        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam Left");
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(1280,720, OpenCvCameraRotation.UPRIGHT);
+            }
 
+            @Override
+            public void onError(int errorCode) {
+
+            }
+        });
         plane = hardwareMap.servo.get("plane");
 
         hook = hardwareMap.dcMotor.get("hook");
         hookServo = hardwareMap.servo.get("hookServo");
         hookServo.setPosition(0);
 
-        waitForStart();
-
         if (isStopRequested()) return;
 
-        while (opModeIsActive()) {
+        while (true) {
             double armRotatePower = gamepad1.right_trigger-gamepad1.left_trigger;
 
             double armExtendPower = -gamepad1.right_stick_y;
@@ -140,6 +162,10 @@ public class KookyKooker extends LinearOpMode {
                 drivetrain.RobotCentric(1, arm.armExtend1.getCurrentPosition() >= 500);
             }
             telemetry.addData("rotatePower",armRotatePower);
+            telemetry.addData("leftFront",drivetrain.FrontL.getPower());
+            telemetry.addData("rightFront",drivetrain.FrontR.getPower());
+            telemetry.addData("leftBack",drivetrain.BackL.getPower());
+            telemetry.addData("rightBack",drivetrain.BackR.getPower());
             telemetry.update();
         }
     }

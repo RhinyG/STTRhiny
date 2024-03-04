@@ -55,13 +55,13 @@ public class newAutonMethods {
      * This methods initialises the mecanum drivetrain and the IMU and sets all the directions and modes to their correct settings.
      */
     public void init() {
-        imu = map.get(IMU.class, "imu");
+        imu = myOpMode.hardwareMap.get(IMU.class, "imu");
 
         //TODO: see what happens if you change this to DcMotorEx
-        FrontL = map.get(DcMotor.class, "left_front");
-        FrontR = map.get(DcMotor.class, "right_front");
-        BackL = map.get(DcMotor.class, "left_back");
-        BackR = map.get(DcMotor.class, "right_back");
+        FrontL = myOpMode.hardwareMap.get(DcMotor.class, "left_front");
+        FrontR = myOpMode.hardwareMap.get(DcMotor.class, "right_front");
+        BackL = myOpMode.hardwareMap.get(DcMotor.class, "left_back");
+        BackR = myOpMode.hardwareMap.get(DcMotor.class, "right_back");
 
         //TODO: see what happens if you change this to DcMotorEx
         FrontL.setDirection(DcMotorSimple.Direction.REVERSE);

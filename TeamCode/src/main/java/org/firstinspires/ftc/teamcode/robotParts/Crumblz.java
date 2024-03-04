@@ -112,17 +112,17 @@ public class Crumblz extends RobotPart {
      * This methods initialises the pixel manipulation mechanisms and sets all the directions and modes to their correct settings.
      */
     public void init() {
-        elbow = map.get(Servo.class,"elbow");
-        clawLeft = map.get(Servo.class, "clawLeft");
-        clawRight = map.get(Servo.class, "clawRight");
+        elbow = myOpMode.hardwareMap.get(Servo.class,"elbow");
+        clawLeft = myOpMode.hardwareMap.get(Servo.class, "clawLeft");
+        clawRight = myOpMode.hardwareMap.get(Servo.class, "clawRight");
 
         elbow.setPosition(ElbowPositions.foldPos.getPosition());
         clawLeft.setPosition(ClawPositions.grabLeft.getPosition());
         clawRight.setPosition(ClawPositions.grabRight.getPosition());
 
-        armExtend1 = map.get(DcMotorEx.class, "armExtend");
-        armExtend2 = map.get(DcMotorEx.class, "armExtendo");
-        armRotate = map.get(DcMotorEx.class, "armRotate");
+        armExtend1 = myOpMode.hardwareMap.get(DcMotorEx.class, "armExtend");
+        armExtend2 = myOpMode.hardwareMap.get(DcMotorEx.class, "armExtendo");
+        armRotate = myOpMode.hardwareMap.get(DcMotorEx.class, "armRotate");
 
         armExtend1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armExtend2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -131,7 +131,7 @@ public class Crumblz extends RobotPart {
         armExtend2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armRotate.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armExtend1.setDirection(DcMotorSimple.Direction.FORWARD);
-        armExtend2.setDirection(DcMotorSimple.Direction.FORWARD);
+        armExtend2.setDirection(DcMotorSimple.Direction.REVERSE);
         armRotate.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // from ArmReza code seems do interact with RobotPart.java I don't know really
