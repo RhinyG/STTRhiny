@@ -106,7 +106,7 @@ public class SanderDrive {
         heading = getTargetHeading(current_target_heading);
         theta = Math.toRadians(90);
         k = 0.1;
-        odoDistances = calculateOdoDistance(x-cur_x,y-cur_y,k, Math.toRadians(-heading + 90));
+        odoDistances = calculateOdoDistance(x-cur_x,y-cur_y, Math.toRadians(-heading + 90));
         X = (int) odoDistances[1];
         Y = (int) odoDistances[0];
         target_x = (int) (X / CM_PER_TICK);
@@ -375,7 +375,7 @@ public class SanderDrive {
         BackR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    private double[] calculateOdoDistance(double x, double y, double k, double heading) {
+    private double[] calculateOdoDistance(double x, double y, double heading) {
         double[][] eMatrix = {{Math.cos(heading), -Math.sin(heading)}, {Math.sin(heading), Math.cos(heading)}};
         double phi = 0;
         double[] gradientPhi = {x, -y};

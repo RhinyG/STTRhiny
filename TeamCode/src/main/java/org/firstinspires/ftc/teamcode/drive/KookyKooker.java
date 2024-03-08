@@ -40,39 +40,29 @@ public class KookyKooker extends LinearOpMode {
     int holdSlides = 0;
     Crumblz.ArmExtendPos extendPos = ZERO;
     Crumblz.ArmRotatePos rotatePos = intakeGround;
-
     Crumblz.ClawPositions leftPos = openLeft, rightPos = openRight;
     double leftTime = 0, rightTime = 0, foldTime = 0;
-    OpenCvWebcam webcam = null;
     @Override
     public void runOpMode() throws InterruptedException {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        OpenCvWebcam camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam Left"), cameraMonitorViewId);
+        FtcDashboard.getInstance().startCameraStream(camera, 0);
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        camera.startStreaming(1280,720, OpenCvCameraRotation.UPRIGHT);
         drivetrain.init(hardwareMap);
         arm.init();
-        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam Left");
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                webcam.startStreaming(1280,720, OpenCvCameraRotation.UPRIGHT);
-            }
 
-            @Override
-            public void onError(int errorCode) {
-
-            }
-        });
         plane = hardwareMap.servo.get("plane");
 
         hook = hardwareMap.dcMotor.get("hook");
         hookServo = hardwareMap.servo.get("hookServo");
         hookServo.setPosition(0);
 
+        waitForStart();
         if (isStopRequested()) return;
 
-        while (true) {
+        while (opModeIsActive()) {
             double armRotatePower = gamepad1.right_trigger-gamepad1.left_trigger;
 
             double armExtendPower = -gamepad1.right_stick_y;
