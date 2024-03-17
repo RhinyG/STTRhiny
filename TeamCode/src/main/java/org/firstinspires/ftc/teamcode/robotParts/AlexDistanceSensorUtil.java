@@ -23,7 +23,6 @@ public class AlexDistanceSensorUtil extends RobotPart {
         sensorRange2 = map.get(DistanceSensor.class, "sensor_range_2");
     }
 
-
     public void workplease(Telemetry telemetry) {
 
         currentDistance1CM = sensorRange1.getDistance(DistanceUnit.CM);

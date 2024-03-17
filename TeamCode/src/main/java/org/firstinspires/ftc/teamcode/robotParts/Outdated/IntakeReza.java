@@ -29,6 +29,6 @@ public class IntakeReza extends RobotPart {
         } else {
             power = 0;
         }
-        crPower(power);
+        allCrPower(power);
     }
 }

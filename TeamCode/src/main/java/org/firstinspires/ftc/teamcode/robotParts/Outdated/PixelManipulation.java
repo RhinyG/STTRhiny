@@ -209,9 +209,9 @@ public class PixelManipulation extends RobotPart {
             }
             telemetry.addLine("down");
         } else if (position == 0 && currentPosLeft <= 0) {
-            setPower(0);
+            setAllPowers(0);
         } else {
-            setPower(0.01);
+            setAllPowers(0.01);
         }
         return distance;
     }
@@ -297,10 +297,10 @@ public class PixelManipulation extends RobotPart {
             int position = slides.getCurrentPosition();
 
             if (position <= lowerLimit && power <= 0) {
-                setPower(0);
+                setAllPowers(0);
             }
             else if (position >= upperLimit && power >= 0) {
-                setPower(0);
+                setAllPowers(0);
             } else {
                 slides.setPower(power);
             }

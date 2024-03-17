@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -441,18 +440,13 @@ public class MecanumDrivetrain {
     /**
      * This method uses the 2023 universal IMU code (works for both BHI260AP and BNO055 chips) and
      * the Control Hub's or Expansion Hub's IMU chip to figure out the robots heading. This value
-     * does not reset when switching from Autonomous to Tele-Op opmodes. We use this method for autonomous
-     * because we have more intuition with degrees.
+     * does not reset when switching from Autonomous to Tele-Op opmodes. We use this method because
+     * degrees are more intuitive than radians.
      * @return - Returns the robots current heading, in degrees.
      */
     public double getCurrentHeadingDegrees() {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         return (orientation.getYaw(AngleUnit.DEGREES));
-    }
-
-    //TODO:documentation
-    public void resetYaw() {
-        imu.resetYaw();
     }
 
     /**
@@ -475,5 +469,13 @@ public class MecanumDrivetrain {
         FrontR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         BackL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         BackR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
+    /**
+     * ResetYaw is one of the new IMU methods, and it resets the yaw of the robot. When implemented correctly,
+     * yaw is the only rotate axis you want to change.
+     */
+    public void resetYaw() {
+        imu.resetYaw();
     }
 }

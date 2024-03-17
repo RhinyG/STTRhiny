@@ -19,7 +19,7 @@ public class TournamentAuton extends LinearOpMode {
     int rotateGoal, slideGoal;
     @Override
     public void runOpMode() {
-        drive.init();
+        drive.initRobot();
         arm.init();
         camera.findScoringPosition(OpenCVTeamPropDetection.robotPositions.RedBackstage,hardwareMap);
 

@@ -21,7 +21,7 @@ public class FiftyFSM extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        drive.init();
+        drive.initRobot();
         arm.init();
         waitForStart();
         while (opModeIsActive()){

@@ -15,7 +15,7 @@ public class BlueBackstage extends LinearOpMode {
     PixelManipulation slides = new PixelManipulation(this);
 
     public void runOpMode() {
-        methods.init();
+        methods.initRobot();
         slides.init(hardwareMap, telemetry);
         methods.calibrateEncoders();
         methods.resetYaw();

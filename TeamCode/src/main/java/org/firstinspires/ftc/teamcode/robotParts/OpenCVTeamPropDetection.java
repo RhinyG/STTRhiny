@@ -67,14 +67,15 @@ public class OpenCVTeamPropDetection {
         robotPositions robotPos;
         brightnessPipeline(robotPositions robotPosition){robotPos = robotPosition;}
         Mat HSV = new Mat();
-        Rect pos0LeftRect = new Rect(190,330, 200, 220);
-        Rect pos0RightRect = new Rect(690, 220, 180, 220);
-        Rect pos1LeftRect = new Rect(390,270, 190, 210);
-        Rect pos1RightRect = new Rect(960, 220, 200, 225);
-        Rect pos2LeftRect = new Rect(390,310, 180, 199);
-        Rect pos2RightRect = new Rect(820, 430, 220, 240);
-        Rect pos3LeftRect = new Rect(80,340, 200, 230);
-        Rect pos3RightRect = new Rect(660, 360, 190, 210);
+        Rect
+            pos0LeftRect = new Rect(190,330, 200, 220),
+            pos0RightRect = new Rect(690, 220, 180, 220),
+            pos1LeftRect = new Rect(390,270, 190, 210),
+            pos1RightRect = new Rect(960, 220, 200, 225),
+            pos2LeftRect = new Rect(390,310, 180, 199),
+            pos2RightRect = new Rect(820, 430, 220, 240),
+            pos3LeftRect = new Rect(80,340, 200, 230),
+            pos3RightRect = new Rect(660, 360, 190, 210);
         Mat outPut = new Mat();
         Scalar redColor = new Scalar(255.0, 0.0, 0.0);
         Scalar greenColor = new Scalar(0.0, 255.0, 0.0);
@@ -82,11 +83,9 @@ public class OpenCVTeamPropDetection {
             Imgproc.cvtColor(input, HSV, Imgproc.COLOR_RGB2HSV);
 
             input.copyTo(outPut);
-            Mat leftCrop;
-            Mat rightCrop;
+            Mat leftCrop,rightCrop;
 
-            Rect leftRect = pos0LeftRect;
-            Rect rightRect = pos0RightRect;
+            Rect leftRect = pos0LeftRect,rightRect = pos0RightRect;
 
             if (robotPos == robotPositions.RedWing) {
                 leftRect = pos3LeftRect;
@@ -109,8 +108,7 @@ public class OpenCVTeamPropDetection {
             Core.extractChannel(leftCrop, leftCrop, 1);
             Core.extractChannel(rightCrop, rightCrop, 1);
 
-            Scalar leftAvg = Core.mean(leftCrop);
-            Scalar rightAvg = Core.mean(rightCrop);
+            Scalar leftAvg = Core.mean(leftCrop),rightAvg = Core.mean(rightCrop);
 
             leftAvgFin = leftAvg.val[0];
             rightAvgFin = rightAvg.val[0];

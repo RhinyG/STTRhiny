@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+//TODO: what does extends do? Can you use that instead of a constructor?
 public class Crumblz extends RobotPart {
 //TODO: explain variables
     private final LinearOpMode myOpMode;
@@ -238,9 +239,9 @@ public class Crumblz extends RobotPart {
             }
             telemetry.addLine("down");
         } else if (position == 0 && currentPosLeft <= 0) {
-            setPower(0);
+            setAllPowers(0);
         } else {
-            setPower(0.01);
+            setAllPowers(0.01);
         }
         return distance;
     }

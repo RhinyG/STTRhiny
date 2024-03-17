@@ -25,7 +25,7 @@ public class SixtyRed extends LinearOpMode {
             slideGoal;
     @Override
     public void runOpMode() {
-        drive.init();
+        drive.initRobot();
         arm.init();
 //        camera.findScoringPosition(OpenCVTeamPropDetection.robotPositions.RedBackstage,hardwareMap);
         PIDController controller = new PIDController(p, i, d);

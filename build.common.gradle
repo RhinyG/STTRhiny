@@ -51,7 +51,6 @@ android {
         noCompress "tflite"
     }
 
-    //TODO: import Acme dashboard
     defaultConfig {
         signingConfig signingConfigs.debug
         applicationId 'com.qualcomm.ftcrobotcontroller'

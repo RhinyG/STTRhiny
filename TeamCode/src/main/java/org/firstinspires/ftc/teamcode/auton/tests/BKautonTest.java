@@ -15,7 +15,7 @@ public class BKautonTest extends LinearOpMode {
     Crumblz arm = new Crumblz(this);
 
     public void runOpMode() {
-        drive.init();
+        drive.initRobot();
         arm.init();
         drive.calibrateEncoders();
         drive.resetYaw();

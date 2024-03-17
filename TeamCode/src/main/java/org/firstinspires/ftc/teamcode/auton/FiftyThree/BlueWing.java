@@ -27,7 +27,7 @@ public class BlueWing extends LinearOpMode {
             slideSpeed = 0.7;
     @Override
     public void runOpMode() {
-        drive.init();
+        drive.initRobot();
         arm.init();
         camera.findScoringPosition(OpenCVTeamPropDetection.robotPositions.BlueWing,hardwareMap);
         PIDController controller = new PIDController(p, i, d);

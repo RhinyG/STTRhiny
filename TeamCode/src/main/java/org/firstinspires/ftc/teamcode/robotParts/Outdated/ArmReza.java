@@ -82,9 +82,9 @@ public class ArmReza extends RobotPart {
             }
             telemetry.addLine("down");
         } else if (position == 0 && currentPos <= 0) {
-            setPower(0);
+            setAllPowers(0);
         } else {
-            setPower(0.01);
+            setAllPowers(0.01);
         }
         return distance;
     }
@@ -93,10 +93,10 @@ public class ArmReza extends RobotPart {
         int position = armLeft.getCurrentPosition();
 
         if (position <= 0 && power <= 0) {
-            setPower(0);
+            setAllPowers(0);
         }
         else if (position >= upperLimit && power >= 0) {
-            setPower(0.001);
+            setAllPowers(0.001);
         } else {
             armLeft.setPower(power + 0.01);
             armRight.setPower((power) * rightMultiplier + 0.01);
@@ -111,10 +111,10 @@ public class ArmReza extends RobotPart {
         int position = armLeft.getCurrentPosition();
 
         if (position <= 0 && power <= 0) {
-            setPower(0);
+            setAllPowers(0);
         }
         else if (position >= upperLimit && power >= 0) {
-            setPower(0.001);
+            setAllPowers(0.001);
         } else {
             armLeft.setPower(power + 0.01);
             armRight.setPower((power) * rightMultiplier + 0.01);
@@ -145,10 +145,10 @@ public class ArmReza extends RobotPart {
             int position = armLeft.getCurrentPosition();
 
             if (position <= 0 && power <= 0) {
-                setPower(0);
+                setAllPowers(0);
             }
             else if (position >= upperLimit && power >= 0) {
-                setPower(0.001);
+                setAllPowers(0.001);
             } else {
                 armLeft.setPower(power + 0.01);
                 armRight.setPower((power) * rightMultiplier + 0.01);

@@ -1,24 +1,21 @@
 package org.firstinspires.ftc.teamcode.robotParts;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class RobotPart {
-
-    protected Telemetry.Item telemetry;
-
-    protected Map<String, DcMotorEx> motors = new HashMap<String, DcMotorEx>();
-    protected Map<String, Servo> servos = new HashMap<String, Servo>();
-    protected Map<String, CRServo> crServos = new HashMap<String, CRServo>();
-
-
+//TODO: rename
+public abstract class RobotPart extends LinearOpMode {
+    protected Map<String, DcMotorEx> motors = new HashMap<>();
+    protected Map<String, Servo> servos = new HashMap<>();
+    protected Map<String, CRServo> crServos = new HashMap<>();
+    IMU imu;
 
     public void resetEncoders() {
         for (DcMotorEx motor : motors.values()) {
@@ -27,16 +24,41 @@ public abstract class RobotPart {
         }
     }
 
-    public void setPower(double power) {
+    public void setAllPowers(double power) {
         for (DcMotorEx motor : motors.values()) {
             motor.setPower(power);
         }
     }
 
-    public void crPower(double power) {
+    public void allCrPower(double power) {
         for (CRServo servo : crServos.values()) {
             servo.setPower(power);
         }
     }
+    //TODO: documentation
+    public void initIMU(){
+        imu = hardwareMap.get(IMU.class, "imu");
 
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
+
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
+        resetYaw();
+    }
+    /**
+     * ResetYaw is one of the new IMU methods, and it resets the yaw of the robot. When implemented correctly,
+     * yaw is the only rotate axis you want to change.
+     */
+    public void resetYaw() {
+        imu.resetYaw();
+    }
+    //TODO: getCurrentHeadingRadians
+    //TODO: getCurrentHeadingDegrees
+    //TODO: calibrateEncoders
+    //TODO: stop
+    //TODO: checkDirection
+    //TODO: toPolar
+    //TODO: toCardinal
 }

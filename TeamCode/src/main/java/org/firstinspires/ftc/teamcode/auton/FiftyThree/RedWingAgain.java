@@ -27,7 +27,7 @@ public class RedWingAgain extends LinearOpMode {
             slideSpeed = 0.7;
     @Override
     public void runOpMode() {
-        drive.init();
+        drive.initRobot();
         arm.init();
         camera.findScoringPosition(OpenCVTeamPropDetection.robotPositions.RedWing,hardwareMap);
         PIDController controller = new PIDController(p, i, d);

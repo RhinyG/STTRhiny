@@ -106,9 +106,9 @@ public class OutdatedOuttake extends RobotPart {
             }
             telemetry.addLine("down");
         } else if (targetPosition == 0 && currentPos <= 0) {
-            setPower(0);
+            setAllPowers(0);
         } else {
-            setPower(0.01);
+            setAllPowers(0.01);
         }
     }
     /**

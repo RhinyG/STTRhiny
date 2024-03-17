@@ -74,9 +74,9 @@ public class ArmAlex extends RobotPart {
             }
             telemetry.addLine("down");
         } else if (position == 0 && currentPos <= 0) {
-            setPower(0);
+            setAllPowers(0);
         } else {
-            setPower(0.01);
+            setAllPowers(0.01);
         }
         return distance;
     }
@@ -85,10 +85,10 @@ public class ArmAlex extends RobotPart {
         int position = arm.getCurrentPosition();
 
         if (position <= 0 && power <= 0) {
-            setPower(0);
+            setAllPowers(0);
         }
         else if (position >= upperLimit && power >= 0) {
-            setPower(0.001);
+            setAllPowers(0.001);
         } else {
             arm.setPower(power + 0.01);
         }
@@ -101,10 +101,10 @@ public class ArmAlex extends RobotPart {
         int position = arm.getCurrentPosition();
 
         if (position <= 0 && power <= 0) {
-            setPower(0);
+            setAllPowers(0);
         }
         else if (position >= upperLimit && power >= 0) {
-            setPower(0.001);
+            setAllPowers(0.001);
         } else {
             arm.setPower(power + 0.01);
         }
@@ -133,10 +133,10 @@ public class ArmAlex extends RobotPart {
             int position = arm.getCurrentPosition();
 
             if (position <= 0 && power <= 0) {
-                setPower(0);
+                setAllPowers(0);
             }
             else if (position >= upperLimit && power >= 0) {
-                setPower(0.001);
+                setAllPowers(0.001);
             } else {
                 arm.setPower(power + 0.01);
             }

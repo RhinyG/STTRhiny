@@ -25,7 +25,7 @@ public class DemoAuton extends LinearOpMode {
     @Override
     public void runOpMode() {
         //TODO: explain init
-        drive.init();
+        drive.initRobot();
         arm.init();
 
         //TODO: explain

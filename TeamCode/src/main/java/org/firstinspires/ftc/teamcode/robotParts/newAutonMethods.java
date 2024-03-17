@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+//TODO: rename to MecanumDrivetrain or make that work like this
 public class newAutonMethods {
     //TODO: explain variables
     private final LinearOpMode myOpMode;
@@ -48,13 +49,14 @@ public class newAutonMethods {
     public newAutonMethods(LinearOpMode opmode) {
         myOpMode = opmode;
         telemetry = opmode.telemetry;
+        //TODO: multipleTelemetry
         map = opmode.hardwareMap;
     }
 
     /**
      * This methods initialises the mecanum drivetrain and the IMU and sets all the directions and modes to their correct settings.
      */
-    public void init() {
+    public void initRobot() {
         imu = myOpMode.hardwareMap.get(IMU.class, "imu");
 
         //TODO: see what happens if you change this to DcMotorEx
@@ -198,6 +200,9 @@ public class newAutonMethods {
     public void drive(double x, double y, double stopTime){drive(x, y, 0.7, stopTime);}
 
     //TODO: documentation
+    //TODO: change FWD, STR, ROT to PID
+    //TODO: global coordinates
+    //TODO: change heading during drive
     public void drive(double x, double y, double max_speed, double stopTime) {
         switch (driveState) {
             case 0:

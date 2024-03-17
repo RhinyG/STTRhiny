@@ -159,9 +159,9 @@ public class OuttakeSingleSlide extends RobotPart {
             }
             telemetry.addLine("down");
         } else if (position == 0 && currentPosLeft <= 0) {
-            setPower(0);
+            setAllPowers(0);
         } else {
-            setPower(0.01);
+            setAllPowers(0.01);
         }
         //so delete this then
         if (currentPosRight < position) {
@@ -179,9 +179,9 @@ public class OuttakeSingleSlide extends RobotPart {
             }
             telemetry.addLine("down");
         } else if (position == 0 && currentPosRight <= 0) {
-            setPower(0);
+            setAllPowers(0);
         } else {
-            setPower(0.01);
+            setAllPowers(0.01);
         }
         return distanceLeft;
     }
@@ -208,12 +208,12 @@ public class OuttakeSingleSlide extends RobotPart {
             int position = slideLeft.getCurrentPosition();
 
             if (position <= lowerLimit && power <= 0) {
-                setPower(0);
+                setAllPowers(0);
             }
             else if (position >= upperLimit && power >= 0) {
-                setPower(0);
+                setAllPowers(0);
             } else {
-                setPower(power);
+                setAllPowers(power);
             }
             telemetry.addData("arm", position);
             telemetry.addData("arm power", slideLeft.getPower());
