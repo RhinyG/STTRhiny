@@ -6,7 +6,7 @@
 //
 //import org.firstinspires.ftc.teamcode.robotParts.Crumblz;
 //import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
-//@Autonomous(name = "FSM Test", group = "Test")
+//@Autonomous(name = "FSM Test", group = "Tests")
 //public class FSMTest extends LinearOpMode {
 //    newAutonMethods drive = new newAutonMethods(this);
 //    Crumblz arm = new Crumblz(this);
@@ -21,8 +21,8 @@
 //
 //    @Override
 //    public void runOpMode() {
-//        drive.init(hardwareMap);
-//        arm.init(hardwareMap);
+//        drive.initRobot();
+//        arm.init();
 //        PIDController controller = new PIDController(p, i, d);
 //
 //        //44.5

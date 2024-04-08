@@ -6,7 +6,7 @@
 //import org.firstinspires.ftc.teamcode.robotParts.OpenCVTeamPropDetection;
 //import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 //
-//@Autonomous(name = "Dean OpenCV Test", group = "Test")
+//@Autonomous(name = "Dean OpenCV Test", group = "Tests")
 //public class DeanAtHomeTest extends LinearOpMode {
 //    newAutonMethods drive = new newAutonMethods(this);
 //    OpenCVTeamPropDetection camera = new OpenCVTeamPropDetection(this);

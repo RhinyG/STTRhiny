@@ -23,6 +23,10 @@ public class OuttakeSingleSlide extends RobotPart {
     int rotateCmdPass = 0;
     int slidesCmdPass = 0;
 
+    public void runOpMode() throws InterruptedException {
+
+    }
+
     public enum ArmHeight {
         INTAKE(0),
         BOTTOM(470),

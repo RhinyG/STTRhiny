@@ -38,4 +38,7 @@ public class AlexDistanceSensorUtil extends RobotPart {
         // veld is in inches dus ook beter om met inches te rekenen
     }
 
+    public void runOpMode() throws InterruptedException {
+
+    }
 }

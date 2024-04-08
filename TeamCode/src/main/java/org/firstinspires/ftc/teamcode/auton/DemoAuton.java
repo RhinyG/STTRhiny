@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 
 //TODO: add camera
 @Disabled
-@Autonomous(group = "Test")
+@Autonomous(group = "Tests")
 public class DemoAuton extends LinearOpMode {
     //TODO: explain this
     newAutonMethods drive = new newAutonMethods(this);

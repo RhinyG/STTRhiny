@@ -129,4 +129,8 @@ public class OutdatedOuttake extends RobotPart {
         updateLeftClaw(1);
         updateLeftRotate(2);
     }
+
+    public void runOpMode() throws InterruptedException {
+
+    }
 }

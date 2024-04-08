@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.robotParts.newAutonMethods;
 
 //TODO: add camera
 
-@Autonomous(group = "Test")
+@Autonomous(group = "Tests")
 public class FiftyFSM extends LinearOpMode {
     newAutonMethods drive = new newAutonMethods(this);
     Crumblz arm = new Crumblz(this);

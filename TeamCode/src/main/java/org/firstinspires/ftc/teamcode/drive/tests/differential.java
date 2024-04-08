@@ -8,20 +8,20 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.robotParts.DifferentialDrivetrain;
 @Config
-@TeleOp(group = "test")
+@TeleOp(group = "Tests")
 public class differential extends LinearOpMode {
 
     DifferentialDrivetrain drive = new DifferentialDrivetrain(this);
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        drive.initRobot();
+        drive.initRobot(hardwareMap);
 
         waitForStart();
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            drive.doubleJoyStickPID();
+            drive.singleJoyStickPID();
             telemetry.update();
         }
     }

@@ -31,4 +31,8 @@ public class IntakeReza extends RobotPart {
         }
         allCrPower(power);
     }
+
+    public void runOpMode() throws InterruptedException {
+
+    }
 }

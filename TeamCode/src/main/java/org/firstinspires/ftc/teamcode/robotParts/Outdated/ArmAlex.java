@@ -18,6 +18,11 @@ public class ArmAlex extends RobotPart {
 
     ArmHeightAlex armHeight;
 
+
+    public void runOpMode() throws InterruptedException {
+
+    }
+
     public enum ArmHeightAlex {
         INTAKE2(0),
         LOW(1400),

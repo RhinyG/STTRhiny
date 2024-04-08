@@ -5,13 +5,14 @@ import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.gr
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.openLeft;
 import static org.firstinspires.ftc.teamcode.robotParts.Crumblz.ClawPositions.openRight;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.robotParts.Crumblz;
 import org.firstinspires.ftc.teamcode.robotParts.MecanumDrivetrain;
-
+@Disabled
 @TeleOp(name = "Secret Technique No Jutsu")
 public class SecretTechniqueNoJutsu extends LinearOpMode {
 

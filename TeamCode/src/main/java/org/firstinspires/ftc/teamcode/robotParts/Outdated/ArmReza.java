@@ -19,6 +19,10 @@ public class ArmReza extends RobotPart {
 
     ArmHeight armHeight;
 
+    public void runOpMode() throws InterruptedException {
+
+    }
+
     public enum ArmHeight {
         INTAKE(0),
         LOW(1400),

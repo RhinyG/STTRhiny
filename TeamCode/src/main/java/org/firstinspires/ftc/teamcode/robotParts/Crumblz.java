@@ -109,10 +109,14 @@ public class Crumblz extends RobotPart {
         map = opmode.hardwareMap;
     }
 
+    public void runOpMode() throws InterruptedException {
+
+    }
+
     /**
      * This methods initialises the pixel manipulation mechanisms and sets all the directions and modes to their correct settings.
      */
-    public void init() {
+    public void waarinit() {
         elbow = myOpMode.hardwareMap.get(Servo.class,"elbow");
         clawLeft = myOpMode.hardwareMap.get(Servo.class, "clawLeft");
         clawRight = myOpMode.hardwareMap.get(Servo.class, "clawRight");

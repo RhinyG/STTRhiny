@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.robotParts.Outdated.SanderDrive;
 import java.util.List;
 
 //@Config
-@Autonomous(name = "SanderTest", group = "Test")
+@Autonomous(name = "SanderTest", group = "Tests")
 public class SanderTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

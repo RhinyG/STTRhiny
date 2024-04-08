@@ -22,6 +22,10 @@ public class PixelManipulation extends RobotPart {
     int upperLimit = 1000;
     int lowerLimit = 0;
 
+    public void runOpMode() throws InterruptedException {
+
+    }
+
     public enum ArmHeight {
         INTAKE(0),
         CHAINPOS(100),

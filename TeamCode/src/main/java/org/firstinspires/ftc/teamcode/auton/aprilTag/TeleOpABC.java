@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.auton.aprilTag;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -16,8 +17,8 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 
 import java.util.ArrayList;
-
-@TeleOp(group = "Test")
+@Disabled
+@TeleOp(group = "Tests")
 public class TeleOpABC extends LinearOpMode {
     newAutonMethods drive = new newAutonMethods(this);
     OpenCvCamera camera;

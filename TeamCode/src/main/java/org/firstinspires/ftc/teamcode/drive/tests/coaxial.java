@@ -8,18 +8,21 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.robotParts.CoaxialDrivetrain;
 @Config
-@TeleOp(group = "test")
+@TeleOp(group = "Tests")
 public class coaxial extends LinearOpMode {
     CoaxialDrivetrain drive = new CoaxialDrivetrain(this);
+
     @Override
     public void runOpMode() throws InterruptedException {
-        drive.initRobot();
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        drive.initRobot(hardwareMap);
 
         waitForStart();
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
             drive.fullDrivetrainSimple();
+            telemetry.update();
         }
     }
 }

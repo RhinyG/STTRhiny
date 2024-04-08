@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Config
 public class DifferentialDrivetrain extends RobotPart{
@@ -19,8 +20,10 @@ public class DifferentialDrivetrain extends RobotPart{
     int[] encoderPositions = {FBpos,FRpos,BBpos,BRpos};
     public static double pb = 0.0025, ib = 0.001, db = 0.00004, pr = 0.0025, ir = 0.001, dr = 0.00004;
     PIDController blueHeading = new PIDController(pb, ib, db), redHeading = new PIDController(pr,ir,dr);
+    LinearOpMode myOpMode;
     public DifferentialDrivetrain(LinearOpMode opmode) {
         telemetry = opmode.telemetry;
+        myOpMode = opmode;
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     }
 
@@ -28,7 +31,7 @@ public class DifferentialDrivetrain extends RobotPart{
      * This methods initialises the swerve drivetrain and the IMU and sets all the directions and modes to their correct settings.
      */
     //TODO: split into initAutonomous en initTeleOp
-    public void initRobot() {
+    public void initRobot(HardwareMap hardwareMap) {
         DTMotors = new DcMotorEx[]{FrontB, FrontR, BackB, BackR};
         for (int i = 0; i < DTMotors.length; i++) {
             DTMotors[i] = hardwareMap.get(DcMotorEx.class,DTMotorNames[i]);
@@ -41,15 +44,15 @@ public class DifferentialDrivetrain extends RobotPart{
             DTMotors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
 
-        initIMU();
+        initIMU(hardwareMap);
     }
     //TODO: documentation
     //TODO: in EN, then delete
     public void simple(){
-        double FWDB = gamepad1.left_stick_y;
-        double ROTB = -0.55 * gamepad1.left_stick_x;
-        double FWDR = gamepad1.right_stick_y;
-        double ROTR = -0.55 * gamepad1.right_stick_y;
+        double FWDB = myOpMode.gamepad1.left_stick_y;
+        double ROTB = -0.55 * myOpMode.gamepad1.left_stick_x;
+        double FWDR = myOpMode.gamepad1.right_stick_y;
+        double ROTR = -0.55 * myOpMode.gamepad1.right_stick_y;
         DTMotors[0].setPower(FWDB + ROTB);
         DTMotors[1].setPower(FWDR + ROTR);
         DTMotors[2].setPower(FWDB - ROTB);
@@ -57,18 +60,18 @@ public class DifferentialDrivetrain extends RobotPart{
     }
     //TODO: documentation
     public void lessSimple() {
-        x = gamepad1.left_stick_x;
-        y = -gamepad1.left_stick_y;
+        x = myOpMode.gamepad1.left_stick_x;
+        y = -myOpMode.gamepad1.left_stick_y;
         r = Math.sqrt(x * x + y * y);
         int Bpos = DTMotors[3].getCurrentPosition(),Fpos = -DTMotors[1].getCurrentPosition();
         redCurrentPos = Fpos - Bpos;
-        DTMotors[1].setPower(gamepad1.left_stick_y);
-        DTMotors[3].setPower(gamepad1.right_stick_y);
+        DTMotors[1].setPower(myOpMode.gamepad1.left_stick_y);
+        DTMotors[3].setPower(myOpMode.gamepad1.right_stick_y);
     }
     //TODO: documentation
     public void singleJoyStickPID() {
-        x = gamepad1.right_stick_x;
-        y = -gamepad1.right_stick_y;
+        x = myOpMode.gamepad1.right_stick_x;
+        y = -myOpMode.gamepad1.right_stick_y;
         r = Math.sqrt(x * x + y * y);
         for (int i = 0; i < DTMotors.length; i++) {
             encoderPositions[i] = DTMotors[i].getCurrentPosition();
@@ -77,7 +80,7 @@ public class DifferentialDrivetrain extends RobotPart{
         redCurrentPos = encoderPositions[1] - encoderPositions[3];
         blueCurrentPos = encoderPositions[0] - encoderPositions[2];
 
-        if (gamepad1.x) {
+        if (myOpMode.gamepad1.x) {
             for (DcMotorEx motor : DTMotors) {
                 motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -108,10 +111,10 @@ public class DifferentialDrivetrain extends RobotPart{
         DTMotors[3].setPower(-pidR + r);
     }
     public void doubleJoyStickPID() {
-        double xR = gamepad1.right_stick_x;
-        double xB = gamepad1.left_stick_x;
-        double yR = -gamepad1.right_stick_y;
-        double yB = -gamepad1.left_stick_y;
+        double xR = myOpMode.gamepad1.right_stick_x;
+        double xB = myOpMode.gamepad1.left_stick_x;
+        double yR = -myOpMode.gamepad1.right_stick_y;
+        double yB = -myOpMode.gamepad1.left_stick_y;
         double rR = Math.sqrt(xR * xR + yR * yR);
         double rB = Math.sqrt(xB * xB + yB * yB);
         for (int i = 0; i < DTMotors.length; i++) {
@@ -121,7 +124,7 @@ public class DifferentialDrivetrain extends RobotPart{
         redCurrentPos = encoderPositions[1] - encoderPositions[3];
         blueCurrentPos = encoderPositions[0] - encoderPositions[2];
 
-        if (gamepad1.x) {
+        if (myOpMode.gamepad1.x) {
             for (DcMotorEx motor : DTMotors) {
                 motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -162,5 +165,9 @@ public class DifferentialDrivetrain extends RobotPart{
         DTMotors[1].setPower(pidR + r);
         DTMotors[2].setPower(-pidB - r);
         DTMotors[3].setPower(-pidR + r);
+    }
+
+    public void runOpMode() throws InterruptedException {
+
     }
 }

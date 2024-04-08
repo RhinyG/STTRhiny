@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.drive;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.robotParts.MecanumDrivetrain;
-
-@TeleOp(name = "FieldCentric Test")
+@Disabled
+@TeleOp(name = "FieldCentric Test", group = "Tests")
 public class LM2FieldCentric extends LinearOpMode {
     MecanumDrivetrain drivetrain = new MecanumDrivetrain(this);
     @Override

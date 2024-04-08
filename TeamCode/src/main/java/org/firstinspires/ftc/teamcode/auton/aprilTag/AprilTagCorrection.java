@@ -16,7 +16,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "linearABC", group = "Test")
+@Autonomous(name = "linearABC", group = "Tests")
 public class AprilTagCorrection extends LinearOpMode {
     newAutonMethods drive = new newAutonMethods(this);
     OpenCvCamera camera;

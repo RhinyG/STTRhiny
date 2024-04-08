@@ -6,7 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @Config
-@TeleOp(group = "Test")
+@TeleOp(group = "Tests")
 public class GlobalCoordinates extends LinearOpMode {
     double k = 0.1, robotX = 0, robotY = 0, dX, dY;
     public static int startOffset = 0;

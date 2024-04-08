@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulati
 import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.ClawPositions.GRABTWO;
 import static org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation.ClawPositions.RELEASE;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -11,7 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.robotParts.Outdated.PixelManipulation;
 import org.firstinspires.ftc.teamcode.robotParts.MecanumDrivetrain;
-
+@Disabled
 @TeleOp(name = "LM2 RobotCentric")
 public class LM2RobotCentric extends LinearOpMode {
 

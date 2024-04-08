@@ -63,4 +63,8 @@ public class DrivetrainAlex extends RobotPart {
             leftBack.setPower(maxSpeed * (leftRearPower / maxPower));
         }
     }
+
+    public void runOpMode() throws InterruptedException {
+
+    }
 }

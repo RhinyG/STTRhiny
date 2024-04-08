@@ -220,4 +220,8 @@ public class RobotCentric extends RobotPart {
         imu = map.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
     }
+
+    public void runOpMode() throws InterruptedException {
+
+    }
 }

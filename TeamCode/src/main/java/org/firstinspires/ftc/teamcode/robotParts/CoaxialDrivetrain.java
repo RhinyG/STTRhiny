@@ -3,16 +3,17 @@ package org.firstinspires.ftc.teamcode.robotParts;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Config
-public abstract class CoaxialDrivetrain extends RobotPart{
+public class CoaxialDrivetrain extends RobotPart {
     double x, y, r, gamepadTheta, servoGoal, turn;
     public Servo servoFrontB,servoFrontR,servoBackB,servoBackR;
     public DcMotorEx FrontL,FrontR,BackL,BackR;
@@ -21,8 +22,9 @@ public abstract class CoaxialDrivetrain extends RobotPart{
     public Servo[] DTServos;
     String[] DTServoNames = {"front_left","front_right","back_left","back_right"};
     Telemetry telemetry;
+    LinearOpMode myOpMode;
     public CoaxialDrivetrain(LinearOpMode opmode) {
-        //TODO: find out why this NPE
+        myOpMode = opmode;
         telemetry = opmode.telemetry;
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     }
@@ -31,10 +33,10 @@ public abstract class CoaxialDrivetrain extends RobotPart{
      * This methods initialises the swerve drivetrain and the IMU and sets all the directions and modes to their correct settings.
      */
     //TODO: split into initAutonomous en initTeleOp
-    public void initRobot() {
+    public void initRobot(HardwareMap map) {
         DTMotors = new DcMotorEx[]{FrontL, FrontR, BackL, BackR};
         for (int i = 0; i < DTMotors.length; i++) {
-            DTMotors[i] = hardwareMap.get(DcMotorEx.class,DTMotorNames[i]);
+            DTMotors[i] = map.get(DcMotorEx.class,DTMotorNames[i]);
             if (i < 2){
                 DTMotors[i].setDirection(DcMotorSimple.Direction.FORWARD);
             } else {
@@ -46,20 +48,23 @@ public abstract class CoaxialDrivetrain extends RobotPart{
 
         DTServos = new Servo[]{servoFrontB,servoFrontR,servoBackB,servoBackR};
         for (int i = 0; i < DTServos.length; i++) {
-            DTServos[i] = hardwareMap.get(Servo.class,DTServoNames[i]);
+            DTServos[i] = map.get(Servo.class,DTServoNames[i]);
         }
-        initIMU();
+        initIMU(map);
+        DTMotors[3].setDirection(DcMotorSimple.Direction.REVERSE);
     }
-
+    public void resetYaw() {
+        imu.resetYaw();
+    }
     public void singlePodSimple(){
-        DTMotors[1].setPower(gamepad1.left_stick_y);
-        DTServos[1].setPosition(gamepad1.left_trigger);
+        DTMotors[1].setPower(myOpMode.gamepad1.left_stick_y);
+        DTServos[1].setPosition(myOpMode.gamepad1.left_trigger);
     }
     public void fullDrivetrainSimple(){
-        x = gamepad1.right_stick_x;
-        y = -gamepad1.right_stick_y;
+        x = myOpMode.gamepad1.left_stick_x;
+        y = -myOpMode.gamepad1.left_stick_y;
         r = Math.sqrt(x * x + y * y);
-        turn = gamepad1.right_trigger - gamepad1.left_trigger;
+        turn = myOpMode.gamepad1.right_trigger - myOpMode.gamepad1.left_trigger;
 
         if (x >= 0 && y >= 0) {
             gamepadTheta = Math.atan(y / x);
@@ -73,42 +78,52 @@ public abstract class CoaxialDrivetrain extends RobotPart{
             servoGoal = gamepadTheta/(2*Math.PI);
         }
 
-        if (gamepad1.x) {
+        if (myOpMode.gamepad1.x) {
             for (DcMotorEx motor : DTMotors) {
                 motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
         }
 
-        if (gamepadTheta < 0.25 * Math.PI) {
-            DTMotors[0].setPower(r + turn);
-            DTMotors[1].setPower(r + turn);
-            DTMotors[2].setPower(r - turn);
-            DTMotors[3].setPower(r - turn);
-        } else if (gamepadTheta < 0.75 * Math.PI) {
-            DTMotors[0].setPower(r + turn);
-            DTMotors[1].setPower(r - turn);
-            DTMotors[2].setPower(r + turn);
-            DTMotors[3].setPower(r - turn);
-        } else if (gamepadTheta < 1.25 * Math.PI) {
-            DTMotors[0].setPower(r - turn);
-            DTMotors[1].setPower(r - turn);
-            DTMotors[2].setPower(r + turn);
-            DTMotors[3].setPower(r + turn);
-        } else if (gamepadTheta < 1.75 * Math.PI) {
-            DTMotors[0].setPower(r - turn);
-            DTMotors[1].setPower(r + turn);
-            DTMotors[2].setPower(r - turn);
-            DTMotors[3].setPower(r + turn);
-        } else {
-            DTMotors[0].setPower(r + turn);
-            DTMotors[1].setPower(r + turn);
-            DTMotors[2].setPower(r - turn);
-            DTMotors[3].setPower(r - turn);
-        }
+//        if (gamepadTheta < 0.25 * Math.PI) {
+//            DTMotors[0].setPower(r + turn);
+//            DTMotors[1].setPower(r + turn);
+//            DTMotors[2].setPower(r - turn);
+//            DTMotors[3].setPower(r - turn);
+//        } else if (gamepadTheta < 0.75 * Math.PI) {
+//            DTMotors[0].setPower(r + turn);
+//            DTMotors[1].setPower(r - turn);
+//            DTMotors[2].setPower(r + turn);
+//            DTMotors[3].setPower(r - turn);
+//        } else if (gamepadTheta < 1.25 * Math.PI) {
+//            DTMotors[0].setPower(r - turn);
+//            DTMotors[1].setPower(r - turn);
+//            DTMotors[2].setPower(r + turn);
+//            DTMotors[3].setPower(r + turn);
+//        } else if (gamepadTheta < 1.75 * Math.PI) {
+//            DTMotors[0].setPower(r - turn);
+//            DTMotors[1].setPower(r + turn);
+//            DTMotors[2].setPower(r - turn);
+//            DTMotors[3].setPower(r + turn);
+//        } else {
+//            DTMotors[0].setPower(r + turn);
+//            DTMotors[1].setPower(r + turn);
+//            DTMotors[2].setPower(r - turn);
+//            DTMotors[3].setPower(r - turn);
+//        }
 
+        for (DcMotorEx motor : DTMotors) {
+            motor.setPower(r);
+        }
         for (Servo servo : DTServos) {
             servo.setPosition(servoGoal);
         }
+        telemetry.addData("servoGoal",servoGoal);
+        telemetry.addData("gamepadTheta",gamepadTheta);
+        telemetry.addData("turn",turn);
+        telemetry.addData("r",r);
+        telemetry.addData("x",x);
+        telemetry.addData("y",y);
     }
+    public void runOpMode() throws InterruptedException {}
 }

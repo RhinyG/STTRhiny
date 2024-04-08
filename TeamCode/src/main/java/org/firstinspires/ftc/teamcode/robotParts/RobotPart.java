@@ -5,13 +5,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import java.util.HashMap;
 import java.util.Map;
 
 //TODO: rename
-public abstract class RobotPart extends LinearOpMode {
+public abstract class RobotPart extends LinearOpMode {//TODO: extends OpMode, like PIDF_test
     protected Map<String, DcMotorEx> motors = new HashMap<>();
     protected Map<String, Servo> servos = new HashMap<>();
     protected Map<String, CRServo> crServos = new HashMap<>();
@@ -36,8 +37,8 @@ public abstract class RobotPart extends LinearOpMode {
         }
     }
     //TODO: documentation
-    public void initIMU(){
-        imu = hardwareMap.get(IMU.class, "imu");
+    public void initIMU(HardwareMap map){
+        imu = map.get(IMU.class, "imu");
 
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
         RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
