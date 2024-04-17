@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Config
 public class DifferentialDrivetrain extends RobotPart{
+    public static int rotations = 0;
     double x, y, r, gamepadTheta, pidR, pidB, TICKS_PER_ROTATION = 537.7/15*26;
     int redCurrentPos, blueCurrentPos, FBpos, FRpos,BBpos,BRpos, redHeadingGoal = 0, blueHeadingGoal = 0;
     public DcMotorEx FrontB,FrontR,BackB,BackR;
@@ -21,6 +22,7 @@ public class DifferentialDrivetrain extends RobotPart{
     public static double pb = 0.0025, ib = 0.001, db = 0.00004, pr = 0.0025, ir = 0.001, dr = 0.00004;
     PIDController blueHeading = new PIDController(pb, ib, db), redHeading = new PIDController(pr,ir,dr);
     LinearOpMode myOpMode;
+
     public DifferentialDrivetrain(LinearOpMode opmode) {
         telemetry = opmode.telemetry;
         myOpMode = opmode;
@@ -70,8 +72,8 @@ public class DifferentialDrivetrain extends RobotPart{
     }
     //TODO: documentation
     public void singleJoyStickPID() {
-        x = myOpMode.gamepad1.right_stick_x;
-        y = -myOpMode.gamepad1.right_stick_y;
+        x = myOpMode.gamepad1.left_stick_x;
+        y = -myOpMode.gamepad1.left_stick_y;
         r = Math.sqrt(x * x + y * y);
         for (int i = 0; i < DTMotors.length; i++) {
             encoderPositions[i] = DTMotors[i].getCurrentPosition();
@@ -95,9 +97,16 @@ public class DifferentialDrivetrain extends RobotPart{
             gamepadTheta = Math.atan(y / x) + 2 * Math.PI;
         }
 
-        if(r > 0.5){
+        if(r > 0.3){
             redHeadingGoal = (int) ((gamepadTheta-0.5*Math.PI)/(Math.PI)*TICKS_PER_ROTATION);
-            blueHeadingGoal = (int) ((gamepadTheta-0.5*Math.PI)/(Math.PI)*TICKS_PER_ROTATION);
+//            if ((redHeadingGoal - redCurrentPos) < TICKS_PER_ROTATION) {
+//                rotations++;
+//            }
+//            if (redHeadingGoal - redCurrentPos > -TICKS_PER_ROTATION) {
+//                rotations--;
+//            }
+            redHeadingGoal = (int) ((gamepadTheta-0.5*Math.PI)/(Math.PI)*TICKS_PER_ROTATION + rotations * 2 * TICKS_PER_ROTATION);
+            blueHeadingGoal = (int) ((gamepadTheta-0.5*Math.PI)/(Math.PI)*TICKS_PER_ROTATION + rotations * 2 * TICKS_PER_ROTATION);
         }
 
         redHeading.setPID(pr,ir,dr);
@@ -109,6 +118,10 @@ public class DifferentialDrivetrain extends RobotPart{
         DTMotors[1].setPower(pidR + r);
         DTMotors[2].setPower(-pidB - r);
         DTMotors[3].setPower(-pidR + r);
+        telemetry.addData("goal",redHeadingGoal);
+        telemetry.addData("pos",redCurrentPos);
+        telemetry.addData("diff",redHeadingGoal - redCurrentPos);
+        telemetry.addData("rots",rotations);
     }
     public void doubleJoyStickPID() {
         double xR = myOpMode.gamepad1.right_stick_x;
