@@ -9,8 +9,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.opencv.core.Mat;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +18,19 @@ public abstract class RobotPart extends LinearOpMode {//TODO: extends OpMode, li
     protected Map<String, Servo> servos = new HashMap<>();
     protected Map<String, CRServo> crServos = new HashMap<>();
     IMU imu;
+    DcMotorEx leftOdo,rightOdo,backOdo;
+    final double Lx = 0,Ly = 15,
+            Rx = 0,Ry = -15,
+            Bx = -15,By = 0,
+            WHEEL_RADIUS = 48,//mm
+            GEAR_RATIO = 1/13.7,
+            TICKS_PER_ROTATION = 8192,
+            odoMultiplier = (69.5/38.6),
+            ticksPerCM = odoMultiplier*(TICKS_PER_ROTATION)/(2*Math.PI * GEAR_RATIO * WHEEL_RADIUS); //about 690 ticks per centimeter
+    double oldX,oldY,oldTheta,currentX,currentY,currentTheta;
+    //pos is in ticks, rest in cm or radian.
+    double oldLPos, oldRPos, oldBPos, currentLPos, currentRPos, currentBPos, dL, dR, dB, relDX, relDY, rSTR, rFWD, dForward, dTheta, dStrafe;
+
 
     public void resetEncoders() {
         for (DcMotorEx motor : motors.values()) {
@@ -95,11 +106,81 @@ public abstract class RobotPart extends LinearOpMode {//TODO: extends OpMode, li
         double y = r * Math.sin(theta);
         return new double[]{x,y};
     }
+    //TODO: documentation, EN
+    //The Clueless linear odometry tracking equations
+    public double[] linearLocalization() {
+        oldTheta = currentTheta;
+        oldX = currentX;
+        oldY = currentY;
+        oldLPos = currentLPos;
+        oldRPos = currentRPos;
+        oldBPos = currentBPos;
+
+        currentLPos = leftOdo.getCurrentPosition();
+        currentRPos = rightOdo.getCurrentPosition();
+        currentBPos = backOdo.getCurrentPosition();
+
+        dR = (currentRPos - oldRPos) / ticksPerCM;
+        dL = (currentLPos - oldLPos) / ticksPerCM;
+        dB = (currentBPos - oldBPos) / ticksPerCM;
+
+        dForward = (dR * Ly - dL * Ry)/(Ly - Ry); //Robot centric variable. If Ly = Ry, this can be simplified to (dR + dL) / 2.
+        dTheta = (dR - dL)/(Ly - Ry);
+        dStrafe = dB - Bx * dTheta;
+
+        relDX = dForward;
+        relDY = dStrafe;
+
+        currentTheta = oldTheta + dTheta;
+        currentX = oldX + relDX * Math.cos(currentTheta) - relDY * Math.sin(currentTheta);
+        currentY = oldY + relDY * Math.cos(currentTheta) - relDX * Math.sin(currentTheta);
+
+        return new double[] {currentX, currentY, currentTheta};
+    }
+    //TODO: documentation, EN
+    //btw it's a constant velocity arc localization.
+    public double[] arcLocalization() {
+        oldTheta = currentTheta;
+        oldX = currentX;
+        oldY = currentY;
+        oldLPos = currentLPos;
+        oldRPos = currentRPos;
+        oldBPos = currentBPos;
+
+        currentLPos = leftOdo.getCurrentPosition();
+        currentRPos = rightOdo.getCurrentPosition();
+        currentBPos = backOdo.getCurrentPosition();
+
+        dR = (currentRPos - oldRPos) / ticksPerCM;
+        dL = (currentLPos - oldLPos) / ticksPerCM;
+        dB = (currentBPos - oldBPos) / ticksPerCM;
+
+        dForward = (dR * Ly - dL * Ry)/(Ly - Ry); //Robot centric variable. If Ly = Ry, this can be simplified to (dR + dL) / 2.
+        dTheta = (dR - dL)/(Ly - Ry);
+        dStrafe = dB - Bx * dTheta;
+
+        //If dTheta == 0, revert to linearLocalization because then you have a circle with infinite diameter, which it can't (because it divides by zero). Luckily a circle with infinite diameter is just a line.
+        if (dTheta == 0) {
+            relDX = dForward;
+            relDY = dStrafe;
+        } else {
+            rFWD = dForward / dTheta;
+            rSTR = dStrafe / dTheta;
+
+            relDX = rFWD * Math.sin(dTheta) - rSTR * (1 - Math.cos(dTheta));
+            relDY = rSTR * Math.sin(dTheta) + rFWD * (1 - Math.cos(dTheta));
+        }
+
+        currentTheta = oldTheta + dTheta;
+        currentX = oldX + relDX * Math.cos(currentTheta) - relDY * Math.sin(currentTheta);
+        currentY = oldY + relDY * Math.cos(currentTheta) - relDX * Math.sin(currentTheta);
+
+        return new double[] {currentX, currentY, currentTheta};
+    }
+    //TODO: new pathfinding algorithm
     //TODO: getCurrentHeadingRadians
     //TODO: getCurrentHeadingDegrees
     //TODO: calibrateEncoders
     //TODO: stop
     //TODO: checkDirection
-    //TODO: new tracking algorithm
-    //TODO: new pathfinding algorithm
 }

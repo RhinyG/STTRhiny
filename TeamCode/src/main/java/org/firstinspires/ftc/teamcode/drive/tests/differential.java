@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.robotParts.DifferentialDrivetrain;
 @Config
 @TeleOp(group = "Tests")
 public class differential extends LinearOpMode {
-
     DifferentialDrivetrain drive = new DifferentialDrivetrain(this);
     @Override
     public void runOpMode() throws InterruptedException {

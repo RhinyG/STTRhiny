@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robotParts;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -13,12 +14,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import java.util.Objects;
 
-public class MecanumDrivetrain {
+public class MecanumDrivetrain extends RobotPart{
     private final LinearOpMode myOpMode;
-    public DcMotor FrontL;
-    public DcMotor FrontR;
-    public DcMotor BackL;
-    public DcMotor BackR;
+    public DcMotorEx FrontL;
+    public DcMotorEx FrontR;
+    public DcMotorEx BackL;
+    public DcMotorEx BackR;
     double current_target_heading = 0;
     public IMU imu;
     double WHEEL_RADIUS = 48;//mm
@@ -37,10 +38,10 @@ public class MecanumDrivetrain {
     public void init(HardwareMap map) {
         imu = map.get(IMU.class, "imu");
 
-        FrontL = map.get(DcMotor.class, "left_front");
-        FrontR = map.get(DcMotor.class, "right_front");
-        BackL = map.get(DcMotor.class, "left_back");
-        BackR = map.get(DcMotor.class, "right_back");
+        FrontL = map.get(DcMotorEx.class, "left_front");
+        FrontR = map.get(DcMotorEx.class, "right_front");
+        BackL = map.get(DcMotorEx.class, "left_back");
+        BackR = map.get(DcMotorEx.class, "right_back");
 
 //        FrontL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        FrontR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -56,6 +57,9 @@ public class MecanumDrivetrain {
 //        FrontR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        BackL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        BackR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftOdo = FrontL;
+        rightOdo = FrontR;
+        backOdo = BackL;
 
         OURTICKS_PER_CM = odoMultiplier*(TICKS_PER_ROTATION)/(2*Math.PI * GEAR_RATIO * WHEEL_RADIUS);
 
@@ -267,6 +271,7 @@ public class MecanumDrivetrain {
         maxPower = Math.max(maxPower, Math.abs(BackRPower));
 
         //TODO: different motor power algorithm
+        //TODO: slowmode based on voltage sensor
         FrontL.setPower(FrontLPower/maxPower);
         FrontR.setPower(FrontRPower/maxPower);
         BackL.setPower(BackLPower/maxPower);
@@ -455,5 +460,10 @@ public class MecanumDrivetrain {
      */
     public void resetYaw() {
         imu.resetYaw();
+    }
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+
     }
 }
