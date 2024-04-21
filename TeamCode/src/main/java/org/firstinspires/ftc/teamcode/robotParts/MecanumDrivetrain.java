@@ -238,30 +238,6 @@ public class MecanumDrivetrain {
         else return 1;
     }
 
-    public void swerveSimple(){
-        FrontL.setPower(1*myOpMode.gamepad1.left_stick_y);
-        FrontR.setPower(1*myOpMode.gamepad1.left_stick_x);
-        BackL.setPower(1*myOpMode.gamepad1.right_stick_y);
-        BackR.setPower(1*myOpMode.gamepad1.right_stick_x);
-    }
-
-    public void swerveRobotCentric(){
-        double x = myOpMode.gamepad1.left_stick_x;
-        double y = -myOpMode.gamepad1.left_stick_y;
-        double r = Math.sqrt(x * x + y * y);
-        double theta;
-
-
-
-        if (x >= 0 && y >= 0) {
-            theta = Math.atan(y / x);
-        } else if (x<0) {
-            theta = Math.atan(y / x) + Math.PI;
-        } else {
-            theta = Math.atan(y / x) + 2 * Math.PI;
-        }
-    }
-
     /**
      * This method is for driving around in Tele-Op. RobotCentric drive means that directions are
      * relative to the robot. This might be slightly difficult to learn at first but it is not impossible
@@ -290,6 +266,7 @@ public class MecanumDrivetrain {
         maxPower = Math.max(maxPower, Math.abs(BackLPower));
         maxPower = Math.max(maxPower, Math.abs(BackRPower));
 
+        //TODO: different motor power algorithm
         FrontL.setPower(FrontLPower/maxPower);
         FrontR.setPower(FrontRPower/maxPower);
         BackL.setPower(BackLPower/maxPower);
@@ -402,6 +379,7 @@ public class MecanumDrivetrain {
         double BackLPower = ((-FWD - STR + ROT) * speed);
         double BackRPower = ((-FWD + STR - ROT) * speed);
 
+        //TODO: different motor power algorithm
         maxPower = Math.max(maxPower, Math.abs(FrontLPower));
         maxPower = Math.max(maxPower, Math.abs(FrontRPower));
         maxPower = Math.max(maxPower, Math.abs(BackLPower));
