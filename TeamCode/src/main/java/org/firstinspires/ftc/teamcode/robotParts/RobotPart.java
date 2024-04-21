@@ -100,4 +100,6 @@ public abstract class RobotPart extends LinearOpMode {//TODO: extends OpMode, li
     //TODO: calibrateEncoders
     //TODO: stop
     //TODO: checkDirection
+    //TODO: new tracking algorithm
+    //TODO: new pathfinding algorithm
 }
