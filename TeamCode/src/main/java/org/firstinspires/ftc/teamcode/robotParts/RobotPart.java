@@ -8,6 +8,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.opencv.core.Mat;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,11 +58,46 @@ public abstract class RobotPart extends LinearOpMode {//TODO: extends OpMode, li
     public void resetYaw() {
         imu.resetYaw();
     }
+    //TODO: documentation, EN
+    public double[] oldToPolar(double[] cartesian) {
+        return oldToPolar(cartesian[0],cartesian[1]);
+    }
+    //TODO: documentation, EN
+    public double[] oldToPolar(double x, double y) {
+        double r = Math.sqrt(x * x + y * y);
+        double theta;
+        if (x >= 0 && y >= 0) {
+            theta = Math.atan(y / x);
+        } else if (x<0) {
+            theta = Math.atan(y / x) + Math.PI;
+        } else {
+            theta = Math.atan(y / x) + 2 * Math.PI;
+        }
+        return new double[]{r,theta};
+    }
+    //TODO: documentation, EN
+    public double[] toPolar(double[] cartesian) {
+        return toPolar(cartesian[0],cartesian[1]);
+    }
+    //TODO: documentation, EN
+    public double[] toPolar(double x, double y) {
+        double r = Math.sqrt(x * x + y * y);
+        double theta = Math.atan2(y,x);
+        return new double[]{r,theta};
+    }
+    //TODO: documentation, EN
+    public double[] toCartesian(double[] polar) {
+        return toCartesian(polar[0],polar[1]);
+    }
+    //TODO: documentation, EN
+    public double[] toCartesian(double r, double theta) {
+        double x = r * Math.cos(theta);
+        double y = r * Math.sin(theta);
+        return new double[]{x,y};
+    }
     //TODO: getCurrentHeadingRadians
     //TODO: getCurrentHeadingDegrees
     //TODO: calibrateEncoders
     //TODO: stop
     //TODO: checkDirection
-    //TODO: toPolar
-    //TODO: toCardinal
 }

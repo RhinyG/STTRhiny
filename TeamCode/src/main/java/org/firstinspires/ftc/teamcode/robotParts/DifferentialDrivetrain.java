@@ -74,7 +74,9 @@ public class DifferentialDrivetrain extends RobotPart{
     public void singleJoyStickPID() {
         x = myOpMode.gamepad1.left_stick_x;
         y = -myOpMode.gamepad1.left_stick_y;
-        r = Math.sqrt(x * x + y * y);
+        r = toPolar(x,y)[0];
+        gamepadTheta = toPolar(x,y)[1];
+
         for (int i = 0; i < DTMotors.length; i++) {
             encoderPositions[i] = DTMotors[i].getCurrentPosition();
         }
@@ -89,15 +91,9 @@ public class DifferentialDrivetrain extends RobotPart{
             }
         }
 
-        if (x >= 0 && y >= 0) {
-            gamepadTheta = Math.atan(y / x);
-        } else if (x<0) {
-            gamepadTheta = Math.atan(y / x) + Math.PI;
-        } else {
-            gamepadTheta = Math.atan(y / x) + 2 * Math.PI;
-        }
 
         if(r > 0.3){
+            //TODO: stop rotation all the way back, maybe with gm0/FTClib button press to event?
             redHeadingGoal = (int) ((gamepadTheta-0.5*Math.PI)/(Math.PI)*TICKS_PER_ROTATION);
 //            if ((redHeadingGoal - redCurrentPos) < TICKS_PER_ROTATION) {
 //                rotations++;
@@ -128,8 +124,11 @@ public class DifferentialDrivetrain extends RobotPart{
         double xB = myOpMode.gamepad1.left_stick_x;
         double yR = -myOpMode.gamepad1.right_stick_y;
         double yB = -myOpMode.gamepad1.left_stick_y;
-        double rR = Math.sqrt(xR * xR + yR * yR);
-        double rB = Math.sqrt(xB * xB + yB * yB);
+        double rR = toPolar(xR,yR)[0];
+        double rB = toPolar(xB,yB)[0];
+        double thetaB = toPolar(xB,yB)[1];
+        double thetaR = toPolar(xR,yR)[1];
+
         for (int i = 0; i < DTMotors.length; i++) {
             encoderPositions[i] = DTMotors[i].getCurrentPosition();
         }
@@ -142,23 +141,6 @@ public class DifferentialDrivetrain extends RobotPart{
                 motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
-        }
-
-        double thetaB,thetaR;
-        if (xB >= 0 && yB >= 0) {
-            thetaB = Math.atan(yB / xB);
-        } else if (xB<0) {
-            thetaB = Math.atan(yB / xB) + Math.PI;
-        } else {
-            thetaB = Math.atan(yB / xB) + 2 * Math.PI;
-        }
-
-        if (xR >= 0 && yR >= 0) {
-            thetaR = Math.atan(yR / xR);
-        } else if (xR<0) {
-            thetaR = Math.atan(yR / xR) + Math.PI;
-        } else {
-            thetaR = Math.atan(yR / xR) + 2 * Math.PI;
         }
 
         if(rB > 0.5){
