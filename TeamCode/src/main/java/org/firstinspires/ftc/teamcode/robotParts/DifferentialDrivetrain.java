@@ -162,6 +162,8 @@ public class DifferentialDrivetrain extends RobotPart{
         DTMotors[3].setPower(-pidR + r);
     }
 
+    //TODO: motor power algorithm based off auton
+    
     public void runOpMode() throws InterruptedException {
 
     }
