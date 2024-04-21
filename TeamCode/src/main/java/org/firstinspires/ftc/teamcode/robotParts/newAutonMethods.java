@@ -242,6 +242,7 @@ public class newAutonMethods {
 
                     telemetry();
 
+                    //TODO: different motor power algorithm
                     FrontL.setPower(FWD + STR + ROT);
                     FrontR.setPower(FWD - STR - ROT);
                     BackL.setPower(FWD - STR + ROT);
@@ -307,6 +308,7 @@ public class newAutonMethods {
                         speed = 0.2;
                     }
 
+                    //TODO: different motor power algorithm
                     FrontL.setPower(-speed * direction);
                     FrontR.setPower(speed * direction);
                     BackL.setPower((-speed * direction));
