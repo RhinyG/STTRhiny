@@ -58,8 +58,8 @@ public class MecanumDrivetrain extends RobotPart{
 //        BackL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        BackR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftOdo = FrontL;
-        rightOdo = FrontR;
-        backOdo = BackL;
+        rightOdo = BackL;
+        backOdo = FrontR;
 
         OURTICKS_PER_CM = odoMultiplier*(TICKS_PER_ROTATION)/(2*Math.PI * GEAR_RATIO * WHEEL_RADIUS);
 

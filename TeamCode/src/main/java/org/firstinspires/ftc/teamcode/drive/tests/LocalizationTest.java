@@ -30,7 +30,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 import java.util.List;
 
 @Config
-@TeleOp(name = "Localization Test")
+@TeleOp(name = "Localization Test", group = "Tests")
 public class LocalizationTest extends LinearOpMode {
     MecanumDrivetrain drivetrain = new MecanumDrivetrain(this);
     double[] localization;
@@ -57,7 +57,10 @@ public class LocalizationTest extends LinearOpMode {
             telemetry.addData("rightBack",drivetrain.BackR.getPower());
             telemetry.addData("x",localization[0]);
             telemetry.addData("y",localization[1]);
-            telemetry.addData("heading",localization[2]);
+            telemetry.addData("heading",Math.toDegrees(localization[2]));
+            telemetry.addData("lPos",drivetrain.currentLPos);
+            telemetry.addData("rPos",drivetrain.currentRPos);
+            telemetry.addData("bPos",drivetrain.currentBPos);
             telemetry.update();
         }
     }

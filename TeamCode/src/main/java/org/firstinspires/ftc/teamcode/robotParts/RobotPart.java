@@ -19,17 +19,17 @@ public abstract class RobotPart extends LinearOpMode {//TODO: extends OpMode, li
     protected Map<String, CRServo> crServos = new HashMap<>();
     IMU imu;
     DcMotorEx leftOdo,rightOdo,backOdo;
-    final double Lx = 0,Ly = 15,
-            Rx = 0,Ry = -15,
-            Bx = -15,By = 0,
+    final double Lx = -7.2,Ly = 12.1,
+            Rx = -7.2,Ry = -12.1,
+            Bx = -16,By = 0,
             WHEEL_RADIUS = 48,//mm
             GEAR_RATIO = 1/13.7,
             TICKS_PER_ROTATION = 8192,
-            odoMultiplier = (69.5/38.6),
+            odoMultiplier = (72/38.6),
             ticksPerCM = odoMultiplier*(TICKS_PER_ROTATION)/(2*Math.PI * GEAR_RATIO * WHEEL_RADIUS); //about 690 ticks per centimeter
     double oldX,oldY,oldTheta,currentX,currentY,currentTheta;
     //pos is in ticks, rest in cm or radian.
-    double oldLPos, oldRPos, oldBPos, currentLPos, currentRPos, currentBPos, dL, dR, dB, relDX, relDY, rSTR, rFWD, dForward, dTheta, dStrafe;
+    public double oldLPos, oldRPos, oldBPos, currentLPos, currentRPos, currentBPos, dL, dR, dB, relDX, relDY, rSTR, rFWD, dForward, dTheta, dStrafe;
 
 
     public void resetEncoders() {
@@ -109,6 +109,10 @@ public abstract class RobotPart extends LinearOpMode {//TODO: extends OpMode, li
     //TODO: documentation, EN
     //The Clueless linear odometry tracking equations
     public double[] linearLocalization() {
+        //check directions are good
+        //check if cm is cm
+        //check theta by rotating 10x, if under 3600 degrees, track width needs to decrease.
+        //rotate, see if y returns to zero. If too high, increase/decrease abs(Bx)
         oldTheta = currentTheta;
         oldX = currentX;
         oldY = currentY;
@@ -116,7 +120,7 @@ public abstract class RobotPart extends LinearOpMode {//TODO: extends OpMode, li
         oldRPos = currentRPos;
         oldBPos = currentBPos;
 
-        currentLPos = leftOdo.getCurrentPosition();
+        currentLPos = -leftOdo.getCurrentPosition();
         currentRPos = rightOdo.getCurrentPosition();
         currentBPos = backOdo.getCurrentPosition();
 
@@ -147,7 +151,7 @@ public abstract class RobotPart extends LinearOpMode {//TODO: extends OpMode, li
         oldRPos = currentRPos;
         oldBPos = currentBPos;
 
-        currentLPos = leftOdo.getCurrentPosition();
+        currentLPos = -leftOdo.getCurrentPosition();
         currentRPos = rightOdo.getCurrentPosition();
         currentBPos = backOdo.getCurrentPosition();
 
