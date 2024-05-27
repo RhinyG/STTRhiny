@@ -69,7 +69,7 @@ public class MecanumDrivetrain extends RobotPart{
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
         imu.initialize(new IMU.Parameters(orientationOnRobot));
-        resetYaw();
+        imu.resetYaw();
     }
 
     /**
@@ -396,7 +396,7 @@ public class MecanumDrivetrain extends RobotPart{
         BackR.setPower(BackRPower/maxPower);
 
         if (myOpMode.gamepad1.right_bumper && myOpMode.gamepad1.left_bumper) {
-            resetYaw();
+            imu.resetYaw();
         }
         telemetry.addData("Current heading",getCurrentHeadingDegrees());
         telemetry.addData("maxPower",maxPower);//TODO: Igor says this felt slow, probably cause that gets too high, print it and look at it.
