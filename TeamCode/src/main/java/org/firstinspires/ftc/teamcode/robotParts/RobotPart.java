@@ -17,8 +17,8 @@ public abstract class RobotPart extends LinearOpMode {
     protected Map<String, DcMotorEx> motors = new HashMap<>();
     protected Map<String, Servo> servos = new HashMap<>();
     protected Map<String, CRServo> crServos = new HashMap<>();
-    IMU imu;
-    DcMotorEx leftOdo,rightOdo,backOdo;
+    public IMU imu;
+    public DcMotorEx leftOdo,rightOdo,backOdo;
     final double Lx = -7.2,Ly = 12.1,
             Rx = -7.2,Ry = -12.1,
             Bx = -16,By = 0,
@@ -192,7 +192,6 @@ public abstract class RobotPart extends LinearOpMode {
 
         return new double[] {currentX, currentY, currentTheta};
     }
-    //TODO: new pathfinding algorithm
     //TODO: getCurrentHeadingRadians
     //TODO: getCurrentHeadingDegrees
     //TODO: calibrateEncoders
