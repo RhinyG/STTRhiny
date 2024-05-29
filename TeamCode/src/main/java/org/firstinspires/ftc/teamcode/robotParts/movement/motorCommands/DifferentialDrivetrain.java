@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robotParts.movement.drive;
+package org.firstinspires.ftc.teamcode.robotParts.movement.motorCommands;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robotParts.movement;
+package org.firstinspires.ftc.teamcode.robotParts.movement.PID2Point;
 
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -7,9 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class pidFollower {
     Telemetry telemetry;
-    double
-            Kp = 0.05,
-            driveDistance,targetHeading,drivePower,driveAngle,rotatePower;
+    double driveDistance,targetHeading,drivePower,driveAngle,rotatePower;
     public static double driveP = 0.0025, driveI = 0.001, driveD = 0.00004, rotateP = 0.0025, rotateI = 0.001, rotateD = 0.00004;
     PIDController drive = new PIDController(driveP, driveI, driveD), rotate = new PIDController(rotateP,rotateI,rotateD);
     double[] position;
@@ -22,7 +20,6 @@ public class pidFollower {
         telemetry = opmode.telemetry;
         //TODO: multipleTelemetry
     }
-    localization odom = new localization();
     //TODO: documentation
     public double[] followPID(double x, double y, double heading) {
         return followPID(new double[]{x, y, heading});
