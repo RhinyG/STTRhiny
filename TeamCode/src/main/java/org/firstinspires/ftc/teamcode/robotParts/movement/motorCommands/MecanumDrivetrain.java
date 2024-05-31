@@ -22,11 +22,11 @@ public class MecanumDrivetrain extends RobotPart {
             xConstant = toCartesian(1,angle)[0],
             yConstant = toCartesian(1,angle)[1];
     double minYValue,powerMultiplier,maxPower;
-    double[] motorPowers = {0,0,0,0};
-
-    Vector2d baseLVector = new Vector2d(xConstant, yConstant);
-    Vector2d baseRVector = new Vector2d(-xConstant, yConstant);
-    Vector2d LVector,RVector,sumVector,checkVector = new Vector2d();
+    double[]
+            motorPowers = {0,0,0,0},
+            baseLVector = toPolar(xConstant, yConstant),
+            baseRVector = toPolar(-xConstant, yConstant),
+            LVector,RVector,sumVector,checkVector;
 
     public MecanumDrivetrain(LinearOpMode opmode) {
         telemetry = opmode.telemetry;
@@ -59,60 +59,59 @@ public class MecanumDrivetrain extends RobotPart {
         }
     }
 
-    public void drive(Vector2d drivePower, double rotatePower) {
-        LVector = baseLVector;
-        RVector = baseRVector;
-        LVector = LVector.rotateBy(-drivePower.angle());
-        RVector = RVector.rotateBy(-drivePower.angle());
-        if (Math.abs(LVector.angle()) > 0.5 * Math.PI) {
-            LVector = LVector.unaryMinus();
+    public void drive(double[] drivePower, double rotatePower) {
+        LVector = new double[]{baseLVector[0],baseLVector[1]-drivePower[1]};
+        RVector = new double[]{baseRVector[0],baseRVector[1]-drivePower[1]};
+
+        telemetry.addData("drivePower r",drivePower[0]);
+        telemetry.addData("drivePower theta",drivePower[1]);
+        telemetry.addData("L rotate X",LVector[0]);
+        telemetry.addData("L rotate Y",LVector[1]);
+        telemetry.addData("R rotate X",RVector[0]);
+        telemetry.addData("R rotate Y",RVector[1]);
+
+        if (LVector[1] > 0.5 * Math.PI) {
+            LVector[1] -= Math.PI;
+        } else if (LVector[1] < -0.5 * Math.PI) {
+            LVector[1] += Math.PI;
         }
-        if (Math.abs(RVector.angle()) > 0.5 * Math.PI) {
-            RVector = RVector.unaryMinus();
+        if (RVector[1] > 0.5 * Math.PI) {
+            RVector[1] -= Math.PI;
+        } else if (RVector[1] < -0.5 * Math.PI) {
+            RVector[1] += Math.PI;
         }
 
-        minYValue = Math.min(LVector.getY(),RVector.getY());
-        LVector = LVector.scale(minYValue/LVector.getY());
-        RVector = RVector.scale(minYValue/RVector.getY());
+        minYValue = Math.min(Math.abs(toCartesian(LVector)[1]),Math.abs(toCartesian(RVector)[1]));
+        LVector[0] *= minYValue/LVector[1];
+        RVector[0] *= minYValue/RVector[1];
 
-        sumVector = LVector.plus(LVector).plus(RVector).plus(RVector);
-        powerMultiplier = drivePower.magnitude()/sumVector.magnitude();
-        LVector = LVector.scale(powerMultiplier);
-        RVector = RVector.scale(powerMultiplier);
-        checkVector = sumVector.scale(powerMultiplier);
+        sumVector = toPolar(2 * toCartesian(LVector)[0] + 2 * toCartesian(RVector)[0],2 * toCartesian(LVector)[1] + 2 * toCartesian(RVector)[1]);
+        powerMultiplier = drivePower[0]/sumVector[0];
+        LVector[0] = LVector[0] * powerMultiplier;
+        RVector[0] = RVector[0] * powerMultiplier;
+        sumVector[0] = sumVector[0] * powerMultiplier;
 
-        motorPowers[0] = LVector.magnitude() - rotatePower;
-        motorPowers[1] = RVector.magnitude() + rotatePower;
-        motorPowers[2] = RVector.magnitude() - rotatePower;
-        motorPowers[3] = LVector.magnitude() + rotatePower;
+        telemetry.addData("checkVector r",sumVector[0]);
+        telemetry.addData("checkVector theta",sumVector[1]+drivePower[1]-0.5*Math.PI);
+
+        motorPowers[0] = LVector[0] - rotatePower;
+        motorPowers[1] = RVector[0] + rotatePower;
+        motorPowers[2] = RVector[0] - rotatePower;
+        motorPowers[3] = LVector[0] + rotatePower;
 
         maxPower = Math.max(Math.abs(motorPowers[0]),Math.abs(motorPowers[1]));
         maxPower = Math.max(maxPower,Math.abs(motorPowers[2]));
         maxPower = Math.max(maxPower,Math.abs(motorPowers[3]));
 
-        if (maxPower > 1) {
+        if (maxPower > drivePower[0]) {
             for (int i = 0; i < 4;i++) {
-                motorPowers[i] /= maxPower;
+                motorPowers[i] /= (maxPower*drivePower[0]);
             }
         }
-//        FrontL.setPower(motorPowers[0]);
-//        FrontR.setPower(motorPowers[1]);
-//        BackL.setPower(motorPowers[2]);
-//        BackR.setPower(motorPowers[3]);
-        telemetry.addData("baseL",baseLVector);
-        telemetry.addData("baseR",baseRVector);
-        telemetry.addData("LVector",LVector);
-        telemetry.addData("RVector",RVector);
-        telemetry.addData("drivePower",drivePower);
-        telemetry.addData("check",checkVector);
-        telemetry.addData("rotatePower",rotatePower);
-        telemetry.addData("minY",minYValue);
-        telemetry.addData("sum",sumVector);
-        telemetry.addData("maxpower",maxPower);
-        telemetry.addData("FL",motorPowers[0]);
-        telemetry.addData("FR",motorPowers[1]);
-        telemetry.addData("BL",motorPowers[2]);
-        telemetry.addData("BR",motorPowers[3]);
+        FrontL.setPower(motorPowers[0]);
+        FrontR.setPower(motorPowers[1]);
+        BackL.setPower(motorPowers[2]);
+        BackR.setPower(motorPowers[3]);
     }
 
     @Override

@@ -17,8 +17,8 @@ import java.util.List;
 @Config
 @TeleOp(name = "Mecanum drive Test", group = "Tests")
 public class MecanumDriveTest extends LinearOpMode {
-    double[] position;
-
+    Vector2d one, two, three = new Vector2d();
+    public static double a, b, c, d = 0;
     @Override
     public void runOpMode() throws InterruptedException {
         MecanumDrivetrain drive = new MecanumDrivetrain(this);
@@ -31,12 +31,12 @@ public class MecanumDriveTest extends LinearOpMode {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
+        drive.init(hardwareMap,false);
         waitForStart();
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            Vector2d vector = new Vector2d(gamepad1.left_stick_x,-gamepad1.left_stick_y);
-            drive.drive(vector,0);
+            drive.drive(drive.toPolar(gamepad1.left_stick_x,-gamepad1.left_stick_y),gamepad1.right_stick_x);
             telemetry.update();
         }
     }
