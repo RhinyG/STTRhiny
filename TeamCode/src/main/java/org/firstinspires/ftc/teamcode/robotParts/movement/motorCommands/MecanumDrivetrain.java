@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.robotParts.movement.motorCommands;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -14,19 +13,19 @@ import org.firstinspires.ftc.teamcode.robotParts.RobotPart;
 //TODO: is extends RobotPart really worth it/the proper way?
 public class MecanumDrivetrain extends RobotPart {
     public DcMotorEx FrontL, FrontR, BackL, BackR;
-//    public DcMotorEx[] motors = {FrontL,FrontR,BackL,BackR};
+    final double[] motorWeights = {1.0,1.0,1.0,1.0};
     LinearOpMode myOpMode;
 
     final double
             angle = Math.PI * 1/3,
             xConstant = toCartesian(1,angle)[0],
             yConstant = toCartesian(1,angle)[1];
-    double minYValue,powerMultiplier,maxPower;
+    double yL,yR,minYValue,powerMultiplier,maxPower;
     double[]
             motorPowers = {0,0,0,0},
             baseLVector = toPolar(xConstant, yConstant),
             baseRVector = toPolar(-xConstant, yConstant),
-            LVector,RVector,sumVector,checkVector;
+            LVector,RVector,sumVector;
 
     public MecanumDrivetrain(LinearOpMode opmode) {
         telemetry = opmode.telemetry;
@@ -36,7 +35,6 @@ public class MecanumDrivetrain extends RobotPart {
 
     /**
      * @param map - Gives a hardwareMap from the opmode for the method to use. Not having this parameter would result in an NPE.
-     *            This can alternatively be done with myOpMode.hardwareMap.get but that's longer so we don't.
      */
     public void init(HardwareMap map, boolean TeleOp) {
         FrontL = map.get(DcMotorEx.class, "left_front");
@@ -59,7 +57,76 @@ public class MecanumDrivetrain extends RobotPart {
         }
     }
 
-    public void drive(double[] drivePower, double rotatePower) {
+    public void unoptimizedDrive(double[] drivePower, double rotatePower) {
+        LVector = new double[]{baseLVector[0],baseLVector[1]-drivePower[1]};
+        RVector = new double[]{baseRVector[0],baseRVector[1]-drivePower[1]};
+
+//        System.out.println("drivePower r "+drivePower[0]);
+//        System.out.println("drivePower theta "+Math.toDegrees(drivePower[1]));
+//        System.out.println("L rotate r "+LVector[0]);
+//        System.out.println("L rotate theta "+Math.toDegrees(LVector[1]));
+//        System.out.println("R rotate r "+RVector[0]);
+//        System.out.println("R rotate theta "+Math.toDegrees(RVector[1]));
+
+        if (Math.abs(LVector[1]) > 0.5 * Math.PI) {
+            LVector[0] *= -1;
+        }
+        if (Math.abs(RVector[1]) > 0.5 * Math.PI) {
+            RVector[0] *= -1;
+        }
+
+//        System.out.println("L negate r "+LVector[0]);
+//        System.out.println("L negate theta "+Math.toDegrees(LVector[1]));
+//        System.out.println("R negate r "+RVector[0]);
+//        System.out.println("R negate theta "+Math.toDegrees(RVector[1]));
+
+        yL = Math.abs(toCartesian(LVector)[1]);
+        yR = Math.abs(toCartesian(RVector)[1]);
+        minYValue = Math.min(yL, yR);
+        LVector[0] *= minYValue/ yL;
+        RVector[0] *= minYValue/ yR;
+
+//        System.out.println("L y corrected r "+LVector[0]);
+//        System.out.println("L y corrected theta "+Math.toDegrees(LVector[1]));
+//        System.out.println("R y corrected r "+RVector[0]);
+//        System.out.println("R y corrected theta "+Math.toDegrees(RVector[1]));
+//        System.out.println("minL "+ yL);
+//        System.out.println("minR "+ yR);
+//        System.out.println("minY "+ minYValue);
+
+        sumVector = toPolar(2 * toCartesian(LVector)[0] + 2 * toCartesian(RVector)[0],2 * toCartesian(LVector)[1] + 2 * toCartesian(RVector)[1]);
+        powerMultiplier = 2*drivePower[0]/sumVector[0];
+        LVector[0] = LVector[0] * powerMultiplier;
+        RVector[0] = RVector[0] * powerMultiplier;
+        sumVector[0] = sumVector[0] * powerMultiplier;
+
+//        System.out.println("checkVector r "+sumVector[0]);
+//        System.out.println("checkVector theta "+Math.toDegrees(sumVector[1]+drivePower[1]));
+
+        motorPowers[0] = (LVector[0] - rotatePower) * motorWeights[0];
+        motorPowers[1] = (RVector[0] + rotatePower) * motorWeights[1];
+        motorPowers[2] = (RVector[0] - rotatePower) * motorWeights[2];
+        motorPowers[3] = (LVector[0] + rotatePower) * motorWeights[3];
+
+        maxPower = Math.max(Math.abs(motorPowers[0]),Math.abs(motorPowers[1]));
+        maxPower = Math.max(maxPower,Math.abs(motorPowers[2]));
+        maxPower = Math.max(maxPower,Math.abs(motorPowers[3]));
+
+//        System.out.println("max "+maxPower);
+
+        for (int i = 0; i < 4;i++) {
+            motorPowers[i] /= (maxPower*drivePower[0]);
+        }
+//        System.out.println("FL "+motorPowers[0]);
+//        System.out.println("FR "+motorPowers[1]);
+//        System.out.println("BL "+motorPowers[2]);
+//        System.out.println("BR "+motorPowers[3]);
+        FrontL.setPower(motorPowers[0]);
+        FrontR.setPower(motorPowers[1]);
+        BackL.setPower(motorPowers[2]);
+        BackR.setPower(motorPowers[3]);
+    }
+    public void driveBroken(double[] drivePower, double rotatePower) {
         LVector = new double[]{baseLVector[0],baseLVector[1]-drivePower[1]};
         RVector = new double[]{baseRVector[0],baseRVector[1]-drivePower[1]};
 
@@ -94,10 +161,10 @@ public class MecanumDrivetrain extends RobotPart {
         telemetry.addData("checkVector r",sumVector[0]);
         telemetry.addData("checkVector theta",sumVector[1]+drivePower[1]-0.5*Math.PI);
 
-        motorPowers[0] = LVector[0] - rotatePower;
-        motorPowers[1] = RVector[0] + rotatePower;
-        motorPowers[2] = RVector[0] - rotatePower;
-        motorPowers[3] = LVector[0] + rotatePower;
+        motorPowers[0] = (LVector[0] - rotatePower) * motorWeights[0];
+        motorPowers[1] = (RVector[0] + rotatePower) * motorWeights[1];
+        motorPowers[2] = (RVector[0] - rotatePower) * motorWeights[2];
+        motorPowers[3] = (LVector[0] + rotatePower) * motorWeights[3];
 
         maxPower = Math.max(Math.abs(motorPowers[0]),Math.abs(motorPowers[1]));
         maxPower = Math.max(maxPower,Math.abs(motorPowers[2]));
@@ -115,7 +182,5 @@ public class MecanumDrivetrain extends RobotPart {
     }
 
     @Override
-    public void runOpMode() throws InterruptedException {
-
-    }
+    public void runOpMode() {}
 }

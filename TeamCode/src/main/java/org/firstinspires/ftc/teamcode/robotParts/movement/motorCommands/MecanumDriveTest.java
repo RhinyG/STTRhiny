@@ -7,10 +7,6 @@ import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-
-import org.firstinspires.ftc.teamcode.robotParts.movement.Localization.localization;
 
 import java.util.List;
 
@@ -36,7 +32,7 @@ public class MecanumDriveTest extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            drive.drive(drive.toPolar(gamepad1.left_stick_x,-gamepad1.left_stick_y),gamepad1.right_stick_x);
+            drive.unoptimizedDrive(drive.toPolar(gamepad1.left_stick_x,-gamepad1.left_stick_y),gamepad1.right_stick_x);
             telemetry.update();
         }
     }
