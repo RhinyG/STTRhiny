@@ -17,6 +17,7 @@ public class MecanumDriveTest extends LinearOpMode {
     public static double a, b, c, d = 0;
     @Override
     public void runOpMode() throws InterruptedException {
+        double[] driveVector;
         MecanumDrivetrain drive = new MecanumDrivetrain(this);
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -32,7 +33,15 @@ public class MecanumDriveTest extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            drive.unoptimizedDrive(drive.toPolar(gamepad1.left_stick_x,-gamepad1.left_stick_y),gamepad1.right_stick_x);
+            driveVector = drive.toPolar(gamepad1.left_stick_x,-gamepad1.left_stick_y);
+            if (driveVector[1] > 1.5 * Math.PI) {
+                driveVector[1] -= 2 * Math.PI;
+            } else if (driveVector[1] <= -0.5 * Math.PI) {
+                driveVector[1] += 2 * Math.PI;
+            }
+            telemetry.addData("drive r ",driveVector[0]);
+            telemetry.addData("drive theta ",driveVector[1]);
+            drive.unoptimizedDrive(driveVector,gamepad1.right_stick_x);
             telemetry.update();
         }
     }

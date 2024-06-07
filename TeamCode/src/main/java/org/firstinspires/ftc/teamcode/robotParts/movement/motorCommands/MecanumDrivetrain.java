@@ -125,6 +125,10 @@ public class MecanumDrivetrain extends RobotPart {
         FrontR.setPower(motorPowers[1]);
         BackL.setPower(motorPowers[2]);
         BackR.setPower(motorPowers[3]);
+        telemetry.addData("FL",motorPowers[0]);
+        telemetry.addData("FR",motorPowers[1]);
+        telemetry.addData("BL",motorPowers[2]);
+        telemetry.addData("BR",motorPowers[3]);
     }
     public void driveBroken(double[] drivePower, double rotatePower) {
         LVector = new double[]{baseLVector[0],baseLVector[1]-drivePower[1]};

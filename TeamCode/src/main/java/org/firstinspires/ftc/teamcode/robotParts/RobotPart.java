@@ -80,13 +80,28 @@ public abstract class RobotPart extends LinearOpMode {
         return new double[]{r,theta};
     }
     //TODO: documentation, EN
+    public double[] toPolar(double[] cartesian, boolean normalise) {
+        return toPolar(cartesian[0],cartesian[1],normalise);
+    }
+    //TODO: documentation, EN
     public double[] toPolar(double[] cartesian) {
-        return toPolar(cartesian[0],cartesian[1]);
+        return toPolar(cartesian[0],cartesian[1],false);
     }
     //TODO: documentation, EN
     public double[] toPolar(double x, double y) {
+        return toPolar(x, y, false);
+    }
+    //TODO: documentation, EN
+    public double[] toPolar(double x, double y, boolean normalise) {
         double r = Math.sqrt(x * x + y * y);
         double theta = Math.atan2(y,x);
+        if (normalise) {
+            if (theta > Math.PI) {
+                theta -= 2 * Math.PI;
+            } else if (theta <= -Math.PI) {
+                theta += 2 * Math.PI;
+            }
+        }
         return new double[]{r,theta};
     }
     //TODO: documentation, EN
